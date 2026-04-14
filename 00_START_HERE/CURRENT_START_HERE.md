@@ -6,18 +6,18 @@ This folder was cleaned because older Jawab strategy files were mixed with curre
 
 These are the only files you should treat as `current`:
 
-- `01_Plans/Jawab_EXECUTION_DASHBOARD.html`
-- `01_Plans/00_JAWAB_LOCKED_PLAN.md`
-- `01_Plans/Jawab_CONTROL_TOWER.md`
-- `01_Plans/Jawab_EXECUTION_PLAYBOOK.md`
-- `02_Docs/Jawab_Outreach_Pack.md`
-- `02_Docs/Jawab_Morning_Send_Pack.md`
-- `02_Docs/Jawab_Tool_Access_Wishlist.md`
-- `03_Data/01_READY_TO_SEND_TOP30_WORKING.csv`
-- `05_System/Jawab_MAKE_BLUEPRINT.md`
-- `05_System/Jawab_AGENT_OPERATING_MODEL.md`
-- `05_System/Skill_Writer_System.md`
-- `06_Skills/SKILL_INDEX.md`
+- `01_Strategy/Jawab_EXECUTION_DASHBOARD.html`
+- `01_Strategy/00_JAWAB_LOCKED_PLAN.md`
+- `01_Strategy/Jawab_CONTROL_TOWER.md`
+- `01_Strategy/Jawab_EXECUTION_PLAYBOOK.md`
+- `02_Outreach_and_Data/Jawab_Outreach_Pack.md`
+- `02_Outreach_and_Data/Jawab_Morning_Send_Pack.md`
+- `02_Outreach_and_Data/Jawab_Tool_Access_Wishlist.md`
+- `02_Outreach_and_Data/01_READY_TO_SEND_TOP30_WORKING.csv`
+- `04_System_and_Skills/Jawab_MAKE_BLUEPRINT.md`
+- `04_System_and_Skills/Jawab_AGENT_OPERATING_MODEL.md`
+- `04_System_and_Skills/Skill_Writer_System.md`
+- `04_System_and_Skills/SKILL_INDEX.md`
 
 ## What Each Current File Is For
 
@@ -43,12 +43,12 @@ These are the only files you should treat as `current`:
   - orchestration and delegation model
 - `Skill_Writer_System.md`
   - the new filter-and-builder workflow for recurring Jawab tasks
-- `06_Skills/SKILL_INDEX.md`
+- `SKILL_INDEX.md`
   - project-local skill registry
 
 ## Archive Warning
 
-Everything inside `99_Archive_Historical` is:
+Everything inside `99_Archive` is:
 
 - older
 - exploratory
