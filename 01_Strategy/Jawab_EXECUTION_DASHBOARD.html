@@ -4,413 +4,294 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jawab Execution Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0b0d10;
-      --panel: #13171d;
-      --panel-2: #1a2028;
-      --line: #2a3442;
-      --text: #eef2f7;
-      --muted: #a7b1bf;
-      --gold: #d4af37;
-      --green: #35c46b;
-      --red: #ff6b6b;
-      --blue: #74b9ff;
+    :root{
+      --bg:#060708;--bg2:#0d1014;--panel:rgba(13,17,23,.82);--panel2:rgba(19,24,31,.92);
+      --line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.16);--text:#eef4fb;--muted:#93a0b4;
+      --gold:#d8b562;--goldSoft:rgba(216,181,98,.14);--blue:#87afff;--blueSoft:rgba(135,175,255,.12);
+      --green:#56db89;--greenSoft:rgba(86,219,137,.14);--shadow:0 30px 80px rgba(0,0,0,.42);--ease:cubic-bezier(.16,1,.3,1);
     }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: linear-gradient(180deg, #08090b 0%, #0f1318 100%);
-      color: var(--text);
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{
+      margin:0;color:var(--text);font-family:"Manrope",sans-serif;overflow-x:hidden;
+      background:
+        radial-gradient(circle at 0 0,rgba(135,175,255,.16),transparent 28%),
+        radial-gradient(circle at 100% 0,rgba(216,181,98,.18),transparent 24%),
+        linear-gradient(180deg,#050607 0%,#0a0d11 52%,#060708 100%);
     }
-
-    .wrap {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 24px;
+    body:before,body:after{
+      content:"";position:fixed;z-index:0;border-radius:50%;filter:blur(70px);opacity:.22;pointer-events:none;
+      width:34vw;height:34vw;animation:float 14s ease-in-out infinite;
     }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 18px;
-      margin-bottom: 18px;
+    body:before{top:-10vw;left:-8vw;background:rgba(135,175,255,.2)}
+    body:after{right:-10vw;bottom:-12vw;background:rgba(216,181,98,.2);animation-delay:-7s}
+    @keyframes float{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(2vw,1.2vw,0) scale(1.06)}}
+    .shell{position:relative;z-index:1;max-width:1420px;margin:0 auto;padding:22px 22px 36px}
+    .reveal{opacity:0;transform:translateY(18px) scale(.985);transition:opacity .75s var(--ease),transform .75s var(--ease)}
+    .reveal.in{opacity:1;transform:none}
+    .hero,.panel{
+      background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(20px);
     }
-
-    .card {
-      background: rgba(19, 23, 29, 0.95);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+    .hero{
+      overflow:hidden;border-radius:34px;padding:28px;margin-bottom:18px;
+      background:
+        linear-gradient(135deg,rgba(11,15,20,.95),rgba(17,22,29,.88)),
+        linear-gradient(120deg,rgba(135,175,255,.08),transparent 40%),
+        linear-gradient(160deg,transparent 58%,rgba(216,181,98,.09));
     }
-
-    h1, h2, h3, p { margin-top: 0; }
-
-    h1 {
-      font-size: 32px;
-      margin-bottom: 8px;
-      letter-spacing: -0.04em;
+    .hero:after{
+      content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent,rgba(255,255,255,.07),transparent);
+      transform:translateX(-120%);animation:sweep 10s linear infinite;pointer-events:none
     }
-
-    h2 {
-      font-size: 18px;
-      margin-bottom: 12px;
+    @keyframes sweep{from{transform:translateX(-120%)}to{transform:translateX(140%)}}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:26px}
+    .brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+    .brand-mark{font-family:"Cormorant Garamond",serif;font-size:clamp(34px,4vw,58px);line-height:.9;letter-spacing:-.05em}
+    .brand-mark span{color:var(--gold);margin-left:8px}
+    .brand-copy{max-width:560px;color:var(--muted);line-height:1.6}
+    .signals{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .signal,.chip,.tag{
+      display:inline-flex;align-items:center;gap:8px;border-radius:999px;border:1px solid var(--line);padding:9px 13px;
+      font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.03);color:var(--muted)
     }
-
-    .muted {
-      color: var(--muted);
+    .signal:before,.tag:before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 16px currentColor}
+    .signal.live{color:var(--green)} .tag.wa{color:#aaf0c1;background:var(--greenSoft)} .tag.ig{color:#bdd5ff;background:var(--blueSoft)} .tag.rule{color:#f0d48f;background:var(--goldSoft)}
+    .hero-grid{display:grid;grid-template-columns:1.25fr .95fr;gap:18px;align-items:end}
+    .kicker{display:inline-flex;align-items:center;gap:8px;color:var(--gold);font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:800;margin-bottom:12px}
+    .kicker:before{content:"";width:22px;height:1px;background:rgba(216,181,98,.9)}
+    h1{margin:0;font-size:clamp(34px,4.3vw,74px);line-height:.95;letter-spacing:-.06em;max-width:860px}
+    h1 strong{color:var(--gold)}
+    .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    .chip{font-weight:600;text-transform:none;letter-spacing:0;padding:10px 14px}
+    .quick{border-radius:24px;padding:18px;background:linear-gradient(180deg,rgba(8,11,16,.94),rgba(16,21,27,.86));border:1px solid var(--line);display:grid;gap:14px}
+    .quick-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--muted)}
+    .quick-value{font-size:26px;letter-spacing:-.04em;font-weight:800}
+    .rule-stack{display:grid;gap:10px}
+    .rule-item{padding:11px 12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.04);color:var(--muted)}
+    .rule-item b{color:var(--text)}
+    .layout{display:grid;grid-template-columns:1.16fr .84fr;gap:18px}
+    .stack{display:grid;gap:18px}
+    .panel{border-radius:28px;padding:20px;position:relative;overflow:hidden}
+    .panel:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.025),transparent 34%);pointer-events:none}
+    .panel-header{display:flex;justify-content:space-between;gap:16px;align-items:baseline;margin-bottom:16px}
+    h2{margin:0;font-size:20px;letter-spacing:-.04em}
+    .note{max-width:430px;color:var(--muted);font-size:13px;line-height:1.65}
+    .flow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+    .flow-block,.metric,.queue-card,.journal-card,.rule-box,.next-box,.connector,.task{
+      border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)
     }
-
-    .pill-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
-
-    .pill {
-      background: var(--panel-2);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .pill strong {
-      color: var(--text);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1.2fr 1.1fr;
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-
-    .subgrid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-
-    .checklist {
-      display: grid;
-      gap: 10px;
-    }
-
-    .checklist label {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      background: var(--panel-2);
-      border: 1px solid transparent;
-      border-radius: 12px;
-      padding: 10px 12px;
-    }
-
-    .checklist input[type="checkbox"] {
-      margin-top: 3px;
-      transform: scale(1.15);
-      accent-color: var(--gold);
-    }
-
-    .checklist label.done {
-      border-color: rgba(53, 196, 107, 0.35);
-      opacity: 0.82;
-    }
-
-    .queue {
-      display: grid;
-      gap: 10px;
-    }
-
-    .queue-item {
-      background: var(--panel-2);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px;
-    }
-
-    .queue-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-
-    .tag {
-      display: inline-block;
-      border-radius: 999px;
-      padding: 4px 10px;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-    }
-
-    .wa { background: rgba(53, 196, 107, 0.12); color: #9ef0bb; }
-    .ig { background: rgba(116, 185, 255, 0.12); color: #a8d3ff; }
-    .prio { background: rgba(212, 175, 55, 0.12); color: #f1d677; }
-
-    textarea, input[type="text"], input[type="number"] {
-      width: 100%;
-      background: #0d1117;
-      color: var(--text);
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font: inherit;
-    }
-
-    textarea {
-      min-height: 90px;
-      resize: vertical;
-    }
-
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-
-    .metric {
-      background: var(--panel-2);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px;
-    }
-
-    .metric label {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .list {
-      margin: 0;
-      padding-left: 18px;
-      color: var(--muted);
-    }
-
-    .status-good { color: var(--green); }
-    .status-warn { color: var(--gold); }
-    .status-bad { color: var(--red); }
-
-    .footer-note {
-      margin-top: 18px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    @media (max-width: 980px) {
-      .hero, .grid, .subgrid { grid-template-columns: 1fr; }
-      .metrics { grid-template-columns: 1fr 1fr; }
-    }
-
-    @media (max-width: 640px) {
-      .metrics, .two-col { grid-template-columns: 1fr; }
-      .wrap { padding: 14px; }
-    }
+    .flow-block{padding:14px}.flow-block h3{margin:0 0 8px;font-size:15px}.flow-block p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+    .checklist{display:grid;gap:10px}
+    .task{display:flex;gap:12px;align-items:flex-start;padding:14px;transition:.3s var(--ease)}
+    .task:hover{transform:translateX(2px)} .task.done{border-color:rgba(86,219,137,.34);background:rgba(86,219,137,.08)}
+    .task input{margin-top:3px;transform:scale(1.15);accent-color:var(--gold)}
+    .task strong{display:block;margin-bottom:4px;font-size:14px}.task span{color:var(--muted);font-size:13px;line-height:1.55}
+    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .metric{padding:14px;min-height:108px}
+    .metric label{display:block;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;margin-bottom:12px}
+    .metric input{width:100%;border:0;outline:0;background:transparent;color:var(--text);font:inherit}
+    .metric input[type=number]{font-size:34px;font-weight:800;letter-spacing:-.06em}.metric input[type=text]{font-size:14px;line-height:1.6}
+    .queue{display:grid;gap:10px}
+    .queue-card{padding:14px 16px;position:relative;overflow:hidden;transition:.28s var(--ease)}
+    .queue-card:hover{transform:translateY(-2px);border-color:rgba(216,181,98,.24)}
+    .queue-card:after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(216,181,98,.52),transparent);opacity:0;transition:.28s var(--ease)}
+    .queue-card:hover:after{opacity:1}
+    .queue-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:7px}
+    .queue-title{font-size:15px;font-weight:700;letter-spacing:-.03em}.queue-meta{margin:0;color:var(--muted);font-size:13px;line-height:1.56}
+    .journal{display:grid;gap:10px}.journal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .journal-card{padding:14px}.journal-card h3{margin:0 0 10px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.11em;text-transform:uppercase}
+    textarea{width:100%;min-height:124px;padding:0;border:0;outline:0;resize:vertical;background:transparent;color:var(--text);font:inherit;line-height:1.62}
+    .proof,.connectors,.rules,.next{display:grid;gap:10px}
+    .rule-box,.next-box,.connector{padding:12px 14px;color:var(--muted);line-height:1.56}
+    .rule-box strong,.next-box strong,.connector strong{color:var(--text)}
+    .connector{display:flex;justify-content:space-between;gap:12px;align-items:center}
+    .state{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.live{color:var(--green)} .soft{color:var(--gold)}
+    .footer{margin-top:18px;text-align:center;color:#708097;font-size:12px;letter-spacing:.04em}
+    @media (max-width:1120px){.hero-grid,.layout,.metrics,.flow,.journal-grid{grid-template-columns:1fr}.signals{justify-content:flex-start}}
+    @media (max-width:720px){.shell{padding:14px 14px 28px}.hero,.panel{padding:16px}.topbar{margin-bottom:20px}}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="hero">
-      <div class="card">
-        <h1>Jawab Execution Dashboard</h1>
-        <p class="muted">Run from this file. Do not drift. Ship before tweak, send before systems, collect replies before adding more tooling.</p>
-        <div class="pill-row">
-          <div class="pill"><strong>Offer:</strong> Recovery Sprint</div>
-          <div class="pill"><strong>Primary channel:</strong> WhatsApp first</div>
-          <div class="pill"><strong>Target:</strong> UAE dental clinics</div>
-          <div class="pill"><strong>Upsell first:</strong> Consult follow-up</div>
+  <div class="shell">
+    <section class="hero reveal">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-mark">Jawab <span>جواب</span></div>
+          <div class="brand-copy">A cleaner, more premium operator cockpit for the Recovery Sprint. Same core logic. Faster eyes. Better rhythm.</div>
+        </div>
+        <div class="signals">
+          <div class="signal live">Active sprint</div>
+          <div class="signal">UAE first</div>
+          <div class="signal">WhatsApp first</div>
         </div>
       </div>
-      <div class="card">
-        <h2>Connector Status</h2>
-        <ul class="list">
-          <li><span class="status-good">Available:</span> Gmail</li>
-          <li><span class="status-good">Available:</span> Google Drive / Docs / Sheets</li>
-          <li><span class="status-warn">Not in-session:</span> Loom connector</li>
-          <li><span class="status-warn">Not in-session:</span> Twilio connector</li>
-          <li><span class="status-warn">Not in-session:</span> Make connector</li>
-        </ul>
+      <div class="hero-grid">
+        <div>
+          <div class="kicker">Current Focus</div>
+          <h1>Recover missed dental patients <strong>before they leak</strong>.</h1>
+          <div class="chips">
+            <div class="chip">Offer: Recovery Sprint</div>
+            <div class="chip">Primary channel: WhatsApp first</div>
+            <div class="chip">First upsell: Consult follow-up</div>
+            <div class="chip">Now: WhatsApp Business + Google + Loom</div>
+          </div>
+        </div>
+        <aside class="quick">
+          <div>
+            <div class="quick-label">Operator Thesis</div>
+            <div class="quick-value">Ship before tweak.</div>
+          </div>
+          <div class="rule-stack">
+            <div class="rule-item"><b>Send first.</b> No more system-building before replies.</div>
+            <div class="rule-item"><b>Human-in-loop.</b> Manual where trust and nuance matter.</div>
+            <div class="rule-item"><b>Proof capture.</b> First win becomes your first weapon.</div>
+          </div>
+        </aside>
       </div>
+    </section>
+
+    <div class="layout">
+      <main class="stack">
+        <section class="panel reveal">
+          <div class="kicker">Flight Plan</div>
+          <div class="panel-header">
+            <div><h2>Today’s execution rhythm</h2><div class="note">Same operating logic, compressed into the shortest useful sequence.</div></div>
+            <span class="tag rule">3-Hour Sprint</span>
+          </div>
+          <div class="flow">
+            <div class="flow-block"><h3>1. Prepare the sender</h3><p>Run from WhatsApp Business with a clean Jawab identity.</p></div>
+            <div class="flow-block"><h3>2. Send the batch</h3><p>Work the first 10 in order. WhatsApp first where direct paths exist.</p></div>
+            <div class="flow-block"><h3>3. Stop editing</h3><p>After sending, switch into replies, objections, demo sends, and proof.</p></div>
+          </div>
+          <div class="checklist">
+            <label class="task"><input type="checkbox" data-persist="task1"><div><strong>Use WhatsApp Business</strong><span>Same number, business-facing profile, not a personal-looking account.</span></div></label>
+            <label class="task"><input type="checkbox" data-persist="task2"><div><strong>Set the profile wrapper</strong><span>Jawab or Jawab Dental Recovery, black/gold mark, clear business description.</span></div></label>
+            <label class="task"><input type="checkbox" data-persist="task3"><div><strong>Send the first 10</strong><span>Do not reopen strategy mode once the batch starts.</span></div></label>
+            <label class="task"><input type="checkbox" data-persist="task4"><div><strong>Log exact channels and objections</strong><span>Who, how, reply/no reply, and exact objection wording.</span></div></label>
+            <label class="task"><input type="checkbox" data-persist="task5"><div><strong>Capture proof immediately</strong><span>Recovered convo, result, screenshot, owner sentence.</span></div></label>
+          </div>
+        </section>
+
+        <section class="panel reveal">
+          <div class="kicker">Send Order</div>
+          <div class="panel-header">
+            <div><h2>Priority queue</h2><div class="note">Fast-reply bias, direct paths first, broken-site clinics still high because the pain is obvious.</div></div>
+          </div>
+          <div class="queue">
+            <div class="queue-card"><div class="queue-head"><div class="queue-title">1. Dr. Thomas Dental Implant Clinic</div><span class="tag wa">WhatsApp</span></div><p class="queue-meta">Direct WhatsApp path already visible. Clean implant recovery pitch.</p></div>
+            <div class="queue-card"><div class="queue-head"><div class="queue-title">2. Leila Hariri Dental &amp; Medical Aesthetics</div><span class="tag wa">WhatsApp</span></div><p class="queue-meta">Premium clinic plus direct mobile path. High trust and high leak value.</p></div>
+            <div class="queue-card"><div class="queue-head"><div class="queue-title">3. NOA Dental Clinic</div><span class="tag wa">WhatsApp</span></div><p class="queue-meta">Cosmetic and veneers. Fast follow-up angle is strong.</p></div>
+            <div class="queue-card"><div class="queue-head"><div class="queue-title">4. DRFK Turkish International Day Surgery Center</div><span class="tag wa">WhatsApp</span></div><p class="queue-meta">Direct mobile line. Strong high-intent treatment angle.</p></div>
+            <div class="queue-card"><div class="queue-head"><div class="queue-title">5. Dentist Direct Dubai</div><span class="tag ig">IG DM</span></div><p class="queue-meta">24/7 emergency positioning means delayed replies hurt trust fast.</p></div>
+            <div class="queue-card"><div class="queue-head"><div class="queue-title">6. Dr. Michael's Dental Clinic</div><span class="tag ig">IG DM</span></div><p class="queue-meta">Huge review volume plus cosmetic and implant positioning.</p></div>
+            <div class="queue-card"><div class="queue-head"><div class="queue-title">7. Dr. Joy Dental Clinic</div><span class="tag ig">IG DM</span></div><p class="queue-meta">Multi-branch response inconsistency angle.</p></div>
+            <div class="queue-card"><div class="queue-head"><div class="queue-title">8. Dentzz Dental Care Centre</div><span class="tag ig">IG DM</span></div><p class="queue-meta">Premium cosmetic brand, likely human bottleneck on inbound flow.</p></div>
+            <div class="queue-card"><div class="queue-head"><div class="queue-title">9. New Ivory Dental &amp; Implant Clinic</div><span class="tag ig">IG DM</span></div><p class="queue-meta">Website down. Every direct message matters more.</p></div>
+            <div class="queue-card"><div class="queue-head"><div class="queue-title">10. The TopDent</div><span class="tag wa">WhatsApp if active</span></div><p class="queue-meta">Website suspended. Strong broken-path wedge.</p></div>
+          </div>
+        </section>
+
+        <section class="panel reveal">
+          <div class="kicker">Journal</div>
+          <div class="panel-header">
+            <div><h2>Send log and reply intelligence</h2><div class="note">Keep this honest, not pretty. It exists to improve the next batch.</div></div>
+          </div>
+          <div class="journal">
+            <div class="journal-grid">
+              <div class="journal-card"><h3>Sent</h3><textarea data-persist="sentLog" placeholder="Who was contacted, on what channel, and when?"></textarea></div>
+              <div class="journal-card"><h3>Replies / Objections</h3><textarea data-persist="replyLog" placeholder="Paste replies, objections, or anything promising."></textarea></div>
+            </div>
+            <div class="journal-card"><h3>Next Moves</h3><textarea data-persist="nextMoves" placeholder="Follow-ups, demo sends, calls to book, proof to capture."></textarea></div>
+          </div>
+        </section>
+      </main>
+
+      <aside class="stack">
+        <section class="panel reveal">
+          <div class="kicker">Scoreboard</div>
+          <div class="panel-header">
+            <div><h2>Daily operating numbers</h2><div class="note">Track enough to stay sharp. Not enough to become the work.</div></div>
+          </div>
+          <div class="metrics">
+            <div class="metric"><label>Researched</label><input type="number" data-persist="m1" placeholder="0"></div>
+            <div class="metric"><label>Touches Sent</label><input type="number" data-persist="m2" placeholder="0"></div>
+            <div class="metric"><label>Warm Intros</label><input type="number" data-persist="m3" placeholder="0"></div>
+            <div class="metric"><label>Replies</label><input type="number" data-persist="m4" placeholder="0"></div>
+            <div class="metric"><label>Demo Links</label><input type="number" data-persist="m5" placeholder="0"></div>
+            <div class="metric"><label>Calls Booked</label><input type="number" data-persist="m6" placeholder="0"></div>
+            <div class="metric"><label>Proposals</label><input type="number" data-persist="m7" placeholder="0"></div>
+            <div class="metric"><label>Closes</label><input type="number" data-persist="m8" placeholder="0"></div>
+            <div class="metric"><label>Top Objection</label><input type="text" data-persist="m9" placeholder="One short objection"></div>
+          </div>
+        </section>
+
+        <section class="panel reveal">
+          <div class="kicker">Proof Capture</div>
+          <div class="proof">
+            <label class="task"><input type="checkbox" data-persist="proof1"><div><strong>Save the recovered conversation</strong><span>Screenshots, not vague recollections.</span></div></label>
+            <label class="task"><input type="checkbox" data-persist="proof2"><div><strong>Save the outcome</strong><span>Booking, handoff, or qualified recovery.</span></div></label>
+            <label class="task"><input type="checkbox" data-persist="proof3"><div><strong>Ask for one sentence</strong><span>Owner or manager feedback becomes proof fast.</span></div></label>
+            <label class="task"><input type="checkbox" data-persist="proof4"><div><strong>Write the 4-line summary</strong><span>Problem, handled, outcome, leak avoided.</span></div></label>
+          </div>
+        </section>
+
+        <section class="panel reveal">
+          <div class="kicker">Connector Reality</div>
+          <div class="connectors">
+            <div class="connector"><strong>Gmail</strong><span class="state live">Available</span></div>
+            <div class="connector"><strong>Google Drive / Sheets</strong><span class="state live">Available</span></div>
+            <div class="connector"><strong>Loom</strong><span class="state soft">Manual for now</span></div>
+            <div class="connector"><strong>Twilio</strong><span class="state soft">Later layer</span></div>
+            <div class="connector"><strong>Make</strong><span class="state soft">Later layer</span></div>
+            <div class="connector"><strong>Apify</strong><span class="state soft">Scale later</span></div>
+          </div>
+        </section>
+
+        <section class="panel reveal">
+          <div class="kicker">Hard Rules</div>
+          <div class="rules">
+            <div class="rule-box"><strong>Do not add more tools</strong> before the first replies.</div>
+            <div class="rule-box"><strong>Do not rebuild the demo</strong> when it is already good enough to sell.</div>
+            <div class="rule-box"><strong>Do not promise</strong> local UAE routing, deep integrations, or full front-desk replacement.</div>
+            <div class="rule-box"><strong>Do not switch strategy</strong> because one clinic ignores you.</div>
+            <div class="rule-box"><strong>After sending, listen.</strong> The next version comes from replies, not imagination.</div>
+          </div>
+        </section>
+
+        <section class="panel reveal">
+          <div class="kicker">Next Connections</div>
+          <div class="next">
+            <div class="next-box"><strong>1. WhatsApp Business</strong> for sender trust and speed</div>
+            <div class="next-box"><strong>2. Google Workspace</strong> for inbox, sheet, and daily control</div>
+            <div class="next-box"><strong>3. Loom</strong> for the 60-second demo link</div>
+            <div class="next-box"><strong>4. Twilio + Make</strong> only after repeated work starts hurting</div>
+          </div>
+        </section>
+      </aside>
     </div>
 
-    <div class="grid">
-      <div class="card">
-        <h2>Today Checklist</h2>
-        <div class="checklist">
-          <label><input type="checkbox" data-persist="task1"><span>Use <strong>WhatsApp Business</strong> on your Egyptian number.</span></label>
-          <label><input type="checkbox" data-persist="task2"><span>Set display name to <strong>Jawab</strong> or <strong>Jawab Dental Recovery</strong>.</span></label>
-          <label><input type="checkbox" data-persist="task3"><span>Add business description: <strong>Arabic-English patient recovery system for dental clinics.</strong></span></label>
-          <label><input type="checkbox" data-persist="task4"><span>Use the first-10 send pack and send the first batch.</span></label>
-          <label><input type="checkbox" data-persist="task5"><span>After sending, log exact channel, reply status, and objections.</span></label>
-          <label><input type="checkbox" data-persist="task6"><span>Do not build Twilio, Make, n8n, or backend before replies start.</span></label>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Daily Scoreboard</h2>
-        <div class="metrics">
-          <div class="metric"><label>Researched</label><input type="number" data-persist="m1" placeholder="0"></div>
-          <div class="metric"><label>Touches Sent</label><input type="number" data-persist="m2" placeholder="0"></div>
-          <div class="metric"><label>Warm Intro Asks</label><input type="number" data-persist="m3" placeholder="0"></div>
-          <div class="metric"><label>Replies</label><input type="number" data-persist="m4" placeholder="0"></div>
-          <div class="metric"><label>Demo Links Sent</label><input type="number" data-persist="m5" placeholder="0"></div>
-          <div class="metric"><label>Calls Booked</label><input type="number" data-persist="m6" placeholder="0"></div>
-          <div class="metric"><label>Proposals</label><input type="number" data-persist="m7" placeholder="0"></div>
-          <div class="metric"><label>Closes</label><input type="number" data-persist="m8" placeholder="0"></div>
-          <div class="metric"><label>Top Objection</label><input type="text" data-persist="m9" placeholder="Write one short objection"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid">
-      <div class="card">
-        <h2>First 10 Send Order</h2>
-        <div class="queue">
-          <div class="queue-item">
-            <div class="queue-head"><strong>1. Dr. Thomas Dental Implant Clinic</strong><span class="tag wa">WhatsApp</span></div>
-            <div class="muted">Direct WhatsApp path already visible. Clean implant recovery pitch.</div>
-          </div>
-          <div class="queue-item">
-            <div class="queue-head"><strong>2. Leila Hariri Dental &amp; Medical Aesthetics</strong><span class="tag wa">WhatsApp</span></div>
-            <div class="muted">Premium clinic plus direct mobile path. High trust and high leak value.</div>
-          </div>
-          <div class="queue-item">
-            <div class="queue-head"><strong>3. NOA Dental Clinic</strong><span class="tag wa">WhatsApp</span></div>
-            <div class="muted">Cosmetic and veneers. Fast follow-up angle is strong.</div>
-          </div>
-          <div class="queue-item">
-            <div class="queue-head"><strong>4. DRFK Turkish International Day Surgery Center</strong><span class="tag wa">WhatsApp</span></div>
-            <div class="muted">Direct mobile line. Strong high-intent treatment angle.</div>
-          </div>
-          <div class="queue-item">
-            <div class="queue-head"><strong>5. Dentist Direct Dubai</strong><span class="tag ig">IG DM</span></div>
-            <div class="muted">24/7 emergency positioning means delayed replies hurt trust fast.</div>
-          </div>
-          <div class="queue-item">
-            <div class="queue-head"><strong>6. Dr. Michael's Dental Clinic</strong><span class="tag ig">IG DM</span></div>
-            <div class="muted">Huge review volume plus cosmetic and implant positioning.</div>
-          </div>
-          <div class="queue-item">
-            <div class="queue-head"><strong>7. Dr. Joy Dental Clinic</strong><span class="tag ig">IG DM</span></div>
-            <div class="muted">Multi-branch response inconsistency angle.</div>
-          </div>
-          <div class="queue-item">
-            <div class="queue-head"><strong>8. Dentzz Dental Care Centre</strong><span class="tag ig">IG DM</span></div>
-            <div class="muted">Premium cosmetic brand, likely human bottleneck on inbound flow.</div>
-          </div>
-          <div class="queue-item">
-            <div class="queue-head"><strong>9. New Ivory Dental &amp; Implant Clinic</strong><span class="tag ig">IG DM</span></div>
-            <div class="muted">Website down. Every direct message matters more.</div>
-          </div>
-          <div class="queue-item">
-            <div class="queue-head"><strong>10. The TopDent</strong><span class="tag wa">WhatsApp if active</span></div>
-            <div class="muted">Website suspended. Strong broken-path wedge.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Send Log</h2>
-        <p class="muted">Paste what happened here after the batch. Keep it ugly but accurate.</p>
-        <div class="two-col">
-          <textarea data-persist="sentLog" placeholder="Who was contacted, on what channel, and at what time?"></textarea>
-          <textarea data-persist="replyLog" placeholder="Replies, objections, or anything promising."></textarea>
-        </div>
-        <div style="margin-top: 10px;">
-          <textarea data-persist="nextMoves" placeholder="Next actions: follow-ups, demo sends, calls to book, proof to capture."></textarea>
-        </div>
-      </div>
-    </div>
-
-    <div class="subgrid">
-      <div class="card">
-        <h2>Proof Capture SOP</h2>
-        <div class="checklist">
-          <label><input type="checkbox" data-persist="proof1"><span>Save recovered conversation screenshot.</span></label>
-          <label><input type="checkbox" data-persist="proof2"><span>Save booking or handoff outcome.</span></label>
-          <label><input type="checkbox" data-persist="proof3"><span>Ask owner or manager for one sentence of feedback.</span></label>
-          <label><input type="checkbox" data-persist="proof4"><span>Write mini summary: problem, what Jawab handled, outcome, leak avoided.</span></label>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Next Connections</h2>
-        <ol class="list">
-          <li>WhatsApp Business</li>
-          <li>Google Workspace / Gmail / Sheets</li>
-          <li>Loom</li>
-          <li>Twilio</li>
-          <li>Make</li>
-          <li>Apify</li>
-          <li>Vercel</li>
-        </ol>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Hard Rules</h2>
-      <ul class="list">
-        <li>Do not add more tools before the first replies.</li>
-        <li>Do not rebuild the demo today.</li>
-        <li>Do not promise local UAE routing, deep integration, or full front-desk replacement.</li>
-        <li>Do not switch strategy because one clinic ignores you.</li>
-        <li>After the first batch goes out, stop editing and start listening.</li>
-      </ul>
-    </div>
-
-    <div class="footer-note">This dashboard stores your checkboxes and notes in your browser on this machine.</div>
+    <div class="footer">Jawab operator cockpit. Stored locally in your browser on this machine.</div>
   </div>
 
   <script>
-    const keyPrefix = "jawab-dashboard:";
-    const elements = document.querySelectorAll("[data-persist]");
-
-    function syncLabelState(input) {
-      if (input.type === "checkbox") {
-        input.parentElement.classList.toggle("done", input.checked);
-      }
-    }
-
-    elements.forEach((el) => {
-      const key = keyPrefix + el.dataset.persist;
+    const keyPrefix = "jawab-dashboard-premium:";
+    const persistNodes = document.querySelectorAll("[data-persist]");
+    const revealNodes = document.querySelectorAll(".reveal");
+    function syncTask(node){ if(node.type==="checkbox"){ const task=node.closest(".task"); if(task) task.classList.toggle("done", node.checked); } }
+    persistNodes.forEach(node=>{
+      const key = keyPrefix + node.dataset.persist;
       const saved = localStorage.getItem(key);
-
-      if (saved !== null) {
-        if (el.type === "checkbox") {
-          el.checked = saved === "true";
-        } else {
-          el.value = saved;
-        }
-      }
-
-      syncLabelState(el);
-
-      el.addEventListener("input", () => {
-        const value = el.type === "checkbox" ? String(el.checked) : el.value;
-        localStorage.setItem(key, value);
-        syncLabelState(el);
-      });
+      if(saved!==null){ node.type==="checkbox" ? node.checked = saved==="true" : node.value = saved; }
+      syncTask(node);
+      node.addEventListener("input",()=>{ localStorage.setItem(key, node.type==="checkbox" ? String(node.checked) : node.value); syncTask(node); });
     });
+    const observer = new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{ if(entry.isIntersecting){ entry.target.classList.add("in"); observer.unobserve(entry.target);} });
+    },{threshold:.08});
+    revealNodes.forEach((node,i)=>{ node.style.transitionDelay=`${i*50}ms`; observer.observe(node); });
   </script>
 </body>
 </html>
