@@ -1,0 +1,69 @@
+JAWAB V2 - QUICK GITHUB GUIDE
+=============================
+
+What GitHub is:
+- a website where your project files live online
+- a place to back up the project and access it from other machines
+- a place to track versions and changes over time
+
+The 4 commands you need most:
+
+1. Clone a repository to your computer
+   git clone https://github.com/YOUR-USERNAME/REPO-NAME.git
+
+2. Go into the repository folder
+   cd REPO-NAME
+
+3. Save your changes locally
+   git add .
+   git commit -m "Describe what changed"
+
+4. Upload your changes to GitHub
+   git push
+
+For Jawab V2 specifically:
+
+If you create the GitHub repo manually on github.com and name it:
+   Jawab-V2
+
+Then in PowerShell inside this folder run:
+
+   cd C:\Users\x\engram\Jawab-V2
+   git init
+   git add .
+   git commit -m "Initial Jawab V2 repository"
+   git branch -M main
+   git remote add origin https://github.com/exxoticperson/Jawab-V2.git
+   git push -u origin main
+
+If GitHub asks for login:
+- sign in through your browser if prompted
+- or use GitHub Desktop if you prefer a GUI
+
+How to download a repository later:
+
+Option 1: ZIP download
+- open the repo on GitHub
+- click the green Code button
+- click Download ZIP
+
+Option 2: Proper git clone
+- copy the repo URL
+- run:
+   git clone https://github.com/exxoticperson/Jawab-V2.git
+
+Best simple workflow:
+- edit files locally
+- run:
+   git add .
+   git commit -m "short message"
+   git push
+
+Three things to remember:
+- `git add .` = prepare changes
+- `git commit` = save a version locally
+- `git push` = upload to GitHub
+
+If you forget where to start:
+- open README.md
+- open 00_START_HERE/CURRENT_START_HERE.md

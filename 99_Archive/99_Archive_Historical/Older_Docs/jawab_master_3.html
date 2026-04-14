@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAWAB — Master Business Document</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,700;1,300&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --black: #0a0a0a;
+    --white: #f8f6f1;
+    --cream: #f2ede4;
+    --gold: #c9a84c;
+    --gold-light: #f0d99a;
+    --red: #c23b22;
+    --blue: #1a3a6b;
+    --blue-light: #e8eef7;
+    --green: #1a5c3a;
+    --green-light: #e4f0ea;
+    --gray: #6b6b6b;
+    --border: #d4cfc5;
+    --mono: 'DM Mono', monospace;
+    --serif: 'Fraunces', serif;
+    --sans: 'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--black);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 40px 120px;
+  }
+
+  /* ── HEADER ── */
+  .masthead {
+    border-bottom: 2px solid var(--black);
+    padding-bottom: 32px;
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1.05;
+    margin-bottom: 16px;
+  }
+  .subtitle {
+    font-size: 16px;
+    color: var(--gray);
+    max-width: 600px;
+    line-height: 1.6;
+  }
+  .meta-row {
+    display: flex;
+    gap: 24px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+  .meta-pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: var(--black);
+    color: var(--white);
+    padding: 5px 12px;
+    border-radius: 2px;
+  }
+  .meta-pill.gold { background: var(--gold); color: var(--black); }
+  .meta-pill.red { background: var(--red); color: var(--white); }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 28px 32px;
+    margin-bottom: 56px;
+  }
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 16px;
+  }
+  .toc ol {
+    columns: 2;
+    column-gap: 32px;
+    padding-left: 20px;
+  }
+  .toc li {
+    font-size: 13px;
+    line-height: 2;
+    color: var(--black);
+  }
+  .toc a {
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s;
+  }
+  .toc a:hover { border-bottom-color: var(--gold); }
+
+  /* ── SECTIONS ── */
+  section { margin-bottom: 64px; }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+  }
+
+  h3 {
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 32px 0 12px;
+    color: var(--black);
+  }
+
+  p { margin-bottom: 16px; }
+
+  strong { font-weight: 600; }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    border-left: 3px solid var(--gold);
+    background: var(--white);
+    padding: 16px 20px;
+    margin: 24px 0;
+    font-size: 14px;
+  }
+  .callout.red { border-left-color: var(--red); }
+  .callout.green { border-left-color: var(--green); background: var(--green-light); }
+  .callout.blue { border-left-color: var(--blue); background: var(--blue-light); }
+  .callout-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 6px;
+  }
+
+  /* ── DATA TABLE ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 20px 0;
+  }
+  .data-table th {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 10px 16px;
+    background: var(--black);
+    color: var(--white);
+  }
+  .data-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .data-table tr:nth-child(even) td { background: var(--white); }
+  .data-table tr:last-child td { border-bottom: 2px solid var(--black); }
+
+  /* ── METRIC CARDS ── */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .metric {
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 20px;
+  }
+  .metric-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 8px;
+  }
+  .metric-value {
+    font-family: var(--serif);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--black);
+  }
+  .metric-sub {
+    font-size: 12px;
+    color: var(--gray);
+    margin-top: 4px;
+  }
+
+  /* ── PHASE TIMELINE ── */
+  .timeline { margin: 28px 0; }
+  .phase {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 0;
+    position: relative;
+  }
+  .phase::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 40px;
+    bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+  .phase:last-child::before { display: none; }
+  .phase-dot {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    background: var(--black);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    z-index: 1;
+  }
+  .phase-dot.gold { background: var(--gold); color: var(--black); }
+  .phase-dot.red { background: var(--red); }
+  .phase-body {
+    padding-bottom: 32px;
+    flex: 1;
+  }
+  .phase-title {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 4px;
+    padding-top: 8px;
+  }
+  .phase-days {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  /* ── SCRIPT BLOCK ── */
+  .script-block {
+    background: var(--black);
+    color: #e8e4dc;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    padding: 20px 24px;
+    margin: 16px 0;
+    border-radius: 2px;
+  }
+  .script-block .comment {
+    color: #6b6b6b;
+    font-style: italic;
+  }
+  .script-block .highlight { color: var(--gold-light); }
+
+  /* ── PILL TAGS ── */
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--gray);
+  }
+  .tag.active { background: var(--gold-light); border-color: var(--gold); color: var(--black); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  /* ── MOAT BOX ── */
+  .moat-box {
+    background: var(--black);
+    color: var(--white);
+    padding: 32px;
+    margin: 28px 0;
+  }
+  .moat-box h3 { color: var(--gold-light); margin-top: 0; }
+  .moat-box p { color: #c8c4bc; font-size: 14px; margin-bottom: 10px; }
+  .moat-box strong { color: var(--white); }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 2px solid var(--black);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--gray);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  ul, ol { padding-left: 20px; margin-bottom: 16px; }
+  li { margin-bottom: 6px; }
+  li:last-child { margin-bottom: 0; }
+
+  @media (max-width: 600px) {
+    body { padding: 32px 20px 80px; }
+    h1 { font-size: 38px; }
+    .toc ol { columns: 1; }
+    .metrics { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="brand">Master Business Document · April 2026 · Confidential</div>
+  <h1>JAWAB</h1>
+  <p class="subtitle">The complete A–Z system for building a $20k–$50k/month Arabic-first AI Voice Receptionist agency for Gulf and Egypt dental clinics. Every corridor of the business. Nothing withheld.</p>
+  <div class="meta-row">
+    <span class="meta-pill gold">AI Voice Agency</span>
+    <span class="meta-pill">MENA Market</span>
+    <span class="meta-pill red">30-Day Sprint</span>
+    <span class="meta-pill">Dental Vertical</span>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+  <div class="toc-title">Contents</div>
+  <ol>
+    <li><a href="#s1">Market Intelligence</a></li>
+    <li><a href="#s2">The Product — What Jawab Is</a></li>
+    <li><a href="#s3">Your Competitive Moat</a></li>
+    <li><a href="#s4">Tech Stack — Full Setup</a></li>
+    <li><a href="#s5">Pricing Architecture</a></li>
+    <li><a href="#s6">Sales System</a></li>
+    <li><a href="#s7">Delivery & Onboarding</a></li>
+    <li><a href="#s8">Legal & Contracts</a></li>
+    <li><a href="#s9">Payments & Finance</a></li>
+    <li><a href="#s10">Operations & Automation</a></li>
+    <li><a href="#s11">Expansion Corridors</a></li>
+    <li><a href="#s12">The 30-Day Execution Plan</a></li>
+    <li><a href="#s13">Revenue Math</a></li>
+    <li><a href="#s14">Risks & Mitigation</a></li>
+  </ol>
+</div>
+
+<!-- S1: MARKET -->
+<section id="s1">
+  <div class="section-num">01 / Market Intelligence</div>
+  <h2>The Opportunity Is Real</h2>
+
+  <p>This is not a theoretical market. These are confirmed numbers from April 2026 research.</p>
+
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">MENA Dental Market</div>
+      <div class="metric-value">$1.33B</div>
+      <div class="metric-sub">Growing to $2.81B by 2032 · CAGR 9.8%</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">UAE Dental Market</div>
+      <div class="metric-value">$195M</div>
+      <div class="metric-sub">Reaching $290M by 2030 · 6.8% CAGR</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">KSA Dental Clinics</div>
+      <div class="metric-value">2,500+</div>
+      <div class="metric-sub">Established nationwide, growing</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Voice AI Market</div>
+      <div class="metric-value">$47.5B</div>
+      <div class="metric-sub">By 2034 · 34.8% CAGR from $2.4B in 2024</div>
+    </div>
+  </div>
+
+  <h3>Why Dental Clinics in the Gulf Are Perfect</h3>
+  <ul>
+    <li><strong>High average transaction value.</strong> Implants, cosmetic, orthodontics — Gulf clinics regularly do $500–$3,000+ per patient. Missing one lead is painful for the owner.</li>
+    <li><strong>35% of calls go unanswered</strong> outside business hours. That is documented. Dental front desks are overworked.</li>
+    <li><strong>88% of UAE and Saudi dental patients are open to digital engagement</strong> including automated systems. The market is already receptive.</li>
+    <li><strong>Solo practices dominate.</strong> 38%+ of dental setups are solo or small group — meaning the owner feels the pain directly and makes buying decisions fast.</li>
+    <li><strong>Growing medical tourism</strong> — Dubai attracted 630,000+ medical tourists in 2022, dental being one of the top categories. These patients reach out via WhatsApp and Instagram at all hours.</li>
+    <li><strong>Vision 2030 in KSA</strong> is actively expanding the healthcare sector with government investment, meaning more new clinics with budgets to spend on tech.</li>
+  </ul>
+
+  <div class="callout blue">
+    <div class="callout-label">The Gap No One Is Filling</div>
+    Most voice AI is English-first, built for Western markets. The research confirms: Arabic voice AI fails due to dialect blindness, code-switching inability, and cultural misalignment. You are not entering a crowded market. You are entering an underserved one with a product that Western competitors literally cannot build.
+  </div>
+
+  <h3>Your Target Segments — Prioritized</h3>
+  <table class="data-table">
+    <thead>
+      <tr><th>Market</th><th>Speed to Close</th><th>Ticket Size</th><th>Arabic Need</th><th>Priority</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Egypt — Cairo, Alexandria</strong></td><td>Very fast · Same language · Low competition</td><td>$500–$1,200</td><td>High</td><td>Start here</td></tr>
+      <tr><td><strong>UAE — Dubai, Abu Dhabi</strong></td><td>Medium · English-friendly too</td><td>$1,500–$3,000</td><td>High + bilingual</td><td>Week 2+</td></tr>
+      <tr><td><strong>KSA — Riyadh, Jeddah</strong></td><td>Slower · More conservative</td><td>$2,000–$4,000</td><td>Very high</td><td>Month 2</td></tr>
+      <tr><td><strong>Qatar, Kuwait, Bahrain</strong></td><td>Medium</td><td>$1,500–$3,000</td><td>High</td><td>Month 2+</td></tr>
+      <tr><td><strong>Aesthetics clinics (non-dental)</strong></td><td>Fast · Same pain point</td><td>$1,000–$2,500</td><td>High</td><td>Expansion</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- S2: PRODUCT -->
+<section id="s2">
+  <div class="section-num">02 / The Product</div>
+  <h2>What Jawab Actually Is</h2>
+
+  <p>Jawab is not a chatbot. It is not a WhatsApp bot. It is an AI employee — a 24/7 Arabic-and-English voice receptionist that lives on a clinic's phone line and handles everything a front desk handles, without sleeping, without quitting, and without speaking broken Arabic.</p>
+
+  <div class="callout green">
+    <div class="callout-label">The One-Line Pitch</div>
+    "Your clinic is losing patients every night when your receptionist goes home. Jawab answers every call, in Arabic and English, qualifies the patient, and books them directly into your calendar. You pay once. It works forever."
+  </div>
+
+  <h3>What It Does — The Full Feature Set</h3>
+  <table class="data-table">
+    <thead>
+      <tr><th>Capability</th><th>How It Works</th><th>Why It Matters</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>24/7 Inbound Calls</strong></td><td>Retell AI answers every call instantly in the patient's language</td><td>35% of dental calls come after hours — this captures all of them</td></tr>
+      <tr><td><strong>Arabic + English + Code-Switching</strong></td><td>Single model handles mid-sentence language switches natively</td><td>Gulf patients switch constantly — monolingual AI sounds broken</td></tr>
+      <tr><td><strong>Patient Qualification</strong></td><td>AI asks the right intake questions, identifies urgency</td><td>Filters emergency vs routine before clinic opens</td></tr>
+      <tr><td><strong>Direct Calendar Booking</strong></td><td>Integrates with Google Calendar / Cal.com and books the slot</td><td>No back-and-forth, no human needed</td></tr>
+      <tr><td><strong>WhatsApp Follow-Up</strong></td><td>Sends confirmation and reminders via WhatsApp after booking</td><td>Reduces no-shows by up to 60%</td></tr>
+      <tr><td><strong>Old Lead Reactivation</strong></td><td>Outbound calls to patients who inquired but never booked</td><td>Instant ROI — clinics sit on lists of dead leads worth thousands</td></tr>
+      <tr><td><strong>After-Hours Emergency Triage</strong></td><td>AI identifies true emergencies and routes to on-call dentist</td><td>Critical for patient safety — clinics love this</td></tr>
+      <tr><td><strong>FAQ Handling</strong></td><td>Prices, insurance, parking, services — AI knows it all</td><td>Frees up 2–3 hours of front desk time daily</td></tr>
+      <tr><td><strong>Cultural Protocols</strong></td><td>Ramadan greetings, gender-appropriate titles, religious sensitivities</td><td>Feels local — not a generic Western AI</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The Three-Phase Product Ladder</h3>
+  <div class="timeline">
+    <div class="phase">
+      <div class="phase-dot gold">1</div>
+      <div class="phase-body">
+        <div class="phase-title">Lead Recovery System</div>
+        <div class="phase-days">What you sell first · Closes in 1 call</div>
+        <p style="font-size:14px">Inbound voice + WhatsApp follow-up + calendar booking. Simple, tangible, immediate ROI. The hook. Priced at $800–$1,500 setup + $300–$500/month.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot">2</div>
+      <div class="phase-body">
+        <div class="phase-title">Full AI Receptionist</div>
+        <div class="phase-days">Upsell after first win · Phase 2</div>
+        <p style="font-size:14px">Full 24/7 voice coverage, outbound reactivation, emergency triage, FAQ handling, analytics dashboard. Complete replacement of front desk for routine tasks. $2,000–$3,000 setup + $600–$1,000/month.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot">3</div>
+      <div class="phase-body">
+        <div class="phase-title">Clinic Intelligence Layer</div>
+        <div class="phase-days">Future product · Don't build now</div>
+        <p style="font-size:14px">Analytics on patient sentiment, missed revenue reports, pipeline tracking, optimization recommendations. This becomes a SaaS product. Park it until month 3.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S3: MOAT -->
+<section id="s3">
+  <div class="section-num">03 / Competitive Moat</div>
+  <h2>Why You Win and They Don't</h2>
+
+  <div class="moat-box">
+    <h3>The Advantages Nobody Can Copy</h3>
+    <p><strong>1. You are a dental student.</strong> You know what a clinic actually needs. You know the terminology. You know the patient journey. You know the pain of a missed appointment. When you walk into a sales call, you speak the owner's language — clinically and literally. No Western AI agency guy can replicate this. It builds immediate trust and closes faster.</p>
+    <p><strong>2. You speak Arabic natively.</strong> Not "we support Arabic." You build it, test it, and tweak it as a native speaker. You catch the dialect issues, the cultural slip-ups, the honorific mistakes. Your product will genuinely work in a way competitor products don't.</p>
+    <p><strong>3. You understand the Gulf market from inside.</strong> The research confirms: "Most voice AI products are built as English models first, trained on synthetic data, tested in ideal lab conditions. This approach can't keep up with the reality of a noisy Gulf contact center." You are not that. You are the local operator who actually gets it.</p>
+    <p><strong>4. You already have the infrastructure.</strong> You built the Jawab backend. You scraped the leads. You wrote the outreach. You are not starting from zero — you are executing a project that already exists.</p>
+  </div>
+
+  <h3>Competitor Landscape — What Exists and Why It Doesn't Beat You</h3>
+  <table class="data-table">
+    <thead>
+      <tr><th>Competitor</th><th>What They Do</th><th>Why You Win</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Arini (YC-backed)</td><td>AI dental receptionist, US-English only</td><td>Zero Arabic, zero Gulf market presence</td></tr>
+      <tr><td>NEVOX AI</td><td>Arabic AI, enterprise focus</td><td>Too expensive, no dental specialization</td></tr>
+      <tr><td>Dello AI / Nabrah AI</td><td>GCC conversational AI</td><td>Not voice-first, not dental-specific</td></tr>
+      <tr><td>Western AI agencies</td><td>Generic voice agents in English</td><td>Can't handle Arabic dialects at all</td></tr>
+      <tr><td>Local freelancers</td><td>Cheap chatbots</td><td>No voice, no quality, no reliability</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <div class="callout-label">Your Positioning Statement</div>
+    "We are the only AI receptionist built specifically for Arabic-speaking dental clinics — by someone who actually understands dentistry and the Gulf patient."
+  </div>
+</section>
+
+<!-- S4: TECH STACK -->
+<section id="s4">
+  <div class="section-num">04 / Tech Stack</div>
+  <h2>Full Setup — Tools, Costs, Config</h2>
+
+  <h3>Core Infrastructure</h3>
+  <table class="data-table">
+    <thead>
+      <tr><th>Tool</th><th>Role</th><th>Cost</th><th>Why This One</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Retell AI</strong></td><td>Voice agent platform — the brain of the call</td><td>$0.07–$0.15/min · Pay-as-you-go</td><td>Simpler than Vapi, strong post-call analytics, 31+ languages, HIPAA-ready</td></tr>
+      <tr><td><strong>ElevenLabs</strong></td><td>Premium Arabic voice quality</td><td>Free tier to start · $5/month after</td><td>Most natural-sounding Arabic TTS available · Clone a voice for each client</td></tr>
+      <tr><td><strong>Twilio</strong></td><td>Phone number provisioning (UAE/Egypt/KSA numbers)</td><td>~$1–$2/month per number</td><td>Covers Gulf countries · Integrates with Retell natively</td></tr>
+      <tr><td><strong>n8n (self-hosted) or Make.com</strong></td><td>Workflow orchestration — connects everything</td><td>Free (self-hosted) / $9/month</td><td>Triggers follow-ups, syncs calendar, sends WhatsApp, logs to CRM</td></tr>
+      <tr><td><strong>Cal.com</strong></td><td>Appointment booking calendar</td><td>Free</td><td>Clean API, customizable, connects to Retell via webhook</td></tr>
+      <tr><td><strong>Meta Cloud API (WhatsApp)</strong></td><td>Follow-up messages + confirmations</td><td>Free under limits</td><td>You already have this set up from Jawab v1</td></tr>
+      <tr><td><strong>Google Sheets + Notion</strong></td><td>Client CRM + analytics</td><td>Free</td><td>Simple enough for now. Replace with real CRM at 10+ clients.</td></tr>
+      <tr><td><strong>VoiceAIWrapper (optional)</strong></td><td>White-label client portal + billing automation</td><td>$29–$79/month</td><td>Gives clients their own dashboard. Looks professional. Use at client 5+.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">Your cost per client/month</div>
+      <div class="metric-value">~$30</div>
+      <div class="metric-sub">At typical call volume for a small clinic</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Your charge per client/month</div>
+      <div class="metric-value">$500+</div>
+      <div class="metric-sub">Starting retainer</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Your margin</div>
+      <div class="metric-value">90%+</div>
+      <div class="metric-sub">After all infrastructure costs</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Total startup cost</div>
+      <div class="metric-value">$80</div>
+      <div class="metric-sub">To build and demo the first agent</div>
+    </div>
+  </div>
+
+  <h3>Build Order — What You Set Up and When</h3>
+  <ol>
+    <li><strong>Day 1:</strong> Create Retell AI account → build the dental clinic agent template → connect ElevenLabs Arabic voice → link to Cal.com calendar → get an Egyptian phone number via Twilio</li>
+    <li><strong>Day 1:</strong> Write the Arabic + English system prompt. This is your core IP. Test it by calling the number and speaking in Egyptian and Gulf Arabic.</li>
+    <li><strong>Day 2:</strong> Record the demo. Call the number on video. Speak Arabic. Let it qualify you, handle objections about scheduling, book a fake appointment. This Loom is your entire sales weapon.</li>
+    <li><strong>Day 3+:</strong> When you close a client — duplicate the template in Retell, customize the system prompt with their clinic's info, provision their local number, connect their calendar. Delivery time: 2–3 days per client.</li>
+  </ol>
+
+  <h3>The System Prompt — Your Core IP</h3>
+  <p>This is what you must write and protect. A strong system prompt for a dental AI receptionist covers:</p>
+  <ul>
+    <li>Clinic name, address, working hours, services offered, prices (if shared)</li>
+    <li>Greeting in Arabic with proper Islamic honorifics (السلام عليكم) + English fallback</li>
+    <li>Qualification flow: What's the reason for your visit → Is this urgent → Have you been here before → Preferred doctor (if applicable)</li>
+    <li>Booking trigger: When patient confirms → call Cal.com API to check availability → offer two slots → confirm booking → send WhatsApp confirmation</li>
+    <li>FAQ responses: Insurance, parking, what to bring, cancellation policy</li>
+    <li>Emergency escalation: If patient describes severe pain, swelling, bleeding → trigger live transfer or on-call SMS</li>
+    <li>Cultural layer: Ramadan timing awareness, patient privacy, gender-appropriate titles</li>
+  </ul>
+</section>
+
+<!-- S5: PRICING -->
+<section id="s5">
+  <div class="section-num">05 / Pricing Architecture</div>
+  <h2>How to Price, What to Charge, When to Raise</h2>
+
+  <h3>Tier Structure</h3>
+  <table class="data-table">
+    <thead>
+      <tr><th>Tier</th><th>What's Included</th><th>Setup Fee</th><th>Monthly Retainer</th><th>Target Client</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Starter</strong></td><td>Inbound calls + booking + WhatsApp confirm</td><td>$800–$1,000</td><td>$350–$500</td><td>Small Egypt clinic · First clients to close fast</td></tr>
+      <tr><td><strong>Professional</strong></td><td>Full voice receptionist + FAQ + emergency triage + lead reactivation</td><td>$1,500–$2,000</td><td>$600–$800</td><td>UAE/KSA solo practice</td></tr>
+      <tr><td><strong>Clinic Pro</strong></td><td>Everything + analytics dashboard + custom voice clone + dedicated number</td><td>$2,500–$3,500</td><td>$900–$1,200</td><td>Multi-location or premium practice</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <div class="callout-label">Pricing Rules</div>
+    <ul>
+      <li>Never discount below $800 setup. It signals low value and attracts bad clients.</li>
+      <li>Always charge setup + retainer. Never setup-only. Recurring revenue is how this scales.</li>
+      <li>After your first 3 clients: raise Starter to $1,200 setup. You have proof now.</li>
+      <li>After 5 clients: never go below $1,500 setup for any new client.</li>
+      <li>Annual contract = 2 months free. Push for this — it locks cash in and reduces churn.</li>
+    </ul>
+  </div>
+
+  <h3>The ROI Pitch — What You Tell the Clinic Owner</h3>
+  <div class="script-block">
+    <span class="comment">// The math you walk them through on the call:</span>
+
+    "How many calls do you think you're missing per week after 5pm?"
+    <span class="highlight">→ Most say 5–15. Real number is usually higher.</span>
+
+    "What's your average patient value — just a basic cleaning and checkup?"
+    <span class="highlight">→ Egypt: ~$80–$200. UAE: $200–$600. Gulf cosmetic: $500–$3,000.</span>
+
+    "So 10 missed calls per week × $150 average = $1,500/month in walked-away patients."
+    "Jawab costs $500/month. You make 3x that back just from the calls you were losing."
+
+    <span class="comment">// Then stop talking. Let them do the math.</span>
+  </div>
+</section>
+
+<!-- S6: SALES SYSTEM -->
+<section id="s6">
+  <div class="section-num">06 / Sales System</div>
+  <h2>The Full Outreach and Closing Machine</h2>
+
+  <h3>Lead Sources</h3>
+  <ul>
+    <li><strong>Instagram:</strong> Search "عيادة اسنان" (dental clinic) + city name. Any clinic posting regularly has leads coming in via DM and is losing them after hours.</li>
+    <li><strong>Google Maps:</strong> Search "dental clinic [city]" — scrape phone numbers, Instagram handles, emails. You built a scraper for this already with Jawab.</li>
+    <li><strong>Your existing scraped leads:</strong> You already have Gulf dental clinic data from the Jawab research phase. Use it immediately.</li>
+    <li><strong>WhatsApp Business directories:</strong> Many Gulf clinics list their WhatsApp. Cold message them.</li>
+    <li><strong>LinkedIn:</strong> Dentist owners in UAE/KSA are on LinkedIn. Senior approach, more professional.</li>
+  </ul>
+
+  <h3>Outreach Sequence — Channel by Channel</h3>
+
+  <p><strong>Instagram DM (Arabic — Egypt/Gulf):</strong></p>
+  <div class="script-block">
+    سؤال سريع دكتور — كم مكالمة بتفوتكم بعد ساعات العمل؟
+    معظم العيادات اللي بتكلمهم بتخسر ٣٠٪–٥٠٪ من المرضى
+    بسبب ردود بطيئة أو مفيش متابعة.
+    عندي نظام بيرد أوتوماتيك ويحجز المريض مباشرة.
+    تحب أشوفلك إزاي هيبدو في عيادتكم؟
+  </div>
+
+  <p><strong>Instagram DM (English — UAE):</strong></p>
+  <div class="script-block">
+    Quick question — how do you currently handle patient calls after hours?
+    Most clinics I work with are losing 30–40% of leads to slow or zero follow-up.
+    I've built an AI that answers every call in Arabic and English, 
+    qualifies the patient, and books directly into your calendar.
+    Want me to show you a 90-second demo?
+  </div>
+
+  <p><strong>Cold Email (for clinics with listed emails):</strong></p>
+  <div class="script-block">
+    Subject: [Clinic Name] — missing patient calls after 5pm?
+
+    Hi Dr. [Name],
+
+    Your clinic gets calls at 7pm when your receptionist 
+    has gone home. Right now, those patients call the next clinic.
+
+    I built an AI receptionist that answers every call — 
+    in Arabic and English — qualifies the patient, 
+    and books them directly into your calendar. 24/7.
+
+    Here's a 90-second demo of it in action:
+    [Loom link]
+
+    Worth a quick call this week?
+
+    [Your name]
+    Jawab · AI Receptionists for Dental Clinics
+  </div>
+
+  <h3>The Sales Call — Exact Structure</h3>
+  <div class="timeline">
+    <div class="phase">
+      <div class="phase-dot gold">1</div>
+      <div class="phase-body">
+        <div class="phase-title">Open with their pain (2 min)</div>
+        <p style="font-size:14px">"Tell me about how you currently handle new patient inquiries." → "What happens when someone calls after 6pm?" → Let them describe the problem. Don't interrupt.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot">2</div>
+      <div class="phase-body">
+        <div class="phase-title">Quantify the loss (2 min)</div>
+        <p style="font-size:14px">"How many calls a week do you think you miss after hours?" → "What's a typical new patient worth to you?" → Do the math out loud with them.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot">3</div>
+      <div class="phase-body">
+        <div class="phase-title">Show the demo (3 min)</div>
+        <p style="font-size:14px">Screen-share the Loom OR call the number live while they listen. Speak Arabic. Let the AI do its job. Say nothing while it works.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot">4</div>
+      <div class="phase-body">
+        <div class="phase-title">Present the offer (2 min)</div>
+        <p style="font-size:14px">"Setup is $X — that covers everything I just showed you, customized for your clinic. Monthly is $Y which covers all the running costs and I manage everything. We can be live in 3 days."</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot red">5</div>
+      <div class="phase-body">
+        <div class="phase-title">Close + handle objections</div>
+        <p style="font-size:14px">See objection handling table below. After handling any objection: "So shall we move forward?" Then stop talking.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Objection Handling</h3>
+  <table class="data-table">
+    <thead>
+      <tr><th>Objection</th><th>Your Response</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>"It's too expensive"</td><td>"You're spending [X they told you] on ads to get patients. You're losing [Y] of them after hours. Jawab costs less than one lost implant patient per month."</td></tr>
+      <tr><td>"Will patients actually talk to an AI?"</td><td>"88% of patients in the UAE and Saudi Arabia said they're open to automated booking. And they don't know it's AI — they just know someone answered and helped them."</td></tr>
+      <tr><td>"I need to think about it"</td><td>"Of course. While you think — what would need to be true for this to be a clear yes for you?" Then fix that specific thing.</td></tr>
+      <tr><td>"My receptionist handles this"</td><td>"Your receptionist handles it during working hours. What about after 5pm? And weekends? And when she's sick?" </td></tr>
+      <tr><td>"What if the AI makes a mistake?"</td><td>"Every conversation is logged. You can review any call. And I'm monitoring performance for the first month. If something goes wrong, I fix it same day."</td></tr>
+      <tr><td>"I need to ask my partner"</td><td>Ask for a second call with both of them. Don't wait for an email response — it dies there.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Daily Outreach Targets</h3>
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">Instagram DMs / day</div>
+      <div class="metric-value">40</div>
+      <div class="metric-sub">Mix Egypt + UAE accounts</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Cold emails / day</div>
+      <div class="metric-value">50</div>
+      <div class="metric-sub">Apollo free tier · Instantly for sending</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">WhatsApp DMs / day</div>
+      <div class="metric-value">20</div>
+      <div class="metric-sub">Direct to clinic WhatsApp numbers</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Total touches / day</div>
+      <div class="metric-value">110</div>
+      <div class="metric-sub">This is the minimum to hit your numbers</div>
+    </div>
+  </div>
+</section>
+
+<!-- S7: DELIVERY -->
+<section id="s7">
+  <div class="section-num">07 / Delivery & Onboarding</div>
+  <h2>How You Deliver — Precise and Fast</h2>
+
+  <h3>Client Onboarding Checklist (Do This After Every Close)</h3>
+  <ol>
+    <li><strong>Send intake form</strong> — clinic name, services, prices (optional), working hours, doctor names, emergency contact, Instagram/website link, their Google Calendar access</li>
+    <li><strong>Duplicate Retell template</strong> — customize system prompt with their clinic's exact info</li>
+    <li><strong>Provision local phone number</strong> via Twilio — get a UAE, Egypt, or KSA number matching their country</li>
+    <li><strong>Configure voice</strong> — choose the Arabic/English voice in ElevenLabs appropriate for their market (Gulf vs Egyptian dialect)</li>
+    <li><strong>Connect calendar</strong> — Cal.com → Google Calendar API → test a booking end-to-end</li>
+    <li><strong>Connect WhatsApp</strong> — Meta Cloud API confirmation message triggered on successful booking</li>
+    <li><strong>Do a live test together</strong> — call the number with the client on the line. Let them hear it in their own language.</li>
+    <li><strong>Hand over the number</strong> — they forward their clinic number to the Jawab number, or you give them the new number to use</li>
+    <li><strong>Monitor week 1</strong> — check call logs daily. Tweak system prompt based on real conversation patterns.</li>
+  </ol>
+
+  <div class="callout green">
+    <div class="callout-label">Delivery Timeline</div>
+    Day 1 of signed contract: Send intake form. Day 2: Build and test the agent. Day 3: Live test with client. Day 4: Go live. This is your promise. 3 business days from payment to live.
+  </div>
+
+  <h3>SLA You Offer Clients</h3>
+  <ul>
+    <li>99.9% uptime (backed by Retell's infrastructure)</li>
+    <li>All calls logged and reviewable within 24 hours</li>
+    <li>Any system issue resolved within same business day</li>
+    <li>Monthly performance report showing: calls answered, bookings made, estimated revenue captured</li>
+    <li>First 30 days: active monitoring. Any missed booking scenario → you fix the prompt and notify them.</li>
+  </ul>
+</section>
+
+<!-- S8: LEGAL -->
+<section id="s8">
+  <div class="section-num">08 / Legal & Contracts</div>
+  <h2>Protect Yourself From Day One</h2>
+
+  <h3>Minimum Contract Terms to Include</h3>
+  <ul>
+    <li><strong>Scope of service:</strong> Exactly what the AI handles and what it doesn't (does not replace the dentist, does not provide medical advice)</li>
+    <li><strong>Payment terms:</strong> 100% of setup fee upfront before work begins. Monthly retainer charged on the 1st of each month.</li>
+    <li><strong>Cancellation policy:</strong> 30-day written notice required. No refund of setup fee under any circumstances.</li>
+    <li><strong>Data handling:</strong> Call recordings stored for 30 days. You are the processor, they are the controller. Simple GDPR/PDPL language.</li>
+    <li><strong>Liability cap:</strong> Your liability is capped at the monthly retainer amount. You are not liable for missed bookings due to factors outside your control.</li>
+    <li><strong>IP ownership:</strong> The system prompt and templates remain your IP. The clinic owns their own patient data.</li>
+    <li><strong>Auto-renewal:</strong> Contract auto-renews monthly unless 30-day notice given.</li>
+  </ul>
+
+  <div class="callout red">
+    <div class="callout-label">Critical</div>
+    Get a simple service agreement signed before you touch anything. Use a tool like PandaDoc (free tier) or DocuSign for signatures. A WhatsApp "yes" is not a contract. In the Gulf, written agreements are expected and respected.
+  </div>
+
+  <h3>Data Privacy — What You Must Know</h3>
+  <ul>
+    <li><strong>UAE:</strong> The Personal Data Protection Law (PDPL) applies. You need a basic data processing agreement with the clinic. Retell AI is HIPAA-ready, which satisfies most healthcare privacy requirements.</li>
+    <li><strong>KSA:</strong> PDPL 2023 — similar requirements. Patient data must be processed with consent.</li>
+    <li><strong>Egypt:</strong> Personal Data Protection Law No. 151/2020. Less strictly enforced but growing. Still worth basic data agreement.</li>
+    <li><strong>Your mitigation:</strong> Store no patient data on your own servers. All recordings and data live in Retell's infrastructure. You just access the logs.</li>
+  </ul>
+</section>
+
+<!-- S9: PAYMENTS -->
+<section id="s9">
+  <div class="section-num">09 / Payments & Finance</div>
+  <h2>Getting Paid and Keeping the Money</h2>
+
+  <h3>Payment Methods by Market</h3>
+  <table class="data-table">
+    <thead>
+      <tr><th>Market</th><th>Primary Method</th><th>Backup</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Egypt</td><td>Instapay (local bank transfer) · Vodafone Cash · Western Union</td><td>Wise for USD invoices</td></tr>
+      <tr><td>UAE / Gulf</td><td>Wise (USD invoice) · Direct bank transfer to your Wise account</td><td>PayPal for smaller amounts</td></tr>
+      <tr><td>International</td><td>Wise multi-currency account — you already use this</td><td>Stripe (if you set up a company)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <div class="callout-label">Wise Strategy</div>
+    Your Wise account can hold USD, AED, SAR, EGP simultaneously. Invoice Gulf clients in USD. Keep the money in USD until you need it. This is your protection against EGP devaluation.
+  </div>
+
+  <h3>Invoicing Structure</h3>
+  <ul>
+    <li>Invoice 1 on day of signing: Setup fee (100% of setup). Work only begins when this clears.</li>
+    <li>Invoice 2 on day of go-live: First month's retainer.</li>
+    <li>Invoice 3+: Monthly recurring, same date each month, auto-sent via Wave (free invoicing tool).</li>
+  </ul>
+
+  <h3>Financial Tracking — Keep It Simple</h3>
+  <p>Use a Google Sheet with: Client name | Setup revenue | Monthly retainer | Start date | Next billing date | Status | Total earned. This is your north star every morning.</p>
+</section>
+
+<!-- S10: OPERATIONS -->
+<section id="s10">
+  <div class="section-num">10 / Operations & Automation</div>
+  <h2>How You Run This Without It Running You</h2>
+
+  <p>The biggest mistake at this stage is spending time ON the business instead of SELLING. Automate everything that isn't outreach and delivery.</p>
+
+  <h3>What to Automate with n8n / Make</h3>
+  <ul>
+    <li><strong>New booking → WhatsApp confirmation</strong> sent to patient automatically</li>
+    <li><strong>48hr before appointment → WhatsApp reminder</strong> sent to patient (reduces no-shows 40–60%)</li>
+    <li><strong>Missed call → SMS alert</strong> to clinic owner's phone if the AI couldn't resolve the call</li>
+    <li><strong>Monthly → performance report generated</strong> from Retell call logs → emailed to client as PDF</li>
+    <li><strong>New client intake form → Retell template duplication trigger</strong> (semi-automated, you just review)</li>
+  </ul>
+
+  <h3>Your Daily Operations Rhythm</h3>
+  <table class="data-table">
+    <thead>
+      <tr><th>Time</th><th>Task</th><th>Duration</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>8:00 AM</td><td>Check Retell call logs for all active clients — flag any failures</td><td>15 min</td></tr>
+      <tr><td>8:15 AM</td><td>Check your tracking sheet — any invoices overdue, any client issues</td><td>10 min</td></tr>
+      <tr><td>8:30–11:00 AM</td><td>Outreach block — DMs, emails, WhatsApp. 110 touches minimum.</td><td>2.5 hrs</td></tr>
+      <tr><td>11:00–1:00 PM</td><td>University / clinical (non-negotiable)</td><td>2 hrs</td></tr>
+      <tr><td>3:00–5:00 PM</td><td>Sales calls scheduled from outreach. Delivery work for new clients.</td><td>2 hrs</td></tr>
+      <tr><td>5:00–6:00 PM</td><td>Follow-up replies to outreach, send proposals, handle client WhatsApps</td><td>1 hr</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <div class="callout-label">The 4–6 Hour Reality</div>
+    You said 4–6 hours/day. This schedule fits in 5.5 hours and respects university. The key is that the first 2.5 hours are sacred outreach time. If outreach gets cut, everything slows down. Protect that block.
+  </div>
+</section>
+
+<!-- S11: EXPANSION -->
+<section id="s11">
+  <div class="section-num">11 / Expansion Corridors</div>
+  <h2>Where This Goes After Month 1</h2>
+
+  <h3>Vertical Expansion — Beyond Dental</h3>
+  <p>Once you have 5+ dental clients and a proven system, these verticals need the exact same product with minor prompt customization:</p>
+  <table class="data-table">
+    <thead>
+      <tr><th>Vertical</th><th>Why It Works</th><th>Ticket Size Premium</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Aesthetics / Beauty Clinics</td><td>Same lead loss problem, higher average transaction ($300–$2,000/treatment)</td><td>+30%</td></tr>
+      <tr><td>Dermatology Clinics</td><td>High patient volume, under-served in Gulf by AI, cosmetic procedures = high ticket</td><td>+25%</td></tr>
+      <tr><td>Private GP Clinics</td><td>Enormous volume in Gulf expat communities, language barrier = big pain</td><td>Standard</td></tr>
+      <tr><td>Physiotherapy / Rehab</td><td>Recurring appointments, insurance coordination, high call volume</td><td>Standard</td></tr>
+      <tr><td>Luxury Real Estate (Gulf)</td><td>Same missed-lead problem, ticket size means one saved client = $5,000+ commission</td><td>+100%</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Geographic Expansion — The Sequencing</h3>
+  <div class="timeline">
+    <div class="phase">
+      <div class="phase-dot gold">1</div>
+      <div class="phase-body">
+        <div class="phase-title">Egypt first (Month 1)</div>
+        <p style="font-size:14px">Your backyard. Fast close. Lower ticket. Use to build case studies and testimonials. The social proof that unlocks Gulf.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot">2</div>
+      <div class="phase-body">
+        <div class="phase-title">UAE (Month 1–2)</div>
+        <p style="font-size:14px">Highest concentration of wealthy solo practices. English-comfortable enough to sell remotely. 2–3x ticket size of Egypt.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot">3</div>
+      <div class="phase-body">
+        <div class="phase-title">KSA (Month 2–3)</div>
+        <p style="font-size:14px">Largest market. Slower close cycle. More formal. But 2,500+ clinics. Vision 2030 means they are actively spending on tech.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot">4</div>
+      <div class="phase-body">
+        <div class="phase-title">White-label to other agencies (Month 3+)</div>
+        <p style="font-size:14px">Once your system is proven, other Arab freelancers and agencies will pay you to use Jawab. Wholesale price: $500/client setup + $150/month. This is leverage without more of your time.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>The Dental Student Advantage — A Unique Expansion Path</h3>
+  <div class="callout blue">
+    <div class="callout-label">No One Else Can Do This</div>
+    <p>When you have 2–3 clients and a testimonial, you walk into your own dental school and offer a free demo to the clinic director. From there: dental school clinics, your professors' private practices, your professors' networks. You have access to a professional network that no outside salesperson can touch. This alone could generate 5–10 clients with zero cold outreach.</p>
+  </div>
+</section>
+
+<!-- S12: 30-DAY PLAN -->
+<section id="s12">
+  <div class="section-num">12 / The 30-Day Execution Plan</div>
+  <h2>Day by Day. No Ambiguity.</h2>
+
+  <div class="timeline">
+    <div class="phase">
+      <div class="phase-dot gold">D1</div>
+      <div class="phase-body">
+        <div class="phase-title">Build the demo</div>
+        <div class="phase-days">Tomorrow</div>
+        <p style="font-size:14px">Create Retell account. Build the dental agent template with Arabic + English system prompt. Connect ElevenLabs. Provision one Egyptian phone number via Twilio. Connect Cal.com. Test it by calling yourself. The agent must be answering, qualifying, and booking by tonight.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot gold">D2</div>
+      <div class="phase-body">
+        <div class="phase-title">Record the Loom + launch outreach</div>
+        <div class="phase-days">Day 2</div>
+        <p style="font-size:14px">Record the 90-second call demo video. Start your first 40 Instagram DMs to Egypt dental clinics. Set up Apollo free tier for email. Write and save all outreach scripts. Set up Google Sheet tracking: Contacted | Replied | Call Booked | Closed | Revenue.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot">D3–7</div>
+      <div class="phase-body">
+        <div class="phase-title">Full outreach volume</div>
+        <div class="phase-days">Days 3–7</div>
+        <p style="font-size:14px">110+ touches/day. DMs, emails, WhatsApp. Book your first calls. Send the Loom to everyone who replies. Do not pitch until they've seen the demo. Goal: 3–5 calls booked by Friday.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot">D5–10</div>
+      <div class="phase-body">
+        <div class="phase-title">Close first 2 clients</div>
+        <div class="phase-days">Days 5–10</div>
+        <p style="font-size:14px">Every call follows the 5-step structure. Price is $800 setup + $350/month for Egypt. Get the contract signed. Invoice sent immediately. Work begins when payment clears. Deliver in 3 days. Goal: $1,600–$2,400 in week 1.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot">D10–20</div>
+      <div class="phase-body">
+        <div class="phase-title">Shift to UAE + scale volume</div>
+        <div class="phase-days">Days 10–20</div>
+        <p style="font-size:14px">You now have 1–2 Egyptian client testimonials. Use them in UAE outreach. UAE ticket: $1,500–$2,000 setup + $600/month. Keep Egypt volume going. Goal: 3 more clients closed. Total: 5 clients. Monthly recurring starts to compound.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot red">D20–30</div>
+      <div class="phase-body">
+        <div class="phase-title">Raise prices + optimize</div>
+        <div class="phase-days">Days 20–30</div>
+        <p style="font-size:14px">You now have proof. Raise setup fee to $1,500 minimum. Pitch Clinic Pro tier to UAE clients. Upsell existing Egypt clients on reactivation campaigns (one-time $300 project). Begin KSA outreach. Goal by day 30: 8–10 active clients. $8,000–$15,000 total revenue month 1.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S13: MATH -->
+<section id="s13">
+  <div class="section-num">13 / Revenue Math</div>
+  <h2>Honest Numbers from Three Scenarios</h2>
+
+  <h3>Conservative (you execute at 70%)</h3>
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Month 1 Setup</div><div class="metric-value">$5,600</div><div class="metric-sub">7 clients × avg $800</div></div>
+    <div class="metric"><div class="metric-label">Month 1 MRR</div><div class="metric-value">$2,800</div><div class="metric-sub">7 clients × avg $400/mo</div></div>
+    <div class="metric"><div class="metric-label">Month 1 Total</div><div class="metric-value">$8,400</div><div class="metric-sub">Real, achievable</div></div>
+    <div class="metric"><div class="metric-label">Month 3 MRR</div><div class="metric-value">$8,400</div><div class="metric-sub">21 clients stacked</div></div>
+  </div>
+
+  <h3>Strong (you execute at 100% + UAE closes)</h3>
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Month 1 Setup</div><div class="metric-value">$14,000</div><div class="metric-sub">7 clients × avg $2,000</div></div>
+    <div class="metric"><div class="metric-label">Month 1 MRR</div><div class="metric-value">$5,600</div><div class="metric-sub">7 clients × avg $800/mo</div></div>
+    <div class="metric"><div class="metric-label">Month 1 Total</div><div class="metric-value">$19,600</div><div class="metric-sub">Strong month</div></div>
+    <div class="metric"><div class="metric-label">Month 3 MRR</div><div class="metric-value">$22,400</div><div class="metric-sub">28 clients stacked</div></div>
+  </div>
+
+  <h3>$50k Month — What It Actually Requires</h3>
+  <div class="callout">
+    <div class="callout-label">The Honest Path to $50k</div>
+    $50k in a single month requires: 15+ clients at $2,500 average setup + accumulated MRR from prior months OR 1–2 enterprise dental groups (multi-location, $5,000–$8,000 setup each). This is a month 2–3 target, not month 1. Month 1 goal is $10–20k and 5–10 clients. That's the foundation.
+  </div>
+</section>
+
+<!-- S14: RISKS -->
+<section id="s14">
+  <div class="section-num">14 / Risks & Mitigation</div>
+  <h2>What Can Kill This and How to Block It</h2>
+
+  <table class="data-table">
+    <thead>
+      <tr><th>Risk</th><th>Likelihood</th><th>Mitigation</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>AI makes a mistake on a call (wrong booking, misheard patient)</td><td>Medium</td><td>All calls logged. Week 1 you review every call. Client has override ability. Frame it: "You get the calls the AI couldn't handle too."</td></tr>
+      <tr><td>Retell AI has downtime</td><td>Low</td><td>Their SLA is 99.9%. In the rare case: calls forward to clinic's original number automatically. No patient is lost.</td></tr>
+      <tr><td>Client cancels after month 1</td><td>Medium</td><td>30-day cancellation notice required in contract. You keep setup fee. Build deep enough value in month 1 that churning feels painful.</td></tr>
+      <tr><td>You get too many clients to deliver fast</td><td>Good problem</td><td>Pause new outreach. Deliver current clients first. Raise prices immediately — demand exceeds supply.</td></tr>
+      <tr><td>Gulf clinic owner not tech-savvy, confused</td><td>High</td><td>Do the setup FOR them. They do nothing. You just need their clinic info and calendar access. Reduce friction to zero.</td></tr>
+      <tr><td>University load spikes (exams)</td><td>High</td><td>Automate recurring client tasks fully before exam periods. Keep outreach paused during finals. MRR continues even when you stop selling.</td></tr>
+      <tr><td>Payment delays from Gulf clients</td><td>Medium</td><td>Zero work before setup fee clears. No exceptions. Your time is not free.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout green">
+    <div class="callout-label">The Final Word</div>
+    You have a real market, a real product, a real moat, and a real plan. The only variable that matters now is execution volume. Every day you don't send 110 outreach messages is a day the math doesn't work. Every day you do, it compounds. This is a sales business dressed as a tech business. Sell first. Perfect later.
+  </div>
+</section>
+
+<hr class="divider">
+
+<footer>
+  <span>JAWAB · Master Business Document · April 10, 2026</span>
+  <span>Confidential · For internal use only</span>
+</footer>
+
+</body>
+</html>

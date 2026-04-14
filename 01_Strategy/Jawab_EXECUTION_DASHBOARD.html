@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jawab Execution Dashboard</title>
+  <style>
+    :root {
+      --bg: #0b0d10;
+      --panel: #13171d;
+      --panel-2: #1a2028;
+      --line: #2a3442;
+      --text: #eef2f7;
+      --muted: #a7b1bf;
+      --gold: #d4af37;
+      --green: #35c46b;
+      --red: #ff6b6b;
+      --blue: #74b9ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(180deg, #08090b 0%, #0f1318 100%);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: rgba(19, 23, 29, 0.95);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+      letter-spacing: -0.04em;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .pill-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .pill {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .pill strong {
+      color: var(--text);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1.1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .subgrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .checklist {
+      display: grid;
+      gap: 10px;
+    }
+
+    .checklist label {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: var(--panel-2);
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .checklist input[type="checkbox"] {
+      margin-top: 3px;
+      transform: scale(1.15);
+      accent-color: var(--gold);
+    }
+
+    .checklist label.done {
+      border-color: rgba(53, 196, 107, 0.35);
+      opacity: 0.82;
+    }
+
+    .queue {
+      display: grid;
+      gap: 10px;
+    }
+
+    .queue-item {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .queue-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .wa { background: rgba(53, 196, 107, 0.12); color: #9ef0bb; }
+    .ig { background: rgba(116, 185, 255, 0.12); color: #a8d3ff; }
+    .prio { background: rgba(212, 175, 55, 0.12); color: #f1d677; }
+
+    textarea, input[type="text"], input[type="number"] {
+      width: 100%;
+      background: #0d1117;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .metric {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .metric label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    .status-good { color: var(--green); }
+    .status-warn { color: var(--gold); }
+    .status-bad { color: var(--red); }
+
+    .footer-note {
+      margin-top: 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 980px) {
+      .hero, .grid, .subgrid { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .metrics, .two-col { grid-template-columns: 1fr; }
+      .wrap { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="card">
+        <h1>Jawab Execution Dashboard</h1>
+        <p class="muted">Run from this file. Do not drift. Ship before tweak, send before systems, collect replies before adding more tooling.</p>
+        <div class="pill-row">
+          <div class="pill"><strong>Offer:</strong> Recovery Sprint</div>
+          <div class="pill"><strong>Primary channel:</strong> WhatsApp first</div>
+          <div class="pill"><strong>Target:</strong> UAE dental clinics</div>
+          <div class="pill"><strong>Upsell first:</strong> Consult follow-up</div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Connector Status</h2>
+        <ul class="list">
+          <li><span class="status-good">Available:</span> Gmail</li>
+          <li><span class="status-good">Available:</span> Google Drive / Docs / Sheets</li>
+          <li><span class="status-warn">Not in-session:</span> Loom connector</li>
+          <li><span class="status-warn">Not in-session:</span> Twilio connector</li>
+          <li><span class="status-warn">Not in-session:</span> Make connector</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Today Checklist</h2>
+        <div class="checklist">
+          <label><input type="checkbox" data-persist="task1"><span>Use <strong>WhatsApp Business</strong> on your Egyptian number.</span></label>
+          <label><input type="checkbox" data-persist="task2"><span>Set display name to <strong>Jawab</strong> or <strong>Jawab Dental Recovery</strong>.</span></label>
+          <label><input type="checkbox" data-persist="task3"><span>Add business description: <strong>Arabic-English patient recovery system for dental clinics.</strong></span></label>
+          <label><input type="checkbox" data-persist="task4"><span>Use the first-10 send pack and send the first batch.</span></label>
+          <label><input type="checkbox" data-persist="task5"><span>After sending, log exact channel, reply status, and objections.</span></label>
+          <label><input type="checkbox" data-persist="task6"><span>Do not build Twilio, Make, n8n, or backend before replies start.</span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Daily Scoreboard</h2>
+        <div class="metrics">
+          <div class="metric"><label>Researched</label><input type="number" data-persist="m1" placeholder="0"></div>
+          <div class="metric"><label>Touches Sent</label><input type="number" data-persist="m2" placeholder="0"></div>
+          <div class="metric"><label>Warm Intro Asks</label><input type="number" data-persist="m3" placeholder="0"></div>
+          <div class="metric"><label>Replies</label><input type="number" data-persist="m4" placeholder="0"></div>
+          <div class="metric"><label>Demo Links Sent</label><input type="number" data-persist="m5" placeholder="0"></div>
+          <div class="metric"><label>Calls Booked</label><input type="number" data-persist="m6" placeholder="0"></div>
+          <div class="metric"><label>Proposals</label><input type="number" data-persist="m7" placeholder="0"></div>
+          <div class="metric"><label>Closes</label><input type="number" data-persist="m8" placeholder="0"></div>
+          <div class="metric"><label>Top Objection</label><input type="text" data-persist="m9" placeholder="Write one short objection"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>First 10 Send Order</h2>
+        <div class="queue">
+          <div class="queue-item">
+            <div class="queue-head"><strong>1. Dr. Thomas Dental Implant Clinic</strong><span class="tag wa">WhatsApp</span></div>
+            <div class="muted">Direct WhatsApp path already visible. Clean implant recovery pitch.</div>
+          </div>
+          <div class="queue-item">
+            <div class="queue-head"><strong>2. Leila Hariri Dental &amp; Medical Aesthetics</strong><span class="tag wa">WhatsApp</span></div>
+            <div class="muted">Premium clinic plus direct mobile path. High trust and high leak value.</div>
+          </div>
+          <div class="queue-item">
+            <div class="queue-head"><strong>3. NOA Dental Clinic</strong><span class="tag wa">WhatsApp</span></div>
+            <div class="muted">Cosmetic and veneers. Fast follow-up angle is strong.</div>
+          </div>
+          <div class="queue-item">
+            <div class="queue-head"><strong>4. DRFK Turkish International Day Surgery Center</strong><span class="tag wa">WhatsApp</span></div>
+            <div class="muted">Direct mobile line. Strong high-intent treatment angle.</div>
+          </div>
+          <div class="queue-item">
+            <div class="queue-head"><strong>5. Dentist Direct Dubai</strong><span class="tag ig">IG DM</span></div>
+            <div class="muted">24/7 emergency positioning means delayed replies hurt trust fast.</div>
+          </div>
+          <div class="queue-item">
+            <div class="queue-head"><strong>6. Dr. Michael's Dental Clinic</strong><span class="tag ig">IG DM</span></div>
+            <div class="muted">Huge review volume plus cosmetic and implant positioning.</div>
+          </div>
+          <div class="queue-item">
+            <div class="queue-head"><strong>7. Dr. Joy Dental Clinic</strong><span class="tag ig">IG DM</span></div>
+            <div class="muted">Multi-branch response inconsistency angle.</div>
+          </div>
+          <div class="queue-item">
+            <div class="queue-head"><strong>8. Dentzz Dental Care Centre</strong><span class="tag ig">IG DM</span></div>
+            <div class="muted">Premium cosmetic brand, likely human bottleneck on inbound flow.</div>
+          </div>
+          <div class="queue-item">
+            <div class="queue-head"><strong>9. New Ivory Dental &amp; Implant Clinic</strong><span class="tag ig">IG DM</span></div>
+            <div class="muted">Website down. Every direct message matters more.</div>
+          </div>
+          <div class="queue-item">
+            <div class="queue-head"><strong>10. The TopDent</strong><span class="tag wa">WhatsApp if active</span></div>
+            <div class="muted">Website suspended. Strong broken-path wedge.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Send Log</h2>
+        <p class="muted">Paste what happened here after the batch. Keep it ugly but accurate.</p>
+        <div class="two-col">
+          <textarea data-persist="sentLog" placeholder="Who was contacted, on what channel, and at what time?"></textarea>
+          <textarea data-persist="replyLog" placeholder="Replies, objections, or anything promising."></textarea>
+        </div>
+        <div style="margin-top: 10px;">
+          <textarea data-persist="nextMoves" placeholder="Next actions: follow-ups, demo sends, calls to book, proof to capture."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="subgrid">
+      <div class="card">
+        <h2>Proof Capture SOP</h2>
+        <div class="checklist">
+          <label><input type="checkbox" data-persist="proof1"><span>Save recovered conversation screenshot.</span></label>
+          <label><input type="checkbox" data-persist="proof2"><span>Save booking or handoff outcome.</span></label>
+          <label><input type="checkbox" data-persist="proof3"><span>Ask owner or manager for one sentence of feedback.</span></label>
+          <label><input type="checkbox" data-persist="proof4"><span>Write mini summary: problem, what Jawab handled, outcome, leak avoided.</span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Next Connections</h2>
+        <ol class="list">
+          <li>WhatsApp Business</li>
+          <li>Google Workspace / Gmail / Sheets</li>
+          <li>Loom</li>
+          <li>Twilio</li>
+          <li>Make</li>
+          <li>Apify</li>
+          <li>Vercel</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Hard Rules</h2>
+      <ul class="list">
+        <li>Do not add more tools before the first replies.</li>
+        <li>Do not rebuild the demo today.</li>
+        <li>Do not promise local UAE routing, deep integration, or full front-desk replacement.</li>
+        <li>Do not switch strategy because one clinic ignores you.</li>
+        <li>After the first batch goes out, stop editing and start listening.</li>
+      </ul>
+    </div>
+
+    <div class="footer-note">This dashboard stores your checkboxes and notes in your browser on this machine.</div>
+  </div>
+
+  <script>
+    const keyPrefix = "jawab-dashboard:";
+    const elements = document.querySelectorAll("[data-persist]");
+
+    function syncLabelState(input) {
+      if (input.type === "checkbox") {
+        input.parentElement.classList.toggle("done", input.checked);
+      }
+    }
+
+    elements.forEach((el) => {
+      const key = keyPrefix + el.dataset.persist;
+      const saved = localStorage.getItem(key);
+
+      if (saved !== null) {
+        if (el.type === "checkbox") {
+          el.checked = saved === "true";
+        } else {
+          el.value = saved;
+        }
+      }
+
+      syncLabelState(el);
+
+      el.addEventListener("input", () => {
+        const value = el.type === "checkbox" ? String(el.checked) : el.value;
+        localStorage.setItem(key, value);
+        syncLabelState(el);
+      });
+    });
+  </script>
+</body>
+</html>
