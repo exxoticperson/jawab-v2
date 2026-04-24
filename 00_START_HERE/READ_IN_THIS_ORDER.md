@@ -43,6 +43,13 @@ This is the online workflow blueprint.
 
 This defines how the Jawab agent roles work.
 
+## 7. Skill System
+
+- `04_System_and_Skills/SKILL_INDEX.md`
+- `04_System_and_Skills/EXTERNAL_SKILL_INTAKE.md`
+
+Use these when importing outside repo ideas, Antigravity skills, or recurring task workflows.
+
 ## Do Not Use As Current Truth
 
 Do not use anything in:

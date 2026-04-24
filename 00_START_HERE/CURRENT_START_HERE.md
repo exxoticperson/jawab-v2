@@ -18,6 +18,7 @@ These are the only files you should treat as `current`:
 - `04_System_and_Skills/Jawab_AGENT_OPERATING_MODEL.md`
 - `04_System_and_Skills/Skill_Writer_System.md`
 - `04_System_and_Skills/SKILL_INDEX.md`
+- `04_System_and_Skills/EXTERNAL_SKILL_INTAKE.md`
 
 ## What Each Current File Is For
 
@@ -45,6 +46,8 @@ These are the only files you should treat as `current`:
   - the new filter-and-builder workflow for recurring Jawab tasks
 - `SKILL_INDEX.md`
   - project-local skill registry
+- `EXTERNAL_SKILL_INTAKE.md`
+  - accepted and rejected patterns from external repos, Antigravity materials, and future skill packs
 
 ## Archive Warning
 

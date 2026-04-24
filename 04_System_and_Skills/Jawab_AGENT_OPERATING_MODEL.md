@@ -160,9 +160,30 @@ Keep the running state in these sections:
 - `Next actions`
 - `Active skills`
 - `Skills to create next`
+- `External patterns accepted`
+- `External patterns rejected`
 
 ## Current Operating Decision
 
 - production path: `Twilio + Make + Sheets/Airtable + Cal.com`
 - local Node backend: `reference spec only`
 - sales focus: `top 10 UAE clinics first this morning, then warm intros in parallel`
+
+## External Skill Intake
+
+External repos and Antigravity materials are treated as pattern sources, not automatic dependencies.
+
+Before importing anything, route through:
+
+- `source_of_truth_guard`
+- `execution_verification`
+- `EXTERNAL_SKILL_INTAKE.md`
+
+Current accepted patterns:
+
+- source-of-truth fidelity
+- small verifiable work units
+- goal-backward verification
+- lead pain extraction
+- Gulf dialect copy
+- conservative economic audit

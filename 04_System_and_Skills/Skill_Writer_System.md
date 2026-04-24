@@ -46,19 +46,25 @@ Create only when:
 
 ## File Layout
 
-- `06_Skills/SKILL_INDEX.md`
+- `04_System_and_Skills/SKILL_INDEX.md`
   - registry of active project-specific skills
-- `06_Skills/SKILL_INTAKE_TEMPLATE.md`
+- `04_System_and_Skills/SKILL_INTAKE_TEMPLATE.md`
   - template for creating a new skill
-- `06_Skills/*.md`
+- `04_System_and_Skills/*.md`
   - one file per project-local skill
+- `04_System_and_Skills/EXTERNAL_SKILL_INTAKE.md`
+  - filter for external repos, Antigravity materials, and future skill packs
 
 ## This Week's First Skills
 
-1. `lead_pain_proofing`
-2. `outreach_personalization`
-3. `demo_critique`
-4. `offer_packaging`
+1. `source_of_truth_guard`
+2. `execution_verification`
+3. `lead_pain_proofing`
+4. `outreach_personalization`
+5. `gulf_dialect_copy`
+6. `clinic_economic_audit`
+7. `demo_critique`
+8. `offer_packaging`
 
 ## Operating Loop
 
@@ -69,6 +75,15 @@ For any new specialized task:
 3. decide: reuse, adapt, or create
 4. route execution through the matched skill
 5. record what improved and what still drifted
+
+## External Skill Rule
+
+When the user sends a repo, plugin, or skill pack:
+
+1. mine for patterns, not installation
+2. compare against `EXTERNAL_SKILL_INTAKE.md`
+3. import only the smallest local skill or reference that changes execution
+4. keep current Jawab strategy untouched unless `Jawab-OS` explicitly changes it
 
 ## Output Contract
 
