@@ -19,6 +19,33 @@ Immediate rule:
 - keep Brain, Acquire, Clay, Instantly, and Sendspark as later leverage
 - outreach starts after the 2-3 day build window
 
+## Final GTM And Tool Stack
+
+Use tools only when they increase replies, trust, proof, or delivery speed.
+
+1. `WhatsApp Business`: sender identity, voice notes, quick replies, and manual follow-up.
+2. `Google Sheets + Gmail + Drive`: CRM, proposals, warm intros, reply handling, and proof archive.
+3. `Loom`: manual clinic audits and the first 60-second demo.
+4. `Vercel`: hosted demo, audit page, and simple clinic-facing offer links.
+5. `Apify`: Google Maps and public-web enrichment after the first manual batch.
+6. `PageSpeed Insights + manual review scan`: audit proof for website and review friction.
+7. `Sendspark`: semi-scaled personalized video after Loom audits prove useful.
+8. `Twilio WhatsApp + Make`: paid-client delivery layer, not cold outreach infrastructure.
+9. `Clay`: enrichment engine after manual research becomes the bottleneck.
+10. `Instantly`: month-two cold email only after proof or case study exists.
+
+Missing GTM assets to build before scale:
+
+- clean WhatsApp Business profile copy
+- hosted demo link
+- one-page `Jawab Audit` template
+- Lost Patient Calculator in Sheets or HTML
+- 45-second Loom audit script
+- 30-second WhatsApp voice-note variants by pain bucket
+- first-client proof/case-study template
+- invoice and receipt template
+- referral ask script for professors, classmates, reps, and clinic owners
+
 ## Product Naming And Pricing
 
 ### Jawab Audit
@@ -286,18 +313,18 @@ Close:
 
 Greeting:
 
-`أهلاً وسهلاً، معك جواب، مساعد العيادة. أقدر آخذ بياناتك وأوصلها للفريق عشان يتابعون معك.`
+`أهلا وسهلا، معك جواب، مساعد العيادة. أقدر آخذ بياناتك وأوصلها للفريق عشان يتابعون معك.`
 
 Questions:
 
 1. `ممكن اسمك؟`
 2. `أي خدمة مهتم فيها؟ زراعة، فينير، تبييض، تنظيف، تقويم، أو استشارة؟`
-3. `هل الموضوع مستعجل، ولا مناسب يتواصلون معك اليوم في وقت لاحق؟`
+3. `هل الموضوع مستعجل، أو مناسب يتواصلون معك اليوم في وقت لاحق؟`
 4. `ما هو أفضل وقت يتواصلون معك فيه؟`
 
 Close:
 
-`تمام يا [Name]، بوصل طلبك للفريق الآن، وراح يتابعون معك على الواتساب أو اتصال.`
+`تمام يا [Name]، بوصل طلبك للفريق الآن، وراح يتابعون معك على الواتساب أو باتصال.`
 
 ### Staff Summary Format
 

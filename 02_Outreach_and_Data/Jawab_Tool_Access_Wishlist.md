@@ -36,6 +36,26 @@ Why now:
 
 ## Useful Soon
 
+### Vercel
+
+Use for the HTML demo and a clean clinic-facing audit or offer page.
+
+Why soon:
+
+- clean demo links in every message
+- better trust than a local file
+- useful before paid automation exists
+
+### Apify
+
+Use for public-web enrichment after the first manual batch is working.
+
+Why soon:
+
+- Google Maps scraping
+- Instagram/business profile enrichment
+- scaling research without full manual repetition
+
 ### Twilio
 
 Use later for the actual recovery workflow and WhatsApp sender setup.
@@ -54,24 +74,15 @@ Why soon:
 - faster than self-hosting n8n
 - enough for the first recovery scenarios
 
-### Apify
+### Sendspark
 
-Use for public-web enrichment after the first manual batch is working.
-
-Why soon:
-
-- Google Maps scraping
-- Instagram/business profile enrichment
-- scaling research without full manual repetition
-
-### Vercel
-
-Use if you want the HTML demo hosted on a clean live URL.
+Use after manual Loom audits prove that personalized video gets replies.
 
 Why soon:
 
-- easier demo sharing
-- better trust than a local file
+- turns one strong audit/demo video into semi-personalized outreach
+- useful for the next 100 leads after the first signal
+- tracks views and replies better than plain links
 
 ## Useful Later
 
@@ -83,12 +94,15 @@ Use only when Sheets becomes too messy.
 
 Use only if enrichment becomes a real bottleneck and the model is already getting replies.
 
+### Instantly
+
+Use in month 2 only, after proof or a case study exists.
+
 ## Do Not Spend Time On Now
 
 - local n8n setup
 - custom backend rewrites
 - Apollo
-- Instantly
 - advanced CRM migrations
 - voice telephony experiments
 
@@ -97,12 +111,14 @@ Use only if enrichment becomes a real bottleneck and the model is already gettin
 1. `WhatsApp Business`
 2. `Google Workspace / Gmail / Sheets`
 3. `Loom`
-4. `Twilio`
-5. `Make`
-6. `Apify`
-7. `Vercel`
-8. `Airtable or HubSpot`
-9. `Clay`
+4. `Vercel`
+5. `Apify`
+6. `Twilio`
+7. `Make`
+8. `Sendspark`
+9. `Airtable or HubSpot`
+10. `Clay`
+11. `Instantly`
 
 ## If You Want To Plug Things Into Me
 
@@ -110,6 +126,7 @@ Highest-value connections or inputs:
 
 - Gmail access for outreach and warm-intro organization
 - Apify outputs for large-batch lead enrichment
+- Vercel access or a deployed demo URL
 - Twilio account details once we start real recovery workflow setup
 - Loom links or exported demo assets
 
