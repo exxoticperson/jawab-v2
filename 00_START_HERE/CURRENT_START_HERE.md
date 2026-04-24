@@ -7,6 +7,7 @@ This folder was cleaned because older Jawab strategy files were mixed with curre
 These are the only files you should treat as `current`:
 
 - `01_Strategy/Jawab_EXECUTION_DASHBOARD.html`
+- `01_Strategy/Jawab_SUPERCHARGED_SOURCE_OF_TRUTH.md`
 - `01_Strategy/00_JAWAB_LOCKED_PLAN.md`
 - `01_Strategy/Jawab_CONTROL_TOWER.md`
 - `01_Strategy/Jawab_EXECUTION_PLAYBOOK.md`
@@ -26,6 +27,8 @@ These are the only files you should treat as `current`:
   - final business model, pricing, GTM order, and stack decision
 - `Jawab_EXECUTION_DASHBOARD.html`
   - the main file to open and run from daily: checklist, send order, scoreboard, and proof capture
+- `Jawab_SUPERCHARGED_SOURCE_OF_TRUTH.md`
+  - expanded master plan with named products, scripts, onboarding, follow-up, churn prevention, content, and expansion logic
 - `Jawab_CONTROL_TOWER.md`
   - the live execution sheet: blockers, trust wrapper, proof capture, scoreboard, and batch-scaling rules
 - `Jawab_EXECUTION_PLAYBOOK.md`
@@ -62,4 +65,4 @@ Keep it only for reference.
 
 ## Current Truth In One Sentence
 
-Jawab is a WhatsApp-first dental patient recovery offer, sold with a voice demo, deployed online-first, and focused on fast outreach and first revenue.
+Jawab is a Clinic Revenue Leak Audit + Patient Recovery System for premium dental clinics, sold through a fast audit/recovery wedge and expanded through named product tiers.

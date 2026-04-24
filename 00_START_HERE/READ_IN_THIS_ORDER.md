@@ -10,6 +10,7 @@ This tells you what is current and what is archive only.
 
 ## 2. Locked Strategy
 
+- `01_Strategy/Jawab_SUPERCHARGED_SOURCE_OF_TRUTH.md`
 - `01_Strategy/00_JAWAB_LOCKED_PLAN.md`
 
 This is the source of truth for:
@@ -18,6 +19,8 @@ This is the source of truth for:
 - current offer
 - current GTM
 - current stack decision
+- expanded product ladder
+- scripts, sequences, onboarding, churn, and expansion logic
 
 ## 3. Operating Rhythm
 
