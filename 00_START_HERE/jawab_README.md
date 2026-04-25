@@ -57,3 +57,12 @@ Use after signal:
 First AED `3,500-5,000` paid by a clinic for Jawab Recover.
 
 Everything else supports that.
+
+## Open First For Actual Work
+
+If you are about to operate, open these in this order:
+
+1. `01_Strategy/Jawab_EXECUTION_DASHBOARD.html`
+2. `02_Outreach_and_Data/01_READY_TO_SEND_TOP30_WORKING.csv`
+3. `02_Outreach_and_Data/outreach_messages.md`
+4. `02_Outreach_and_Data/discovery_call_script.md`

@@ -20,6 +20,8 @@ This is the current source of truth for pricing, products, GTM, scripts, onboard
 - `01_Strategy/Jawab_EXECUTION_PLAYBOOK.md`
 - `01_Strategy/kpi_scoreboard.md`
 
+Open the dashboard first when you are actively working. Open the source-of-truth first when you are making decisions.
+
 ## 4. Outreach
 
 - `02_Outreach_and_Data/01_READY_TO_SEND_TOP30_WORKING.csv`

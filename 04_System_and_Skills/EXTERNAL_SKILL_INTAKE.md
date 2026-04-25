@@ -15,6 +15,8 @@ Useful patterns become small local skills. Everything else stays reference-only.
 - `snarktank/ralph`
 - `coleam00/Archon`
 - `multica-ai/multica`
+- `shadcn-ui/ui`
+- `goabstract/Awesome-Design-Tools`
 - `superryeti/Email-Crawler-Lead-Generator`
 - `xeneta/LeadQualifier`
 - local Antigravity Jawab files under `C:\Users\x\.gemini\antigravity\brain`
@@ -77,6 +79,14 @@ Agents are role boundaries, not bureaucracy. Keep roles to OS, Leads, Outreach, 
 
 Existing file: `Jawab_AGENT_OPERATING_MODEL.md`
 
+### Visual Restraint For Operator UI
+
+Borrowed from the stronger patterns behind shadcn's component restraint and the curated design-tool references.
+
+Use visual discipline, spacing, typography, and contrast to make the dashboard feel authored. Avoid gradient-heavy AI-dashboard styling, ornamental chrome, and explanatory hero copy.
+
+Local skill: `dashboard_art_direction.md`
+
 ## Patterns To Ignore For Now
 
 - Full GSD/Archon/Ralph orchestration engines.
@@ -112,6 +122,12 @@ Skip: YAML workflow engine for now.
 Keep: agents as named teammates with role ownership.
 
 Skip: managed agent platform setup.
+
+### shadcn-ui / Awesome Design Tools
+
+Keep: spacing discipline, utility-first restraint, layout hierarchy, and the idea that product UI should be readable first and decorative second.
+
+Skip: importing a component library or copying generic SaaS styling into Jawab.
 
 ### Email Crawler
 

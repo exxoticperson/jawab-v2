@@ -39,6 +39,11 @@ This file lists the active project-local skills for Jawab.
 - purpose: keep the HTML demo aligned with Jawab positioning and improve conversion without overbuilding
 - trigger: demo review, polish pass, scene-level sharpening
 
+### dashboard_art_direction
+
+- purpose: keep the operator dashboard visually strong, minimal, and aligned with Jawab's working reality
+- trigger: dashboard redesigns, control-panel styling, internal execution UI passes
+
 ### offer_packaging
 
 - purpose: turn the current Jawab offer into clean one-pagers, pitch copy, and pricing framing

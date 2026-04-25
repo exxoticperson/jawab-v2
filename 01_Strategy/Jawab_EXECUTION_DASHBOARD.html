@@ -6,292 +6,1024 @@
   <title>Jawab Execution Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#060708;--bg2:#0d1014;--panel:rgba(13,17,23,.82);--panel2:rgba(19,24,31,.92);
-      --line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.16);--text:#eef4fb;--muted:#93a0b4;
-      --gold:#d8b562;--goldSoft:rgba(216,181,98,.14);--blue:#87afff;--blueSoft:rgba(135,175,255,.12);
-      --green:#56db89;--greenSoft:rgba(86,219,137,.14);--shadow:0 30px 80px rgba(0,0,0,.42);--ease:cubic-bezier(.16,1,.3,1);
+      --bg:#090b0f;
+      --bg-soft:#10141a;
+      --panel:#12171f;
+      --panel-2:#161d27;
+      --line:rgba(255,255,255,.08);
+      --line-strong:rgba(255,255,255,.14);
+      --text:#f3f5f7;
+      --muted:#8d98a6;
+      --accent:#ff6f4d;
+      --accent-soft:rgba(255,111,77,.12);
+      --accent-faint:rgba(255,111,77,.05);
+      --ok:#72d98c;
+      --ok-soft:rgba(114,217,140,.12);
+      --warn:#ffca63;
+      --shadow:0 22px 60px rgba(0,0,0,.35);
+      --radius:22px;
+      --radius-sm:14px;
+      --mono:"IBM Plex Mono",monospace;
+      --sans:"Sora",sans-serif;
     }
-    *{box-sizing:border-box} html{scroll-behavior:smooth}
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
     body{
-      margin:0;color:var(--text);font-family:"Manrope",sans-serif;overflow-x:hidden;
+      margin:0;
+      color:var(--text);
+      font-family:var(--sans);
       background:
-        radial-gradient(circle at 0 0,rgba(135,175,255,.16),transparent 28%),
-        radial-gradient(circle at 100% 0,rgba(216,181,98,.18),transparent 24%),
-        linear-gradient(180deg,#050607 0%,#0a0d11 52%,#060708 100%);
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px),
+        radial-gradient(circle at 12% 0%, rgba(255,111,77,.11), transparent 30%),
+        radial-gradient(circle at 100% 12%, rgba(255,255,255,.05), transparent 22%),
+        linear-gradient(180deg, #090b0f 0%, #0d1117 100%);
+      background-size:32px 32px,32px 32px,auto,auto,auto;
+      min-height:100vh;
     }
-    body:before,body:after{
-      content:"";position:fixed;z-index:0;border-radius:50%;filter:blur(70px);opacity:.22;pointer-events:none;
-      width:34vw;height:34vw;animation:float 14s ease-in-out infinite;
+
+    a{color:inherit;text-decoration:none}
+    button,input,textarea{font:inherit}
+
+    .shell{
+      max-width:1480px;
+      margin:0 auto;
+      padding:18px 18px 28px;
     }
-    body:before{top:-10vw;left:-8vw;background:rgba(135,175,255,.2)}
-    body:after{right:-10vw;bottom:-12vw;background:rgba(216,181,98,.2);animation-delay:-7s}
-    @keyframes float{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(2vw,1.2vw,0) scale(1.06)}}
-    .shell{position:relative;z-index:1;max-width:1420px;margin:0 auto;padding:22px 22px 36px}
-    .reveal{opacity:0;transform:translateY(18px) scale(.985);transition:opacity .75s var(--ease),transform .75s var(--ease)}
-    .reveal.in{opacity:1;transform:none}
-    .hero,.panel{
-      background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(20px);
+
+    .reveal{
+      opacity:0;
+      transform:translateY(16px);
+      transition:opacity .6s ease, transform .6s ease;
     }
-    .hero{
-      overflow:hidden;border-radius:34px;padding:28px;margin-bottom:18px;
-      background:
-        linear-gradient(135deg,rgba(11,15,20,.95),rgba(17,22,29,.88)),
-        linear-gradient(120deg,rgba(135,175,255,.08),transparent 40%),
-        linear-gradient(160deg,transparent 58%,rgba(216,181,98,.09));
+    .reveal.in{
+      opacity:1;
+      transform:none;
     }
-    .hero:after{
-      content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent,rgba(255,255,255,.07),transparent);
-      transform:translateX(-120%);animation:sweep 10s linear infinite;pointer-events:none
+
+    .topbar{
+      display:grid;
+      grid-template-columns:1.3fr .7fr;
+      gap:16px;
+      margin-bottom:16px;
     }
-    @keyframes sweep{from{transform:translateX(-120%)}to{transform:translateX(140%)}}
-    .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:26px}
-    .brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-    .brand-mark{font-family:"Cormorant Garamond",serif;font-size:clamp(34px,4vw,58px);line-height:.9;letter-spacing:-.05em}
-    .brand-mark span{color:var(--gold);margin-left:8px}
-    .brand-copy{max-width:560px;color:var(--muted);line-height:1.6}
-    .signals{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-    .signal,.chip,.tag{
-      display:inline-flex;align-items:center;gap:8px;border-radius:999px;border:1px solid var(--line);padding:9px 13px;
-      font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.03);color:var(--muted)
+
+    .mast,
+    .summary,
+    .section,
+    .rail-card{
+      background:linear-gradient(180deg, rgba(18,23,31,.96), rgba(12,16,22,.96));
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
     }
-    .signal:before,.tag:before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 16px currentColor}
-    .signal.live{color:var(--green)} .tag.wa{color:#aaf0c1;background:var(--greenSoft)} .tag.ig{color:#bdd5ff;background:var(--blueSoft)} .tag.rule{color:#f0d48f;background:var(--goldSoft)}
-    .hero-grid{display:grid;grid-template-columns:1.25fr .95fr;gap:18px;align-items:end}
-    .kicker{display:inline-flex;align-items:center;gap:8px;color:var(--gold);font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:800;margin-bottom:12px}
-    .kicker:before{content:"";width:22px;height:1px;background:rgba(216,181,98,.9)}
-    h1{margin:0;font-size:clamp(34px,4.3vw,74px);line-height:.95;letter-spacing:-.06em;max-width:860px}
-    h1 strong{color:var(--gold)}
-    .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-    .chip{font-weight:600;text-transform:none;letter-spacing:0;padding:10px 14px}
-    .quick{border-radius:24px;padding:18px;background:linear-gradient(180deg,rgba(8,11,16,.94),rgba(16,21,27,.86));border:1px solid var(--line);display:grid;gap:14px}
-    .quick-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--muted)}
-    .quick-value{font-size:26px;letter-spacing:-.04em;font-weight:800}
-    .rule-stack{display:grid;gap:10px}
-    .rule-item{padding:11px 12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.04);color:var(--muted)}
-    .rule-item b{color:var(--text)}
-    .layout{display:grid;grid-template-columns:1.16fr .84fr;gap:18px}
-    .stack{display:grid;gap:18px}
-    .panel{border-radius:28px;padding:20px;position:relative;overflow:hidden}
-    .panel:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.025),transparent 34%);pointer-events:none}
-    .panel-header{display:flex;justify-content:space-between;gap:16px;align-items:baseline;margin-bottom:16px}
-    h2{margin:0;font-size:20px;letter-spacing:-.04em}
-    .note{max-width:430px;color:var(--muted);font-size:13px;line-height:1.65}
-    .flow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-    .flow-block,.metric,.queue-card,.journal-card,.rule-box,.next-box,.connector,.task{
-      border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)
+
+    .mast{
+      border-radius:28px;
+      padding:22px 24px;
+      position:relative;
+      overflow:hidden;
     }
-    .flow-block{padding:14px}.flow-block h3{margin:0 0 8px;font-size:15px}.flow-block p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
-    .checklist{display:grid;gap:10px}
-    .task{display:flex;gap:12px;align-items:flex-start;padding:14px;transition:.3s var(--ease)}
-    .task:hover{transform:translateX(2px)} .task.done{border-color:rgba(86,219,137,.34);background:rgba(86,219,137,.08)}
-    .task input{margin-top:3px;transform:scale(1.15);accent-color:var(--gold)}
-    .task strong{display:block;margin-bottom:4px;font-size:14px}.task span{color:var(--muted);font-size:13px;line-height:1.55}
-    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-    .metric{padding:14px;min-height:108px}
-    .metric label{display:block;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;margin-bottom:12px}
-    .metric input{width:100%;border:0;outline:0;background:transparent;color:var(--text);font:inherit}
-    .metric input[type=number]{font-size:34px;font-weight:800;letter-spacing:-.06em}.metric input[type=text]{font-size:14px;line-height:1.6}
-    .queue{display:grid;gap:10px}
-    .queue-card{padding:14px 16px;position:relative;overflow:hidden;transition:.28s var(--ease)}
-    .queue-card:hover{transform:translateY(-2px);border-color:rgba(216,181,98,.24)}
-    .queue-card:after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(216,181,98,.52),transparent);opacity:0;transition:.28s var(--ease)}
-    .queue-card:hover:after{opacity:1}
-    .queue-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:7px}
-    .queue-title{font-size:15px;font-weight:700;letter-spacing:-.03em}.queue-meta{margin:0;color:var(--muted);font-size:13px;line-height:1.56}
-    .journal{display:grid;gap:10px}.journal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .journal-card{padding:14px}.journal-card h3{margin:0 0 10px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.11em;text-transform:uppercase}
-    textarea{width:100%;min-height:124px;padding:0;border:0;outline:0;resize:vertical;background:transparent;color:var(--text);font:inherit;line-height:1.62}
-    .proof,.connectors,.rules,.next{display:grid;gap:10px}
-    .rule-box,.next-box,.connector{padding:12px 14px;color:var(--muted);line-height:1.56}
-    .rule-box strong,.next-box strong,.connector strong{color:var(--text)}
-    .connector{display:flex;justify-content:space-between;gap:12px;align-items:center}
-    .state{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.live{color:var(--green)} .soft{color:var(--gold)}
-    .footer{margin-top:18px;text-align:center;color:#708097;font-size:12px;letter-spacing:.04em}
-    @media (max-width:1120px){.hero-grid,.layout,.metrics,.flow,.journal-grid{grid-template-columns:1fr}.signals{justify-content:flex-start}}
-    @media (max-width:720px){.shell{padding:14px 14px 28px}.hero,.panel{padding:16px}.topbar{margin-bottom:20px}}
+
+    .mast::after{
+      content:"";
+      position:absolute;
+      inset:auto -10% -40% auto;
+      width:320px;
+      height:320px;
+      background:radial-gradient(circle, rgba(255,111,77,.18), transparent 72%);
+      pointer-events:none;
+    }
+
+    .eyebrow,
+    .section-label,
+    .metric-label,
+    .rail-label{
+      font-family:var(--mono);
+      font-size:11px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+
+    .mast-head{
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      align-items:flex-start;
+      margin-bottom:18px;
+    }
+
+    .mark{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .brand{
+      font-size:30px;
+      font-weight:800;
+      letter-spacing:-.05em;
+    }
+
+    .brand small{
+      display:block;
+      font-size:13px;
+      color:var(--muted);
+      letter-spacing:.02em;
+      font-weight:500;
+      margin-top:6px;
+      max-width:560px;
+      line-height:1.6;
+    }
+
+    .status-bar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      min-height:34px;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid var(--line-strong);
+      background:rgba(255,255,255,.025);
+      font-size:11px;
+      font-family:var(--mono);
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:var(--muted);
+    }
+
+    .pill::before{
+      content:"";
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:currentColor;
+      box-shadow:0 0 16px currentColor;
+    }
+
+    .pill.live{color:var(--ok)}
+    .pill.hot{color:var(--accent)}
+    .pill.soft{color:var(--warn)}
+
+    .mast-grid{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:18px;
+      align-items:end;
+    }
+
+    .mission{
+      display:grid;
+      gap:14px;
+    }
+
+    .mission h1{
+      margin:0;
+      font-size:clamp(34px, 4.4vw, 70px);
+      line-height:.93;
+      letter-spacing:-.07em;
+      max-width:820px;
+    }
+
+    .mission h1 span{color:var(--accent)}
+
+    .meta-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .meta-chip{
+      border-radius:999px;
+      padding:10px 14px;
+      background:var(--accent-faint);
+      border:1px solid rgba(255,111,77,.18);
+      color:#f7c3b6;
+      font-size:13px;
+    }
+
+    .summary{
+      border-radius:22px;
+      padding:18px;
+      display:grid;
+      gap:16px;
+    }
+
+    .summary-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:end;
+    }
+
+    .summary-value{
+      font-size:30px;
+      font-weight:800;
+      letter-spacing:-.06em;
+    }
+
+    .progress{
+      width:100%;
+      height:8px;
+      border-radius:999px;
+      overflow:hidden;
+      background:rgba(255,255,255,.07);
+    }
+
+    .progress-bar{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--accent), #ff9d78);
+      transition:width .3s ease;
+    }
+
+    .summary-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+    }
+
+    .summary-item{
+      padding:12px 14px;
+      border-radius:16px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.05);
+    }
+
+    .summary-item strong{
+      display:block;
+      margin-top:4px;
+      font-size:14px;
+      color:var(--text);
+    }
+
+    .nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin:0 0 16px;
+    }
+
+    .nav a{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      color:var(--muted);
+      font-family:var(--mono);
+      font-size:11px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(0, 1.24fr) minmax(320px, .76fr);
+      gap:16px;
+      align-items:start;
+    }
+
+    .main-stack,
+    .rail{
+      display:grid;
+      gap:16px;
+    }
+
+    .section,
+    .rail-card{
+      border-radius:22px;
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .section-head{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:flex-end;
+      margin-bottom:16px;
+    }
+
+    .section-head h2{
+      margin:4px 0 0;
+      font-size:22px;
+      letter-spacing:-.04em;
+    }
+
+    .section-note{
+      color:var(--muted);
+      max-width:430px;
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    .strip{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .strip-card,
+    .task,
+    .queue-item,
+    .metric,
+    .log-card,
+    .rule,
+    .tool-item,
+    .read-item{
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.05);
+      border-radius:16px;
+    }
+
+    .strip-card{
+      padding:14px;
+    }
+
+    .strip-card strong{
+      display:block;
+      font-size:15px;
+      margin-bottom:6px;
+    }
+
+    .strip-card span{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    .task-list,
+    .queue,
+    .rules,
+    .read-list{
+      display:grid;
+      gap:10px;
+    }
+
+    .task{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      padding:14px;
+      transition:border-color .2s ease, background .2s ease, transform .2s ease;
+    }
+
+    .task:hover,
+    .queue-item:hover{
+      transform:translateY(-1px);
+      border-color:rgba(255,111,77,.24);
+    }
+
+    .task.done{
+      background:rgba(114,217,140,.08);
+      border-color:rgba(114,217,140,.22);
+    }
+
+    .task input{
+      margin-top:2px;
+      transform:scale(1.15);
+      accent-color:var(--accent);
+    }
+
+    .task strong{
+      display:block;
+      margin-bottom:4px;
+      font-size:14px;
+    }
+
+    .task span{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    .queue{
+      grid-template-columns:1fr 1fr;
+    }
+
+    .queue-item{
+      padding:14px 15px;
+      display:grid;
+      gap:10px;
+      transition:transform .2s ease, border-color .2s ease;
+    }
+
+    .queue-top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+    }
+
+    .queue-rank{
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--accent);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .queue-name{
+      font-size:16px;
+      font-weight:700;
+      letter-spacing:-.03em;
+    }
+
+    .queue-copy{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    .channel{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 11px;
+      border-radius:999px;
+      font-family:var(--mono);
+      font-size:11px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .channel.wa{
+      color:#bff0cf;
+      background:var(--ok-soft);
+    }
+
+    .channel.ig{
+      color:#ffceb8;
+      background:var(--accent-soft);
+    }
+
+    .journal{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .log-card{
+      padding:14px;
+      display:grid;
+      gap:10px;
+    }
+
+    .log-card h3,
+    .rail-card h3{
+      margin:0;
+      font-size:12px;
+      font-family:var(--mono);
+      letter-spacing:.1em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+
+    textarea,
+    .metric input{
+      width:100%;
+      background:transparent;
+      color:var(--text);
+      border:0;
+      outline:0;
+    }
+
+    textarea{
+      min-height:132px;
+      resize:vertical;
+      line-height:1.6;
+    }
+
+    .metrics{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+    }
+
+    .metric{
+      padding:14px;
+      min-height:112px;
+    }
+
+    .metric-label{
+      display:block;
+      margin-bottom:10px;
+    }
+
+    .metric input[type="number"]{
+      font-size:34px;
+      font-weight:800;
+      letter-spacing:-.06em;
+    }
+
+    .metric input[type="text"]{
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .rail{
+      position:sticky;
+      top:18px;
+    }
+
+    .rail-card{
+      display:grid;
+      gap:12px;
+    }
+
+    .read-item,
+    .rule,
+    .tool-item{
+      padding:13px 14px;
+      color:var(--muted);
+      line-height:1.55;
+    }
+
+    .read-item strong,
+    .rule strong,
+    .tool-item strong{
+      color:var(--text);
+      display:block;
+      margin-bottom:4px;
+    }
+
+    .rail-kpi{
+      display:grid;
+      gap:8px;
+    }
+
+    .rail-kpi div{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      font-size:13px;
+      color:var(--muted);
+      padding-bottom:8px;
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+
+    .rail-kpi span:last-child{
+      color:var(--text);
+      font-weight:700;
+    }
+
+    .footer{
+      margin-top:16px;
+      padding:0 4px;
+      color:var(--muted);
+      font-family:var(--mono);
+      font-size:11px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    @media (max-width:1100px){
+      .topbar,
+      .mast-grid,
+      .layout,
+      .queue,
+      .journal,
+      .metrics,
+      .strip{
+        grid-template-columns:1fr;
+      }
+
+      .rail{
+        position:static;
+      }
+
+      .status-bar{
+        justify-content:flex-start;
+      }
+    }
+
+    @media (max-width:720px){
+      .shell{
+        padding:12px 12px 22px;
+      }
+
+      .mast,
+      .section,
+      .rail-card{
+        padding:15px;
+        border-radius:18px;
+      }
+
+      .brand{
+        font-size:24px;
+      }
+
+      .mission h1{
+        font-size:34px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="shell">
-    <section class="hero reveal">
-      <div class="topbar">
-        <div class="brand">
-          <div class="brand-mark">Jawab <span>جواب</span></div>
-          <div class="brand-copy">A cleaner, more premium operator cockpit for the Recovery Sprint. Same core logic. Faster eyes. Better rhythm.</div>
+    <section class="topbar">
+      <div class="mast reveal">
+        <div class="mast-head">
+          <div class="mark">
+            <div class="eyebrow">Jawab / Recovery Sprint</div>
+            <div class="brand">
+              Jawab execution
+              <small>Clinic Revenue Leak Audit + Patient Recovery System. Dental first. Cash first. Audit, demo, send, close.</small>
+            </div>
+          </div>
+          <div class="status-bar">
+            <div class="pill live">active sprint</div>
+            <div class="pill hot">uae dental</div>
+            <div class="pill soft">whatsapp first</div>
+          </div>
         </div>
-        <div class="signals">
-          <div class="signal live">Active sprint</div>
-          <div class="signal">UAE first</div>
-          <div class="signal">WhatsApp first</div>
+        <div class="mast-grid">
+          <div class="mission">
+            <h1>Catch missed patients <span>before they disappear.</span></h1>
+            <div class="meta-row">
+              <div class="meta-chip">Offer: Jawab Audit + Recover</div>
+              <div class="meta-chip">Price: AED 5,000 setup / AED 1,500 monthly</div>
+              <div class="meta-chip">Primary upsell: Treatment Plan Rescue</div>
+            </div>
+          </div>
+          <aside class="summary">
+            <div class="summary-top">
+              <div>
+                <div class="rail-label">Completion</div>
+                <div class="summary-value"><span id="taskCount">0</span>/<span id="taskTotal">0</span></div>
+              </div>
+              <div class="rail-label" id="completionLabel">not started</div>
+            </div>
+            <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+            <div class="summary-grid">
+              <div class="summary-item">
+                <div class="rail-label">Now</div>
+                <strong>sender trust + first batch</strong>
+              </div>
+              <div class="summary-item">
+                <div class="rail-label">Do not do</div>
+                <strong>more system-building</strong>
+              </div>
+              <div class="summary-item">
+                <div class="rail-label">Proof</div>
+                <strong>screenshots + owner line</strong>
+              </div>
+              <div class="summary-item">
+                <div class="rail-label">Next scale</div>
+                <strong>Apify after signal</strong>
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
-      <div class="hero-grid">
-        <div>
-          <div class="kicker">Current Focus</div>
-          <h1>Recover missed dental patients <strong>before they leak</strong>.</h1>
-          <div class="chips">
-            <div class="chip">Offer: Recovery Sprint</div>
-            <div class="chip">Primary channel: WhatsApp first</div>
-            <div class="chip">First upsell: Consult follow-up</div>
-            <div class="chip">Now: WhatsApp Business + Google + Loom</div>
-          </div>
+
+      <aside class="summary reveal">
+        <div class="rail-label">Immediate read order</div>
+        <div class="read-list">
+          <div class="read-item"><strong>1. `jawab_README`</strong>One-page system map for any new session.</div>
+          <div class="read-item"><strong>2. `Jawab_SUPERCHARGED_SOURCE_OF_TRUTH`</strong>Pricing, scripts, onboarding, expansion.</div>
+          <div class="read-item"><strong>3. `01_READY_TO_SEND_TOP30_WORKING.csv`</strong>Live lead queue and pain proof.</div>
+          <div class="read-item"><strong>4. `outreach_messages + discovery_call_script`</strong>What to send, what to say, what to close.</div>
         </div>
-        <aside class="quick">
-          <div>
-            <div class="quick-label">Operator Thesis</div>
-            <div class="quick-value">Ship before tweak.</div>
-          </div>
-          <div class="rule-stack">
-            <div class="rule-item"><b>Send first.</b> No more system-building before replies.</div>
-            <div class="rule-item"><b>Human-in-loop.</b> Manual where trust and nuance matter.</div>
-            <div class="rule-item"><b>Proof capture.</b> First win becomes your first weapon.</div>
-          </div>
-        </aside>
-      </div>
+      </aside>
     </section>
 
+    <nav class="nav reveal">
+      <a href="#today">today</a>
+      <a href="#queue">queue</a>
+      <a href="#score">score</a>
+      <a href="#logs">logs</a>
+      <a href="#rail">rail</a>
+    </nav>
+
     <div class="layout">
-      <main class="stack">
-        <section class="panel reveal">
-          <div class="kicker">Flight Plan</div>
-          <div class="panel-header">
-            <div><h2>Today’s execution rhythm</h2><div class="note">Same operating logic, compressed into the shortest useful sequence.</div></div>
-            <span class="tag rule">3-Hour Sprint</span>
+      <main class="main-stack">
+        <section class="section reveal" id="today">
+          <div class="section-head">
+            <div>
+              <div class="section-label">today</div>
+              <h2>Execution stack</h2>
+            </div>
+            <div class="section-note">The first three moves matter most: sender trust, targeted sends, exact reply logging.</div>
           </div>
-          <div class="flow">
-            <div class="flow-block"><h3>1. Prepare the sender</h3><p>Run from WhatsApp Business with a clean Jawab identity.</p></div>
-            <div class="flow-block"><h3>2. Send the batch</h3><p>Work the first 10 in order. WhatsApp first where direct paths exist.</p></div>
-            <div class="flow-block"><h3>3. Stop editing</h3><p>After sending, switch into replies, objections, demo sends, and proof.</p></div>
+          <div class="strip">
+            <div class="strip-card">
+              <strong>1. Set the sender</strong>
+              <span>WhatsApp Business profile, clean name, logo, short description, quick replies.</span>
+            </div>
+            <div class="strip-card">
+              <strong>2. Work the batch</strong>
+              <span>Use the current top 10 or top 30 with pain-proofed openers, not generic copy.</span>
+            </div>
+            <div class="strip-card">
+              <strong>3. Switch to proof</strong>
+              <span>After the batch starts, everything becomes replies, demos, calls, and screenshots.</span>
+            </div>
           </div>
-          <div class="checklist">
-            <label class="task"><input type="checkbox" data-persist="task1"><div><strong>Use WhatsApp Business</strong><span>Same number, business-facing profile, not a personal-looking account.</span></div></label>
-            <label class="task"><input type="checkbox" data-persist="task2"><div><strong>Set the profile wrapper</strong><span>Jawab or Jawab Dental Recovery, black/gold mark, clear business description.</span></div></label>
-            <label class="task"><input type="checkbox" data-persist="task3"><div><strong>Send the first 10</strong><span>Do not reopen strategy mode once the batch starts.</span></div></label>
-            <label class="task"><input type="checkbox" data-persist="task4"><div><strong>Log exact channels and objections</strong><span>Who, how, reply/no reply, and exact objection wording.</span></div></label>
-            <label class="task"><input type="checkbox" data-persist="task5"><div><strong>Capture proof immediately</strong><span>Recovered convo, result, screenshot, owner sentence.</span></div></label>
+          <div class="task-list">
+            <label class="task"><input type="checkbox" data-persist="task_sender"><div><strong>Open from WhatsApp Business</strong><span>Business-facing identity on the Egyptian number, not a blank personal profile.</span></div></label>
+            <label class="task"><input type="checkbox" data-persist="task_profile"><div><strong>Set display name, logo, and quick replies</strong><span>`Jawab` or `Jawab Dental Recovery`, one-line description, demo and price quick replies.</span></div></label>
+            <label class="task"><input type="checkbox" data-persist="task_demo"><div><strong>Have the demo link ready</strong><span>Hosted or shareable, with the 60-second voice/demo flow easy to send.</span></div></label>
+            <label class="task"><input type="checkbox" data-persist="task_send"><div><strong>Send the first batch</strong><span>WhatsApp first where direct paths exist, IG second, Gmail fallback only when useful.</span></div></label>
+            <label class="task"><input type="checkbox" data-persist="task_log"><div><strong>Log exact replies and objections</strong><span>Copy the wording exactly. The next version comes from the market, not memory.</span></div></label>
+            <label class="task"><input type="checkbox" data-persist="task_proof"><div><strong>Capture first proof</strong><span>Screenshot the recovered thread, handoff, or owner reaction the same day it happens.</span></div></label>
           </div>
         </section>
 
-        <section class="panel reveal">
-          <div class="kicker">Send Order</div>
-          <div class="panel-header">
-            <div><h2>Priority queue</h2><div class="note">Fast-reply bias, direct paths first, broken-site clinics still high because the pain is obvious.</div></div>
+        <section class="section reveal" id="queue">
+          <div class="section-head">
+            <div>
+              <div class="section-label">queue</div>
+              <h2>Send order</h2>
+            </div>
+            <div class="section-note">Direct mobile/WhatsApp paths first, then obvious broken-path clinics, then prestige clinics with heavy inbound volume.</div>
           </div>
           <div class="queue">
-            <div class="queue-card"><div class="queue-head"><div class="queue-title">1. Dr. Thomas Dental Implant Clinic</div><span class="tag wa">WhatsApp</span></div><p class="queue-meta">Direct WhatsApp path already visible. Clean implant recovery pitch.</p></div>
-            <div class="queue-card"><div class="queue-head"><div class="queue-title">2. Leila Hariri Dental &amp; Medical Aesthetics</div><span class="tag wa">WhatsApp</span></div><p class="queue-meta">Premium clinic plus direct mobile path. High trust and high leak value.</p></div>
-            <div class="queue-card"><div class="queue-head"><div class="queue-title">3. NOA Dental Clinic</div><span class="tag wa">WhatsApp</span></div><p class="queue-meta">Cosmetic and veneers. Fast follow-up angle is strong.</p></div>
-            <div class="queue-card"><div class="queue-head"><div class="queue-title">4. DRFK Turkish International Day Surgery Center</div><span class="tag wa">WhatsApp</span></div><p class="queue-meta">Direct mobile line. Strong high-intent treatment angle.</p></div>
-            <div class="queue-card"><div class="queue-head"><div class="queue-title">5. Dentist Direct Dubai</div><span class="tag ig">IG DM</span></div><p class="queue-meta">24/7 emergency positioning means delayed replies hurt trust fast.</p></div>
-            <div class="queue-card"><div class="queue-head"><div class="queue-title">6. Dr. Michael's Dental Clinic</div><span class="tag ig">IG DM</span></div><p class="queue-meta">Huge review volume plus cosmetic and implant positioning.</p></div>
-            <div class="queue-card"><div class="queue-head"><div class="queue-title">7. Dr. Joy Dental Clinic</div><span class="tag ig">IG DM</span></div><p class="queue-meta">Multi-branch response inconsistency angle.</p></div>
-            <div class="queue-card"><div class="queue-head"><div class="queue-title">8. Dentzz Dental Care Centre</div><span class="tag ig">IG DM</span></div><p class="queue-meta">Premium cosmetic brand, likely human bottleneck on inbound flow.</p></div>
-            <div class="queue-card"><div class="queue-head"><div class="queue-title">9. New Ivory Dental &amp; Implant Clinic</div><span class="tag ig">IG DM</span></div><p class="queue-meta">Website down. Every direct message matters more.</p></div>
-            <div class="queue-card"><div class="queue-head"><div class="queue-title">10. The TopDent</div><span class="tag wa">WhatsApp if active</span></div><p class="queue-meta">Website suspended. Strong broken-path wedge.</p></div>
+            <article class="queue-item">
+              <div class="queue-top">
+                <div>
+                  <div class="queue-rank">01</div>
+                  <div class="queue-name">Dr. Thomas Dental Implant Clinic</div>
+                </div>
+                <span class="channel wa">whatsapp</span>
+              </div>
+              <div class="queue-copy">Implant-focused clinic with a direct WhatsApp path. Strongest opener: missed or slow implant follow-up becomes another clinic's patient.</div>
+            </article>
+            <article class="queue-item">
+              <div class="queue-top">
+                <div>
+                  <div class="queue-rank">02</div>
+                  <div class="queue-name">Leila Hariri Dental & Medical Aesthetics</div>
+                </div>
+                <span class="channel wa">whatsapp</span>
+              </div>
+              <div class="queue-copy">Premium aesthetics plus direct mobile path. Strong angle: front desk load leaks high-trust cosmetic inquiries.</div>
+            </article>
+            <article class="queue-item">
+              <div class="queue-top">
+                <div>
+                  <div class="queue-rank">03</div>
+                  <div class="queue-name">NOA Dental Clinic</div>
+                </div>
+                <span class="channel wa">whatsapp</span>
+              </div>
+              <div class="queue-copy">Cosmetic/veneer clinic where response speed matters. Strong angle: fast follow-up before intent cools.</div>
+            </article>
+            <article class="queue-item">
+              <div class="queue-top">
+                <div>
+                  <div class="queue-rank">04</div>
+                  <div class="queue-name">DRFK Turkish International Day Surgery Center</div>
+                </div>
+                <span class="channel wa">whatsapp</span>
+              </div>
+              <div class="queue-copy">Direct mobile line and high-intent procedures. Missed calls here are expensive immediately.</div>
+            </article>
+            <article class="queue-item">
+              <div class="queue-top">
+                <div>
+                  <div class="queue-rank">05</div>
+                  <div class="queue-name">Dentist Direct Dubai</div>
+                </div>
+                <span class="channel ig">ig dm</span>
+              </div>
+              <div class="queue-copy">24/7 emergency positioning creates a trust gap when replies are delayed. Strong opener: emergency promise, weak recovery path.</div>
+            </article>
+            <article class="queue-item">
+              <div class="queue-top">
+                <div>
+                  <div class="queue-rank">06</div>
+                  <div class="queue-name">Dr. Michael's Dental Clinic</div>
+                </div>
+                <span class="channel ig">ig dm</span>
+              </div>
+              <div class="queue-copy">Large review volume plus cosmetic/implant focus. One slow reply likely costs a premium patient.</div>
+            </article>
+            <article class="queue-item">
+              <div class="queue-top">
+                <div>
+                  <div class="queue-rank">07</div>
+                  <div class="queue-name">Dr. Joy Dental Clinic</div>
+                </div>
+                <span class="channel ig">ig dm</span>
+              </div>
+              <div class="queue-copy">Multi-branch coordination means inconsistent response handling. Strong angle: overflow and multi-location leakage.</div>
+            </article>
+            <article class="queue-item">
+              <div class="queue-top">
+                <div>
+                  <div class="queue-rank">08</div>
+                  <div class="queue-name">Dentzz Dental Care Centre</div>
+                </div>
+                <span class="channel ig">ig dm</span>
+              </div>
+              <div class="queue-copy">Premium cosmetic brand with likely human bottleneck on high-value inbound inquiries.</div>
+            </article>
+            <article class="queue-item">
+              <div class="queue-top">
+                <div>
+                  <div class="queue-rank">09</div>
+                  <div class="queue-name">New Ivory Dental & Implant Clinic</div>
+                </div>
+                <span class="channel ig">ig dm</span>
+              </div>
+              <div class="queue-copy">Broken website path. Strong opener: when the site is down, every direct message matters more.</div>
+            </article>
+            <article class="queue-item">
+              <div class="queue-top">
+                <div>
+                  <div class="queue-rank">10</div>
+                  <div class="queue-name">The TopDent</div>
+                </div>
+                <span class="channel wa">wa / ig</span>
+              </div>
+              <div class="queue-copy">Suspended website path. Strong opener: direct messaging becomes the de facto booking channel, so response gaps become visible.</div>
+            </article>
           </div>
         </section>
 
-        <section class="panel reveal">
-          <div class="kicker">Journal</div>
-          <div class="panel-header">
-            <div><h2>Send log and reply intelligence</h2><div class="note">Keep this honest, not pretty. It exists to improve the next batch.</div></div>
+        <section class="section reveal" id="logs">
+          <div class="section-head">
+            <div>
+              <div class="section-label">logs</div>
+              <h2>Reply intelligence</h2>
+            </div>
+            <div class="section-note">The only notes that matter are the ones that change the next send, call, or offer.</div>
           </div>
           <div class="journal">
-            <div class="journal-grid">
-              <div class="journal-card"><h3>Sent</h3><textarea data-persist="sentLog" placeholder="Who was contacted, on what channel, and when?"></textarea></div>
-              <div class="journal-card"><h3>Replies / Objections</h3><textarea data-persist="replyLog" placeholder="Paste replies, objections, or anything promising."></textarea></div>
+            <div class="log-card">
+              <h3>Sent</h3>
+              <textarea data-persist="sent_log" placeholder="Who was contacted, which channel, what leak angle, what time."></textarea>
             </div>
-            <div class="journal-card"><h3>Next Moves</h3><textarea data-persist="nextMoves" placeholder="Follow-ups, demo sends, calls to book, proof to capture."></textarea></div>
+            <div class="log-card">
+              <h3>Replies and objections</h3>
+              <textarea data-persist="reply_log" placeholder="Paste exact replies, objections, and what felt warm or cold."></textarea>
+            </div>
+            <div class="log-card">
+              <h3>Next actions</h3>
+              <textarea data-persist="next_actions" placeholder="Who gets a demo, who needs a follow-up, who should move to call."></textarea>
+            </div>
+            <div class="log-card">
+              <h3>Proof capture</h3>
+              <textarea data-persist="proof_log" placeholder="Recovered threads, screenshots saved, owner feedback, handoff outcome."></textarea>
+            </div>
           </div>
         </section>
       </main>
 
-      <aside class="stack">
-        <section class="panel reveal">
-          <div class="kicker">Scoreboard</div>
-          <div class="panel-header">
-            <div><h2>Daily operating numbers</h2><div class="note">Track enough to stay sharp. Not enough to become the work.</div></div>
-          </div>
+      <aside class="rail" id="rail">
+        <section class="rail-card reveal" id="score">
+          <div class="rail-label">score</div>
+          <h3>Daily numbers</h3>
           <div class="metrics">
-            <div class="metric"><label>Researched</label><input type="number" data-persist="m1" placeholder="0"></div>
-            <div class="metric"><label>Touches Sent</label><input type="number" data-persist="m2" placeholder="0"></div>
-            <div class="metric"><label>Warm Intros</label><input type="number" data-persist="m3" placeholder="0"></div>
-            <div class="metric"><label>Replies</label><input type="number" data-persist="m4" placeholder="0"></div>
-            <div class="metric"><label>Demo Links</label><input type="number" data-persist="m5" placeholder="0"></div>
-            <div class="metric"><label>Calls Booked</label><input type="number" data-persist="m6" placeholder="0"></div>
-            <div class="metric"><label>Proposals</label><input type="number" data-persist="m7" placeholder="0"></div>
-            <div class="metric"><label>Closes</label><input type="number" data-persist="m8" placeholder="0"></div>
-            <div class="metric"><label>Top Objection</label><input type="text" data-persist="m9" placeholder="One short objection"></div>
+            <div class="metric">
+              <label class="metric-label">Leads enriched</label>
+              <input type="number" data-persist="score_leads" placeholder="0">
+            </div>
+            <div class="metric">
+              <label class="metric-label">Touches sent</label>
+              <input type="number" data-persist="score_touches" placeholder="0">
+            </div>
+            <div class="metric">
+              <label class="metric-label">Replies</label>
+              <input type="number" data-persist="score_replies" placeholder="0">
+            </div>
+            <div class="metric">
+              <label class="metric-label">Demos booked</label>
+              <input type="number" data-persist="score_demos" placeholder="0">
+            </div>
+            <div class="metric">
+              <label class="metric-label">Proposals</label>
+              <input type="number" data-persist="score_proposals" placeholder="0">
+            </div>
+            <div class="metric">
+              <label class="metric-label">Closes</label>
+              <input type="number" data-persist="score_closes" placeholder="0">
+            </div>
           </div>
         </section>
 
-        <section class="panel reveal">
-          <div class="kicker">Proof Capture</div>
-          <div class="proof">
-            <label class="task"><input type="checkbox" data-persist="proof1"><div><strong>Save the recovered conversation</strong><span>Screenshots, not vague recollections.</span></div></label>
-            <label class="task"><input type="checkbox" data-persist="proof2"><div><strong>Save the outcome</strong><span>Booking, handoff, or qualified recovery.</span></div></label>
-            <label class="task"><input type="checkbox" data-persist="proof3"><div><strong>Ask for one sentence</strong><span>Owner or manager feedback becomes proof fast.</span></div></label>
-            <label class="task"><input type="checkbox" data-persist="proof4"><div><strong>Write the 4-line summary</strong><span>Problem, handled, outcome, leak avoided.</span></div></label>
+        <section class="rail-card reveal">
+          <div class="rail-label">right now</div>
+          <h3>Operating rail</h3>
+          <div class="rail-kpi">
+            <div><span>Offer</span><span>Jawab Audit + Recover</span></div>
+            <div><span>Price</span><span>AED 5,000 / 1,500</span></div>
+            <div><span>Channel</span><span>WhatsApp first</span></div>
+            <div><span>Demo</span><span>voice + audit</span></div>
+            <div><span>Primary proof</span><span>screenshots + handoff</span></div>
+            <div><span>First upsell</span><span>Treatment Plan Rescue</span></div>
           </div>
         </section>
 
-        <section class="panel reveal">
-          <div class="kicker">Connector Reality</div>
-          <div class="connectors">
-            <div class="connector"><strong>Gmail</strong><span class="state live">Available</span></div>
-            <div class="connector"><strong>Google Drive / Sheets</strong><span class="state live">Available</span></div>
-            <div class="connector"><strong>Loom</strong><span class="state soft">Manual for now</span></div>
-            <div class="connector"><strong>Twilio</strong><span class="state soft">Later layer</span></div>
-            <div class="connector"><strong>Make</strong><span class="state soft">Later layer</span></div>
-            <div class="connector"><strong>Apify</strong><span class="state soft">Scale later</span></div>
+        <section class="rail-card reveal">
+          <div class="rail-label">tool order</div>
+          <h3>Connect next</h3>
+          <div class="read-list">
+            <div class="tool-item"><strong>1. WhatsApp Business</strong>Sender identity, quick replies, voice notes, business profile.</div>
+            <div class="tool-item"><strong>2. Gmail + Sheets + Drive</strong>Lead tracking, replies, warm intros, proof archive.</div>
+            <div class="tool-item"><strong>3. Loom</strong>Manual audit videos and demo send.</div>
+            <div class="tool-item"><strong>4. Vercel</strong>Clean demo and audit links.</div>
+            <div class="tool-item"><strong>5. Apify</strong>Scale lead research after the first manual batch.</div>
+            <div class="tool-item"><strong>6. Twilio + Make</strong>Only when delivery is real.</div>
           </div>
         </section>
 
-        <section class="panel reveal">
-          <div class="kicker">Hard Rules</div>
+        <section class="rail-card reveal">
+          <div class="rail-label">hard rules</div>
+          <h3>Do not drift</h3>
           <div class="rules">
-            <div class="rule-box"><strong>Do not add more tools</strong> before the first replies.</div>
-            <div class="rule-box"><strong>Do not rebuild the demo</strong> when it is already good enough to sell.</div>
-            <div class="rule-box"><strong>Do not promise</strong> local UAE routing, deep integrations, or full front-desk replacement.</div>
-            <div class="rule-box"><strong>Do not switch strategy</strong> because one clinic ignores you.</div>
-            <div class="rule-box"><strong>After sending, listen.</strong> The next version comes from replies, not imagination.</div>
-          </div>
-        </section>
-
-        <section class="panel reveal">
-          <div class="kicker">Next Connections</div>
-          <div class="next">
-            <div class="next-box"><strong>1. WhatsApp Business</strong> for sender trust and speed</div>
-            <div class="next-box"><strong>2. Google Workspace</strong> for inbox, sheet, and daily control</div>
-            <div class="next-box"><strong>3. Loom</strong> for the 60-second demo link</div>
-            <div class="next-box"><strong>4. Twilio + Make</strong> only after repeated work starts hurting</div>
+            <div class="rule"><strong>No more architecture before replies.</strong> The model is already good enough to test.</div>
+            <div class="rule"><strong>Do not lead with AI receptionist.</strong> Lead with the leak, then the recovery.</div>
+            <div class="rule"><strong>Voice is a closer, not the core deployment.</strong> Demo it, then sell Recover first.</div>
+            <div class="rule"><strong>Archive is reference only.</strong> Use `99_Outdated_V2` only when deliberately salvaging old ideas.</div>
           </div>
         </section>
       </aside>
     </div>
 
-    <div class="footer">Jawab operator cockpit. Stored locally in your browser on this machine.</div>
+    <div class="footer">Stored locally in this browser. Open `jawab_README`, then the source of truth, then send.</div>
   </div>
 
   <script>
-    const keyPrefix = "jawab-dashboard-premium:";
-    const persistNodes = document.querySelectorAll("[data-persist]");
-    const revealNodes = document.querySelectorAll(".reveal");
-    function syncTask(node){ if(node.type==="checkbox"){ const task=node.closest(".task"); if(task) task.classList.toggle("done", node.checked); } }
-    persistNodes.forEach(node=>{
+    const keyPrefix = "jawab-dashboard-v3:";
+    const persisted = document.querySelectorAll("[data-persist]");
+    const reveals = document.querySelectorAll(".reveal");
+    const taskInputs = document.querySelectorAll('.task input[type="checkbox"]');
+    const taskCountNode = document.getElementById("taskCount");
+    const taskTotalNode = document.getElementById("taskTotal");
+    const completionLabel = document.getElementById("completionLabel");
+    const progressBar = document.getElementById("progressBar");
+
+    function syncTaskState(node){
+      if(node.type !== "checkbox") return;
+      const task = node.closest(".task");
+      if(task) task.classList.toggle("done", node.checked);
+    }
+
+    function updateProgress(){
+      const total = taskInputs.length;
+      const done = Array.from(taskInputs).filter(node => node.checked).length;
+      const pct = total ? Math.round((done / total) * 100) : 0;
+      taskTotalNode.textContent = total;
+      taskCountNode.textContent = done;
+      progressBar.style.width = pct + "%";
+      completionLabel.textContent =
+        pct === 100 ? "locked in" :
+        pct >= 66 ? "in motion" :
+        pct >= 33 ? "warming up" :
+        "not started";
+    }
+
+    persisted.forEach(node => {
       const key = keyPrefix + node.dataset.persist;
       const saved = localStorage.getItem(key);
-      if(saved!==null){ node.type==="checkbox" ? node.checked = saved==="true" : node.value = saved; }
-      syncTask(node);
-      node.addEventListener("input",()=>{ localStorage.setItem(key, node.type==="checkbox" ? String(node.checked) : node.value); syncTask(node); });
+      if(saved !== null){
+        if(node.type === "checkbox"){
+          node.checked = saved === "true";
+        } else {
+          node.value = saved;
+        }
+      }
+      syncTaskState(node);
+      node.addEventListener("input", () => {
+        const value = node.type === "checkbox" ? String(node.checked) : node.value;
+        localStorage.setItem(key, value);
+        syncTaskState(node);
+        updateProgress();
+      });
     });
-    const observer = new IntersectionObserver(entries=>{
-      entries.forEach(entry=>{ if(entry.isIntersecting){ entry.target.classList.add("in"); observer.unobserve(entry.target);} });
-    },{threshold:.08});
-    revealNodes.forEach((node,i)=>{ node.style.transitionDelay=`${i*50}ms`; observer.observe(node); });
+
+    updateProgress();
+
+    const revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          entry.target.classList.add("in");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+
+    reveals.forEach((node, index) => {
+      node.style.transitionDelay = `${index * 45}ms`;
+      revealObserver.observe(node);
+    });
   </script>
 </body>
 </html>
