@@ -1,0 +1,10 @@
+Metric,DefaultValue,ConservativeRange,Notes
+MissedCallsPerWeek,5,5-10,"Use clinic-specific call test if available"
+SlowWhatsAppRepliesPerWeek,8,5-15,"Count delayed replies or visible weak WhatsApp path"
+PostConsultDropoffsPerMonth,3,2-6,"Implants, veneers, ortho, smile design, whitening"
+AverageTreatmentValueAED,10000,5000-20000,"Use conservative treatment value"
+ConservativeRecoveryRate,0.10,0.05-0.15,"Never present as guaranteed"
+JawabMonthlyCostAED,1500,1500,"Base monthly retainer after first month"
+EstimatedMonthlyLeakAED,=(((B2+B3)*4)+B4)*B5,Formula,"Estimate only"
+EstimatedRecoverableValueAED,=B7*B6,Formula,"Estimate only"
+SimpleROIRatio,=B8/B6,Formula,"Estimate only"

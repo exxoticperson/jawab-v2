@@ -642,6 +642,63 @@ Invoice fields:
 - setup begins after payment
 - receipt issued after transfer
 
+## Daily KPI Scoreboard
+
+Track only the numbers that change sales decisions.
+
+| Date | Leads Enriched | Touches Sent | Replies | Demos Sent | Demos Booked | Proposals Sent | Closes | MRR AED | Top Objection | Next Action |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|
+| YYYY-MM-DD | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |  |  |
+
+Daily minimum:
+
+- 10 enriched clinics
+- 10 high-quality touches
+- all replies answered same day
+- every objection copied into the sheet
+
+Weekly target:
+
+- 50-100 high-quality touches
+- 10-20 demo sends
+- 5+ real sales conversations
+- 1 paid or founding clinic by day 14
+
+## Discovery Call Script
+
+Goal: diagnose leakage, show the audit/demo, and close `Jawab Recover`.
+
+1. Open:
+   `Thanks for taking the call. I will keep this simple: I want to understand how patient inquiries are handled now, show the leak I noticed, then tell you if Jawab is worth installing.`
+2. Current flow:
+   `When a new patient calls or messages, who handles it first?`
+3. Missed demand:
+   `What happens after-hours, during lunch, or when reception is busy?`
+4. WhatsApp:
+   `Do most patients prefer WhatsApp, calls, Instagram, or website forms?`
+5. High-ticket services:
+   `Which services matter most commercially: implants, veneers, ortho, smile design, whitening, or something else?`
+6. Consult drop-off:
+   `After a patient comes for a consult and says they will think about it, who follows up and when?`
+7. Existing systems:
+   `What software or booking process does the team already use?`
+8. Impact:
+   `If Jawab recovered even one serious implant or veneer inquiry per month, would that be meaningful for the clinic?`
+9. Demo:
+   show the 60-second demo or clinic-specific audit.
+10. Price:
+   `The founding Recovery Sprint is AED 5,000 upfront, including setup and the first 30 days. After that it is AED 1,500/month if you want to keep it running.`
+11. Close:
+   `If this makes sense, the next step is simple: I send the invoice and setup checklist today, and we can have the first recovery workflow ready within 72 hours.`
+
+Do not present price before the clinic agrees the leak is real.
+
+## Egyptian Number Credibility Line
+
+Use this only if a clinic asks why the outreach comes from an Egyptian number.
+
+`I am based in Egypt and building Jawab for Arabic-English clinics across the Gulf. The system is not tied to my personal number; this is just the founder outreach line. For a clinic deployment, the workflow runs through the clinic-approved WhatsApp or official business setup.`
+
 ## Integration Rules
 
 - Do not change the core positioning: `Clinic Revenue Leak Audit + Patient Recovery System`.
