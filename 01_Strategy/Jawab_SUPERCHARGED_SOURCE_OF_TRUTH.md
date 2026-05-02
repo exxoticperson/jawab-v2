@@ -39,7 +39,6 @@ Missing GTM assets to build before scale:
 - clean WhatsApp Business profile copy
 - hosted demo link
 - one-page `Jawab Audit` template
-- Lost Patient Calculator in Sheets or HTML
 - 45-second Loom audit script
 - 30-second WhatsApp voice-note variants by pain bucket
 - first-client proof/case-study template
@@ -350,6 +349,10 @@ Acceptance criteria:
 ## Lost Patient Calculator
 
 Purpose: conservative sales math, not guaranteed revenue.
+
+Current asset:
+
+- `03_Demo_and_Assets/jawab_lost_patient_calculator.html`
 
 Fields:
 

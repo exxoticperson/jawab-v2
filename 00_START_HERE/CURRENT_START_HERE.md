@@ -23,15 +23,30 @@ Treat only these files as current:
 - `02_Outreach_and_Data/Jawab_Morning_Send_Pack.md`
 - `02_Outreach_and_Data/Jawab_Tool_Access_Wishlist.md`
 - `03_Demo_and_Assets/jawab_demo.html`
+- `03_Demo_and_Assets/jawab_lost_patient_calculator.html`
 - `03_Demo_and_Assets/demo_agent_script.md`
 - `04_System_and_Skills/Jawab_MAKE_BLUEPRINT.md`
 - `04_System_and_Skills/Jawab_AGENT_OPERATING_MODEL.md`
 - `04_System_and_Skills/SKILL_INDEX.md`
 - `04_System_and_Skills/EXTERNAL_SKILL_INTAKE.md`
+- `04_System_and_Skills/clinic_audit_tool.py`
+- `04_System_and_Skills/Jawab_AUTOMATION_GUIDE.md`
+- `04_System_and_Skills/Jawab_AGENTIC_TOOLKIT.md`
+- `04_System_and_Skills/Jawab_OPERATOR_MEMORY.md`
 - `06_Client_Ops/jawab_service_agreement.md`
 - `06_Client_Ops/jawab_data_processing_addendum.md`
 - `06_Client_Ops/jawab_founding_client_letter.md`
 - `06_Client_Ops/jawab_invoice_template.md`
+- `06_Client_Ops/Jawab_CLIENT_ONE_ONBOARDING.md`
+- `06_Client_Ops/Jawab_PAYMENT_PATH.md`
+- `06_Client_Ops/Jawab_PRIVACY_TRUST_BLOCK.md`
+- `01_Strategy/Jawab_VISIBLE_OFFER.md`
+- `01_Strategy/Jawab_PRICING_LADDER_2026.md`
+- `02_Outreach_and_Data/Jawab_REVENUE_LEAK_SCORECARD.md`
+- `02_Outreach_and_Data/Jawab_MYSTERY_SHOP_PROTOCOL.md`
+- `02_Outreach_and_Data/Jawab_PARTNER_SPRINT.md`
+- `03_Demo_and_Assets/Jawab_OWNER_PROOF_DEMO_SCRIPT.md`
+- `03_Demo_and_Assets/Jawab_INTELLIGENCE_REPORT_TEMPLATE.md`
 
 ## Current Truth In One Sentence
 

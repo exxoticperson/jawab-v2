@@ -26,6 +26,18 @@ Goal: diagnose leakage, show the audit/demo, and close `Jawab Recover`.
    `The founding Recovery Sprint is AED 5,000 upfront, including setup and the first 30 days. After that it is AED 1,500/month if you want to keep it running.`
 11. Close:
    `If this makes sense, the next step is simple: I send the invoice and setup checklist today, and we can have the first recovery workflow ready within 72 hours.`
+12. Approval path:
+   `If this was installed this week, who would need to approve it?`
+13. Decision pressure:
+   `Is there any reason we should not start with the Recovery Sprint this week?`
+14. Direct close:
+   `Do you want me to send the invoice now, or do you need the one-page agreement first?`
+
+## Fallback Close
+
+If full Recover feels early:
+
+`We can start with the paid Jawab Visible + Revenue Leak Audit at AED 1,500 and credit that toward Recover if you move forward within 7 days.`
 
 ## Rules
 

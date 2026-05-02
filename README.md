@@ -34,10 +34,11 @@ Jawab is a `Clinic Revenue Leak Audit + Patient Recovery System` for premium den
   - lead sheets, audit templates, calculator CSV, outreach scripts, objections, discovery call flow, partnerships, and content calendar.
 - `03_Demo_and_Assets`
   - `jawab_demo.html`: interactive demo.
+  - `jawab_lost_patient_calculator.html`: live conservative ROI calculator for clinic audits and follow-up.
   - `demo_agent_script.md`: Arabic/English voice demo script and staff summary format.
   - demo notes and visual assets.
 - `04_System_and_Skills`
-  - agent model, Make blueprint, source-of-truth guard, and project-local skills.
+  - agent model, Make blueprint, agentic toolkit, operator memory, source-of-truth guard, and project-local skills.
 - `05_Backend_Reference`
   - old Node backend saved as reference only, not the production path.
 - `06_Client_Ops`

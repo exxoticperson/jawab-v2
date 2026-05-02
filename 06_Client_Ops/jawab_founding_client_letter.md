@@ -18,6 +18,8 @@ In return, I would appreciate:
 - permission to use anonymized results in a case study.
 - one referral to another clinic if Jawab creates value for you.
 
+Because you are a founding clinic, I will personally handle setup, weekly reporting, and optimization during the first 30 days.
+
 The goal in the first 30 days is simple:
 
 - recover missed or delayed patient conversations.

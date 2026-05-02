@@ -5,12 +5,12 @@
 ```text
 Hi Dr. [Name] - quick one.
 
-I noticed [specific leak].
-For implant/veneer patients, that kind of delay can mean they message the next clinic.
+I checked [Clinic]'s public patient path and noticed [specific leak].
+For implant/veneer patients, that kind of leak can mean they message the next clinic before your team even sees them.
 
 I built Jawab, an Arabic-English recovery loop that catches missed or delayed patient conversations and routes them to WhatsApp or staff follow-up.
 
-Want me to send a 60-second demo for [Clinic]?
+I made a 60-second audit showing the issue and how Jawab would catch it. Can I send it here?
 ```
 
 ## WhatsApp Voice Note Script
@@ -18,9 +18,9 @@ Want me to send a 60-second demo for [Clinic]?
 ```text
 Hi Dr. [Name], this is Adam. I am a dental student building Jawab.
 
-I noticed [specific leak] at [Clinic], and I think it is the exact kind of thing that causes high-value patients to disappear before booking.
+I checked [Clinic]'s public patient path and noticed [specific leak], and I think it is exactly the kind of thing that causes high-value patients to disappear before booking.
 
-I made a short demo of an Arabic-English recovery loop that catches those missed conversations and routes them back to WhatsApp or staff. I can send it here if useful.
+I made a short audit showing the leak and the Arabic-English recovery flow Jawab uses to catch those missed conversations and route them back to WhatsApp or staff. I can send it here if useful.
 ```
 
 ## Loom Audit Script
@@ -39,7 +39,7 @@ If you want, I can install the Recovery Sprint this week and show you exactly wh
 ## Positive Reply
 
 ```text
-Perfect. Here is the 60-second demo: [link]
+Perfect. Here is the 60-second audit: [link]
 
 Quick question: how are missed calls and slow WhatsApp replies handled right now?
 ```
@@ -61,7 +61,7 @@ Send first touch with specific leak proof.
 ### Day 4
 
 ```text
-Just checking this landed. I made the demo short because the point is simple: when a patient slips through, Jawab catches the thread and routes it back to WhatsApp or staff. Want me to send it here?
+Just checking this landed. I made the audit short because the point is simple: when a patient slips through, Jawab catches the thread and routes it back to WhatsApp or staff. Want me to send it here?
 ```
 
 ### Day 9
