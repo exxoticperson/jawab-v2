@@ -88,7 +88,7 @@ A luxury brand still life: a thick matte black business card with minimal gold f
 ## LOGO PROMPT
 
 ```
-
+A ultra-minimalist, timeless logo mark for "Jawab" (Arabic: جواب), a premium clinic intelligence brand. The logo is a single geometric abstract mark that subtly combines the Latin letter "J" and the Arabic letter "ج" (jeem) into one unified symbol. The mark uses clean, continuous lines — no fills, just elegant strokes. The stroke weight is medium-thin, like a luxury fashion house wordmark. Color: solid gold (#D4AF37) on a pure black (#000000) background. The style is inspired by Aesop, Byredo, and Apple — restrained, confident, timeless. No gradients, no shadows, no 3D effects, no decorative elements. Just the single mark, centered, with generous negative space around it. Vector-quality sharpness. This logo should work at 16px favicon size and at billboard scale.
 ```
 
 **Alternative logo prompt (wordmark version):**
@@ -100,7 +100,7 @@ A minimalist luxury wordmark logo: the word "Jawab" in a custom sans-serif typef
 **Alternative logo prompt (icon-only version):**
 
 ```
-A single abstract geometric icon for a brand called "Jawab." The icon is a minimal speech bubble shape, but insteaA ultra-minimalist, timeless logo mark for "Jawab" (Arabic: جواب), a premium clinic intelligence brand. The logo is a single geometric abstract mark that subtly combines the Latin letter "J" and the Arabic letter "ج" (jeem) into one unified symbol. The mark uses clean, continuous lines — no fills, just elegant strokes. The stroke weight is medium-thin, like a luxury fashion house wordmark. Color: solid gold (#D4AF37) on a pure black (#000000) background. The style is inspired by Aesop, Byredo, and Apple — restrained, confident, timeless. No gradients, no shadows, no 3D effects, no decorative elements. Just the single mark, centered, with generous negative space around it. Vector-quality sharpness. This logo should work at 16px favicon size and at billboard scale.d of the traditional rounded rectangle, it's constructed from two overlapping circles — creating a subtle "conversation" metaphor. The tail of the speech bubble points downward-left and is a single clean line. The entire icon is rendered in one solid color: gold (#D4AF37) on black (#000000). The style is ultra-clean, geometric, could be mistaken for a luxury fashion monogram. No text, no gradients. Perfectly symmetrical. Works at any size from app icon to business card.
+A single abstract geometric icon for a brand called "Jawab." The icon is a minimal speech bubble shape, but instead of the traditional rounded rectangle, it's constructed from two overlapping circles — creating a subtle "conversation" metaphor. The tail of the speech bubble points downward-left and is a single clean line. The entire icon is rendered in one solid color: gold (#D4AF37) on black (#000000). The style is ultra-clean, geometric, could be mistaken for a luxury fashion monogram. No text, no gradients. Perfectly symmetrical. Works at any size from app icon to business card.
 ```
 
 ---
