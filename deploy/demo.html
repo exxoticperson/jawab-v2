@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jawab - Cinematic Product Film</title>
+    <!-- Fonts: Inter (UI), Tajawal (Arabic UI), Oswald (Editorial Cinematic Typography) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Tajawal:wght@300;400;500;700&family=Oswald:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Cinematic Palette */
+            --true-black: #000000;
+            --off-black: #09090b;
+            --surface-dark: #111112;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            
+            /* Text */
+            --text-primary: #ffffff;
+            --text-secondary: #86868b;
+            --text-tertiary: #505055;
+            
+            /* Brands & Accents */
+            --jawab-gold: #D4AF37;
+            --wa-out-premium: #0B3D30;
+            --wa-in-premium: #1C1C1E;
+            --wa-bg-premium: #000000;
+            --wa-blue-tick: #0A84FF;
+            --red-alert: #FF453A;
+            
+            /* Motion Easing (Apple/High-Fashion default) */
+            --ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+            --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        
+        body {
+            background-color: var(--true-black);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #ambient-light {
+            position: absolute; top:0; left:0; right:0; bottom:0;
+            background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.05) 0%, var(--true-black) 60%);
+            transition: all 1.5s var(--ease-cinematic); z-index: -100;
+        }
+        #stage.pulse-red #ambient-light { background: radial-gradient(circle at 50% 30%, rgba(255, 69, 58, 0.2) 0%, var(--true-black) 80%); }
+        #stage.pulse-gold #ambient-light { background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.2) 0%, var(--true-black) 80%); }
+
+        /* --- 3D CAMERA SYSTEM --- */
+        #stage {
+            perspective: 2500px;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        #camera {
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            transform-style: preserve-3d;
+            transition: transform 2.5s var(--ease-cinematic);
+            /* Initial Pose: Slightly tilted, distant */
+            transform: translateZ(-200px) rotateX(15deg) rotateY(-20deg);
+        }
+
+        /* Camera Core States */
+        #camera.c-intro { transform: translateZ(-400px) rotateX(20deg) rotateY(-25deg); }
+        #camera.c-flat { transform: translateZ(0px) rotateX(0deg) rotateY(0deg); }
+        #camera.c-missed { transform: translateZ(100px) rotateX(-5deg) rotateY(5deg); }
+        #camera.c-chat { transform: translateZ(50px) rotateX(2deg) rotateY(-2deg); }
+        #camera.c-alert { transform: translateZ(0px) rotateX(15deg) rotateY(0deg); }
+        #camera.c-proof { transform: translateZ(200px) rotateX(-10deg) rotateY(10deg); }
+
+        /* --- INTERSTITIAL EDITORIAL TYPOGRAPHY --- */
+        .interstitial {
+            position: absolute;
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            font-size: 19vw;
+            font-weight: 500;
+            color: rgba(255,255,255,0);
+            white-space: nowrap;
+            letter-spacing: -0.05em;
+            pointer-events: none;
+            z-index: 1000; /* Extremely high to fly over the phone layout */
+            transform: translateZ(-800px) scale(0.6);
+            opacity: 0;
+            filter: blur(30px);
+            transition: transform 3.5s cubic-bezier(0.2, 0.9, 0.2, 1), opacity 1.5s ease, filter 1.5s ease, color 1.5s ease;
+            text-align: center;
+            line-height: 0.85;
+        }
+        .interstitial.show {
+            opacity: 1;
+            transform: translateZ(350px) scale(1.1); /* Pops right to the front */
+            color: rgba(255,255,255,0.9);
+            text-shadow: 0 0 100px rgba(255,255,255,0.4);
+            filter: blur(0px);
+        }
+        .interstitial.fade-blur {
+            opacity: 0;
+            transform: translateZ(1400px) scale(3.5); /* SWALLOWS THE LENS */
+            filter: blur(50px);
+            color: rgba(255,255,255,0);
+            transition: transform 1.2s cubic-bezier(0.5, 0, 0.2, 1), opacity 0.8s ease 0.2s, filter 0.8s ease;
+        }
+        .interstitial.type-gold.show { color: var(--jawab-gold); text-shadow: 0 0 100px rgba(212, 175, 55, 0.6); }
+        .interstitial.type-red.show { color: var(--red-alert); text-shadow: 0 0 100px rgba(255, 69, 58, 0.6); }
+        
+        .unmissable-bg {
+            position: absolute; z-index: -50;
+            font-family: 'Oswald', sans-serif; font-size: 12vw; color: rgba(255,255,255,0.04);
+            text-align: center; line-height: 0.95; letter-spacing: -2px;
+            opacity: 0; transform: translateY(30px) translateZ(-500px);
+            transition: all 4s ease; pointer-events: none;
+        }
+        .unmissable-bg.show { opacity: 1; transform: translateY(0) translateZ(-300px); }
+
+        /* --- HARDWARE: TITANIUM IPHONE PRO --- */
+        .device {
+            position: relative;
+            width: 390px; height: 844px; /* Exact iPhone 14/15 Pro resolution mapping */
+            background: var(--true-black);
+            border-radius: 55px;
+            transform-style: preserve-3d;
+            box-shadow: 
+                inset 0 0 0 2px rgba(255,255,255,0.1),
+                inset 0 0 0 8px #000,
+                inset 0 0 0 9px rgba(255,255,255,0.2), /* Titanium rim highlight */
+                0 0 0 1px rgba(255,255,255,0.05),
+                0 60px 120px -20px rgba(0,0,0,0.9),
+                0 30px 60px rgba(212, 175, 55, 0.04);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        /* Glass reflection layer over the entire screen */
+        .glass-glare {
+            position: absolute; top:0; left:0; right:0; bottom:0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 40%);
+            pointer-events: none; z-index: 9999;
+        }
+
+        .dynamic-island {
+            position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+            width: 124px; height: 37px; background: #000; border-radius: 20px;
+            z-index: 1000; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+            transition: all 0.6s var(--ease-bounce);
+        }
+        /* Expanding island animation */
+        .dynamic-island.expand {
+            width: 320px; height: 110px; border-radius: 32px;
+            background: rgba(28, 28, 30, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 16px 24px; display: flex; align-items: center; justify-content: center;
+        }
+        .island-stat {
+            opacity: 0; display: flex; align-items: center; justify-content: center; gap: 20px; width: 100%;
+            transition: opacity 0.8s ease 0.4s; pointer-events: none;
+        }
+        .dynamic-island.expand .island-stat { opacity: 1; }
+        .stat-num { font-family: 'Oswald', sans-serif; font-size: 56px; color: var(--jawab-gold); line-height: 1; text-shadow: 0 0 30px rgba(212, 175, 55, 0.4); }
+        .stat-label { font-size: 14px; color: rgba(255,255,255,0.6); font-weight: 500; text-transform: uppercase; letter-spacing: 1.5px; line-height: 1.4; text-align: left;}
+
+        .status-bar {
+            position: absolute; top: 0; left: 0; right: 0; height: 50px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 32px; font-size: 15px; font-weight: 500; color: #fff; z-index: 999;
+            letter-spacing: -0.5px; opacity: 0.9;
+        }
+        .home-indicator {
+            position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+            width: 134px; height: 5px; background: rgba(255,255,255,0.4); border-radius: 100px;
+            z-index: 1000;
+        }
+
+        /* --- SCENE ENGINE --- */
+        .scene {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.8s ease;
+            display: flex; flex-direction: column;
+            background: var(--true-black);
+            z-index: 1;
+        }
+        .scene.active { opacity: 1; pointer-events: auto; z-index: 5; }
+
+        /* --- 0. LAUNCH FILM INTRO (Lock Screen) --- */
+        .s-intro { 
+            justify-content: space-between; align-items: center; text-align: center;
+            padding: 80px 0 40px;
+            background: radial-gradient(circle at 50% -20%, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+        }
+        .s-intro.unlocked {
+            transform: translateY(-100%);
+            opacity: 0.2; pointer-events: none;
+            transition: transform 1.2s cubic-bezier(0.8, 0, 0.2, 1), opacity 1s ease;
+        }
+        .lock-header { display: flex; flex-direction: column; align-items: center; }
+        .lock-icon { margin-bottom: 12px; fill: rgba(255,255,255,0.8); width: 22px; height: 22px; }
+        .lock-time { font-size: 76px; font-weight: 400; letter-spacing: -2px; line-height: 1; font-family: -apple-system, sans-serif; margin-bottom: 4px; }
+        .lock-date { font-size: 19px; font-weight: 400; color: rgba(255,255,255,0.8); }
+        
+        .logo-mark {
+            font-size: 32px; font-weight: 400; letter-spacing: -1px;
+            color: var(--text-primary); margin-bottom: 24px;
+            display: flex; align-items: center; gap: 10px; justify-content: center;
+        }
+        .logo-mark span { font-family: 'Tajawal', serif; font-weight: 300; color: var(--jawab-gold); }
+        @keyframes pulse-btn {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.1); }
+            50% { box-shadow: 0 0 0 10px rgba(255,255,255,0); }
+        }
+        .btn-launch {
+            background: rgba(28, 28, 30, 0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1);
+            padding: 16px 40px; border-radius: 40px; font-size: 16px; font-weight: 500; letter-spacing: 0.5px;
+            cursor: pointer; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            transition: all 0.4s var(--ease-cinematic); font-family: inherit;
+            animation: pulse-btn 2.5s infinite ease-out;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .btn-launch:hover { background: #fff; color: #000; transform: scale(1.05); animation: none; }
+        .swipe-bar-hint {
+            font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.5);
+            letter-spacing: 1.5px; text-transform: uppercase; animation: pulse-btn 3s infinite;
+        }
+
+        /* --- 1. MISSED CALL (Tense & Stark) --- */
+        .s-call {
+            background: radial-gradient(circle at 50% 20%, rgba(255, 69, 58, 0.15) 0%, var(--true-black) 70%);
+            align-items: center; padding-top: 130px;
+        }
+        .call-avatar {
+            width: 120px; height: 120px; border-radius: 50%;
+            background: #1c1c1e; border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center; font-size: 44px; color: #fff; font-weight: 300;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 0 20px rgba(255,255,255,0.02);
+            /* Pulse animation for ringing */
+            animation: ring-pulse 2s infinite ease-out;
+        }
+        @keyframes ring-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 69, 58, 0.3); }
+            100% { box-shadow: 0 0 0 40px rgba(255, 69, 58, 0); }
+        }
+        .caller-name { font-size: 34px; font-weight: 300; letter-spacing: -1px; margin-top: 24px; color: #fff; }
+        .caller-meta { font-size: 17px; color: rgba(255,255,255,0.5); margin-top: 8px; font-weight: 400; }
+        .call-ended { margin-top: 40px; color: var(--red-alert); font-size: 15px; font-weight: 500; opacity: 0; transition: opacity 0.5s;}
+
+        /* --- 2. THE APP LAUNCH (OS Level Transition) --- */
+        /* Instead of just appearing, WhatsApp explodes from a notification */
+        .os-home { background: var(--true-black); }
+        .push-notification {
+            position: absolute; top: 60px; left: 16px; right: 16px;
+            background: rgba(28, 28, 30, 0.85); backdrop-filter: saturate(180%) blur(30px);
+            border-radius: 24px; padding: 16px 20px;
+            display: flex; align-items: center; gap: 16px; border: 1px solid rgba(255,255,255,0.1);
+            transform: translateY(-50px) scale(0.9); opacity: 0;
+            transition: all 0.8s var(--ease-bounce);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6); z-index: 50;
+        }
+        .push-notification.arrive { transform: translateY(0) scale(1); opacity: 1; }
+        /* The magical tap expansion */
+        .push-notification.expand-to-app {
+            animation: app-expand 0.8s var(--ease-cinematic) forwards;
+        }
+        @keyframes app-expand {
+            0% { transform: translateY(0) scale(1); opacity: 1; border-radius: 24px; }
+            40% { transform: translateY(10px) scale(0.95); opacity: 1; filter: brightness(1.2); }
+            100% { transform: translateY(100px) scale(5); opacity: 0; border-radius: 0; }
+        }
+        .pn-icon { width: 44px; height: 44px; border-radius: 12px; background: #25D366; display:flex; align-items:center; justify-content:center; }
+        .pn-icon svg { width: 26px; height: 26px; fill: #fff; }
+        .pn-text h4 { color: #fff; font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+        .pn-text p { color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 400; }
+
+        /* --- 3. WHATSAPP (Deep, Rich Dark Mode) --- */
+        .s-chat { background: var(--true-black); }
+        /* Fake physical depth behind the chat */
+        .wa-bg-texture {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background-color: var(--true-black);
+            background-image: radial-gradient(circle at 50% 10%, rgba(20, 20, 22, 1) 0%, transparent 80%), url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g fill="%23ffffff" fill-opacity="0.02"><path d="M10 10h10v10H10zM30 30h10v10H30zM50 50h10v10H50zM70 70h10v10H70z"/></g></svg>');
+            background-size: 150px 150px;
+            opacity: 0.5; z-index: -1;
+        }
+
+        .wa-header {
+            height: 110px; padding: 55px 16px 14px;
+            background: rgba(15, 15, 15, 0.85); backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px);
+            border-bottom: 0.5px solid rgba(255,255,255,0.06);
+            display: flex; justify-content: space-between; align-items: center; z-index: 10;
+        }
+        .wa-back { color: var(--wa-blue-tick); font-size: 36px; font-weight: 300; line-height: 1; margin-right: 4px; padding-bottom: 4px;}
+        .wa-avatar { width: 42px; height: 42px; border-radius: 50%; background: #222; display:flex; align-items:center; justify-content:center; font-family:'Tajawal'; color:#fff; font-size:18px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.5);}
+        .wa-title { margin-left: 8px; }
+        .wa-title h3 { color: #fff; font-size: 16px; font-weight: 600; letter-spacing: -0.3px;}
+        .wa-title p { color: rgba(255,255,255,0.5); font-size: 12px; font-weight: 400; margin-top:2px;}
+        .wah-right { display: flex; gap: 20px; color: var(--wa-blue-tick); }
+
+        .wa-body {
+            flex: 1; padding: 24px 16px; overflow-y: hidden;
+            display: flex; flex-direction: column; gap: 6px; position: relative;
+            perspective: 800px; /* 3D effect for messages coming in */
+        }
+
+        /* Message Bubbles - CINEMATIC ENTRY */
+        .msg {
+            max-width: 82%; padding: 10px 14px 12px; border-radius: 20px;
+            font-size: 16px; color: #fff; position: relative;
+            line-height: 1.4;
+            /* Entry state: lowered in Z-space, rotated, blurred */
+            opacity: 0;
+            transform: translateY(40px) translateZ(-50px) rotateX(-20deg) scale(0.9);
+            filter: blur(10px);
+            transform-origin: bottom center;
+            transition: all 0.9s var(--ease-cinematic);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .msg.show {
+            opacity: 1;
+            transform: translateY(0) translateZ(0) rotateX(0deg) scale(1);
+            filter: blur(0px);
+        }
+        .msg-out { background: linear-gradient(145deg, #0e4c3c, #09372b); align-self: flex-start; border-top-left-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
+        .msg-in { background: #202022; align-self: flex-end; border-top-right-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
+
+        .msg .ar { font-family: 'Tajawal', sans-serif; direction: rtl; text-align: right; font-size: 17px; font-weight: 500; letter-spacing: 0; color: #fff; }
+        .msg .en { border-top: 1px solid rgba(255,255,255,0.06); margin-top: 10px; padding-top: 10px; font-size: 14px; font-weight: 400; color: #c0c0c5; }
+        
+        .msg-meta { font-size: 11px; color: rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 6px; float: right; font-weight: 500; }
+        .read-ticks svg { width: 17px; height: 16px; fill: var(--wa-blue-tick); margin-bottom: -3px; }
+
+        /* Premium Booking Card (Inside Chat) */
+        .booking-card {
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px; padding: 16px; margin-top: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: relative; overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        .booking-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--jawab-gold); box-shadow: 0 0 20px var(--jawab-gold); }
+        .bc-title { color: #fff; font-size: 15px; font-weight: 600; margin-bottom: 6px; display:flex; align-items:center; gap:8px;}
+        .bc-detail { color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 400; line-height: 1.6;}
+
+        .wa-input {
+            background: rgba(15, 15, 15, 0.85); backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px);
+            padding: 10px 16px 36px; display: flex; align-items: center; gap: 14px;
+            border-top: 0.5px solid rgba(255,255,255,0.06); z-index: 10;
+        }
+        .wa-field {
+            flex: 1; background: #000; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px; height: 40px; display: flex; align-items: center; padding: 0 16px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .wa-field span { font-size: 15px; color: rgba(255,255,255,0.3); }
+
+        /* --- 4. CLINIC ALERT (Premium SaaS Dashboard feel) --- */
+        .s-alert {
+            background: var(--true-black); display: flex; flex-direction: column; justify-content: center;
+            background-image: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 60%);
+        }
+        .alert-sheet {
+            background: rgba(20, 20, 22, 0.8); backdrop-filter: blur(40px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 36px; margin: 0 20px; padding: 36px 30px;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+            /* Cinematic entry */
+            opacity: 0; transform: translateY(60px) rotateX(20deg) scale(0.9);
+            transition: all 1.2s var(--ease-cinematic);
+        }
+        .alert-sheet.show { opacity: 1; transform: translateY(0) rotateX(0deg) scale(1); }
+        .as-header { display: flex; align-items: center; gap: 18px; margin-bottom: 36px; }
+        .as-icon { width: 56px; height: 56px; border-radius: 16px; background: rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; color: var(--jawab-gold); font-size: 28px; border: 1px solid rgba(212,175,55,0.3); box-shadow: 0 10px 20px rgba(0,0,0,0.5);}
+        .as-title h2 { color: #fff; font-size: 22px; font-weight: 500; letter-spacing: -0.5px;}
+        .as-title p { color: rgba(255,255,255,0.5); font-size: 14px; font-weight: 400; margin-top: 4px;}
+        
+        .as-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .as-row:last-child { border-bottom: none; padding-bottom: 0; padding-top: 24px;}
+        .as-label { color: rgba(255,255,255,0.5); font-size: 15px; font-weight: 400; }
+        .as-val { color: #fff; font-size: 16px; font-weight: 500;}
+        .badge-success {
+            background: rgba(212, 175, 55, 0.15); color: var(--jawab-gold);
+            padding: 10px 18px; border-radius: 30px; font-size: 14px; font-weight: 600;
+            border: 1px solid rgba(212,175,55,0.3); box-shadow: 0 0 20px rgba(212,175,55,0.1);
+        }
+
+        /* --- 5. THE PROOF & ENDING --- */
+        .s-end { align-items: center; justify-content: center; }
+        .end-content { text-align: center; opacity: 0; transform: scale(0.9) translateY(20px); transition: all 2s var(--ease-cinematic); }
+        .end-content.show { opacity: 1; transform: scale(1) translateY(0); }
+        .brand-final { font-family: 'Oswald', sans-serif; font-size: 64px; font-weight: 400; color: #fff; letter-spacing: -2px; margin-bottom: 8px; display:flex; align-items:center; justify-content:center; gap:16px;}
+        .brand-final span { font-family: 'Tajawal', serif; font-weight: 300; color: rgba(255,255,255,0.4);}
+        .tagline { font-family: 'Inter', sans-serif; font-size: 18px; color: var(--jawab-gold); font-weight: 400; letter-spacing: 0.5px;}
+
+        /* Icons */
+        .icon { width: 26px; height: 26px; fill: currentColor; }
+    </style>
+</head>
+<body>
+
+<!-- 3D STAGE -->
+<div id="stage">
+    <div id="ambient-light"></div>
+
+    <!-- THE DEVICE CAMERA RIG -->
+    <div id="camera">
+        
+        <!-- HARDWARE -->
+        <div class="device">
+            <div class="glass-glare"></div>
+            
+            <div class="dynamic-island" id="island">
+                <div class="island-stat" id="island-stat">
+                    <div class="stat-num" id="stat-num">0</div>
+                    <div class="stat-label">Calls Recovered<br>Today</div>
+                </div>
+            </div>
+            <div class="status-bar">
+                <div id="clock">9:41</div>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                    <svg width="17" height="11" viewBox="0 0 17 11" fill="none"><path d="M16 3C16 3 14 1 8.5 1C3 1 1 3 1 3" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M13 6C13 6 11.5 4.5 8.5 4.5C5.5 4.5 4 6 4 6" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M10 9C10 9 9.5 8.5 8.5 8.5C7.5 8.5 7 9 7 9" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="20" height="10" rx="3" stroke="white" stroke-width="1"/><rect x="3" y="3" width="16" height="6" rx="1.5" fill="white"/><path d="M24 4V8" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </div>
+            </div>
+            <div class="home-indicator"></div>
+
+            <!-- SCENE 0: INTRO -->
+            <div class="scene s-intro active" id="scene-intro">
+                <div class="lock-header">
+                    <svg class="lock-icon" viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9v-2a6 6 0 10-12 0v2H4v14h16V8h-2zm-2 0H8v-2a4 4 0 118 0v2z"/></svg>
+                    <div class="lock-time" id="sys-time">09:41</div>
+                    <div class="lock-date" id="sys-date">Tuesday, March 24</div>
+                </div>
+                <div>
+                    <div class="logo-mark">Jawab <span>جواب</span></div>
+                    <button class="btn-launch" onclick="startFilm()">Initialize Engine</button>
+                </div>
+                <div class="swipe-bar-hint">Press to Unlock</div>
+            </div>
+
+            <!-- SCENE 1: MISSED CALL -->
+            <div class="scene s-call" id="scene-call">
+                <div class="call-avatar">M</div>
+                <div class="caller-name">Mohammed Otaibi</div>
+                <div class="caller-meta">Mobile</div>
+                <div class="call-ended" id="call-end-text">Call Ended</div>
+            </div>
+
+            <!-- SCENE 2: OS LEVEL / NOTIFICATION -->
+            <div class="scene os-home" id="scene-os">
+                <div class="push-notification" id="push-wa">
+                    <div class="pn-icon">
+                        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.488-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51h-.57c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" fill="#fff"/></svg>
+                    </div>
+                    <div class="pn-text">
+                        <h4>WhatsApp</h4>
+                        <p>Jawab activated sequence.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCENE 3: THE CONVERSATION -->
+            <div class="scene s-chat" id="scene-chat">
+                <div class="wa-bg-texture"></div>
+                
+                <div class="wa-header" id="wa-head">
+                    <div style="display:flex; align-items:center;">
+                        <div class="wa-back">‹</div>
+                        <div class="wa-avatar">S</div>
+                        <div class="wa-title">
+                            <h3>Smile Dental Clinic</h3>
+                            <p>online</p>
+                        </div>
+                    </div>
+                    <div class="wah-right">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+                    </div>
+                </div>
+                
+                <div class="wa-body" id="chat-stream">
+                    <!-- Msg 1 -->
+                    <div class="msg msg-out" id="msg-1">
+                        <div class="ar">مرحباً! لاحظنا أنك اتصلت بعيادتنا وموظفينا مشغولين. كيف نقدر نساعدك في حجز موعد؟</div>
+                        <div class="en">Hi! We noticed you called but our team is busy. How can we help you book an appointment today?</div>
+                        <div class="msg-meta">09:42 <span class="read-ticks"><svg viewBox="0 0 16 15"><path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l1.32 1.267c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/><path d="M9.796 3.316l-.478-.372a.365.365 0 0 0-.51.063L3.45 9.879a.32.32 0 0 1-.484.033L1.35 8.356a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l2.235 2.146c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/></svg></span></div>
+                    </div>
+
+                    <!-- Msg 2 -->
+                    <div class="msg msg-in" id="msg-2">
+                        <div class="ar">ابي احجز موعد تقويم للاطفال</div>
+                        <div class="msg-meta">09:43</div>
+                    </div>
+
+                    <!-- Msg 3 -->
+                    <div class="msg msg-out" id="msg-3" style="border-top-left-radius: 20px;">
+                        <div class="ar">أكيد. مواعيد دكتور التقويم متوفرة بكرة يوم الثلاثاء أو الخميس. وش اليوم اللي يناسبك؟</div>
+                        <div class="msg-meta">09:43 <span class="read-ticks"><svg viewBox="0 0 16 15"><path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l1.32 1.267c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/><path d="M9.796 3.316l-.478-.372a.365.365 0 0 0-.51.063L3.45 9.879a.32.32 0 0 1-.484.033L1.35 8.356a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l2.235 2.146c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/></svg></span></div>
+                    </div>
+
+                    <!-- Msg 4 -->
+                    <div class="msg msg-in" id="msg-4">
+                        <div class="ar">الثلاثاء العصر بعد المدرسة مناسب</div>
+                        <div class="msg-meta">09:44</div>
+                    </div>
+
+                    <!-- Msg 5 (Booking) -->
+                    <div class="msg msg-out" id="msg-5" style="border-top-left-radius: 20px;">
+                        <div class="ar">طبعاً، حجزك تأكد!</div>
+                        <div class="booking-card">
+                            <div class="bc-title">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--jawab-gold)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                                موعد مؤكد (Confirmed)
+                            </div>
+                            <div class="bc-detail">استشارة تقويم أطفال<br>الثلاثاء — 4:00 PM</div>
+                        </div>
+                        <div class="msg-meta">09:44 <span class="read-ticks"><svg viewBox="0 0 16 15"><path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l1.32 1.267c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/><path d="M9.796 3.316l-.478-.372a.365.365 0 0 0-.51.063L3.45 9.879a.32.32 0 0 1-.484.033L1.35 8.356a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l2.235 2.146c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/></svg></span></div>
+                    </div>
+                </div>
+                
+                <div class="wa-input" id="wa-foot">
+                    <div style="font-size: 28px; font-weight: 300; color: var(--wa-blue-tick);">+</div>
+                    <div class="wa-field"><span>Message</span></div>
+                    <svg viewBox="0 0 24 24" class="icon" fill="var(--wa-blue-tick)"><path d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.468 2.349 8.468 4.35v7.061c0 2.001 1.53 3.531 3.531 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z"/></svg>
+                </div>
+            </div>
+
+            <!-- SCENE 4: CLINIC DASHBOARD ALERT -->
+            <div class="scene s-alert" id="scene-alert">
+                <div class="alert-sheet" id="alert-card">
+                    <div class="as-header">
+                        <div class="as-icon">✧</div>
+                        <div class="as-title">
+                            <h2>Jawab Engine</h2>
+                            <p>Live Recovery Event</p>
+                        </div>
+                    </div>
+                    <div class="as-row">
+                        <span class="as-label">Patient</span><span class="as-val" style="font-family:'Tajawal'">محمد العتيبي</span>
+                    </div>
+                    <div class="as-row">
+                        <span class="as-label">Context</span><span class="as-val">Orthodontics</span>
+                    </div>
+                    <div class="as-row">
+                        <span class="as-label">Outcome</span><span class="badge-success">Booked</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCENE 5: FINAL BRANDING -->
+            <div class="scene s-end" id="scene-end">
+                <div class="end-content" id="brand-ui">
+                    <div class="brand-final">JAWAB <span>جواب</span></div>
+                    <div class="tagline">The unmissable clinic.</div>
+                </div>
+            </div>
+
+        </div> <!-- /Device -->
+    </div> <!-- /Camera -->
+    
+    <!-- EDITORIAL TYPOGRAPHY OVERLAY (Placed to fly over the camera plane) -->
+    <div class="interstitial type-red" id="t-missed">MISSED.</div>
+    <div class="interstitial type-gold" id="t-zero">NO PATIENT<br>LEFT UNSEEN.</div>
+    
+    <!-- SUBTLE BACKGROUND TEXT -->
+    <div class="unmissable-bg" id="t-unmissable">THE UNMISSABLE<br>CLINIC.</div>
+</div> <!-- /Stage -->
+
+
+<script>
+    // --- AUDIO ENGINE (CINEMATIC) ---
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+
+    function initAudio() {
+        if(!audioCtx) audioCtx = new AudioContext();
+    }
+
+    // Heavy dramatic bass drone for texts
+    function playDrone() {
+        if(!audioCtx) return;
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(45, audioCtx.currentTime); 
+        o.frequency.exponentialRampToValueAtTime(35, audioCtx.currentTime + 2);
+        
+        g.gain.setValueAtTime(0, audioCtx.currentTime);
+        g.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 0.5);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.5);
+        
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(); o.stop(audioCtx.currentTime + 2.5);
+    }
+
+    // Crisp tactile haptic pop
+    function playPop() {
+        if(!audioCtx) return;
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(600, audioCtx.currentTime);
+        o.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.05);
+        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(); o.stop(audioCtx.currentTime + 0.05);
+    }
+
+    // Glass ding for incoming msg
+    function playDing() {
+        if(!audioCtx) return;
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(1400, audioCtx.currentTime);
+        g.gain.setValueAtTime(0, audioCtx.currentTime);
+        g.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(); o.stop(audioCtx.currentTime + 0.3);
+    }
+
+    /* Cinematic Timeline Utils */
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const cam = document.getElementById('camera');
+
+    function setCam(pose) {
+        cam.className = '';
+        cam.classList.add(pose);
+    }
+
+    function switchScene(id) {
+        document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    async function showInterstitial(id, colorClass) {
+        const text = document.getElementById(id);
+        const stage = document.getElementById('stage');
+        
+        if(colorClass) stage.classList.add(colorClass); 
+        playDrone();
+        text.classList.remove('fade-blur');
+        text.classList.add('show');
+        
+        // Hang time - text hits the screen powerfully
+        await sleep(2500); 
+        
+        text.classList.remove('show');
+        text.classList.add('fade-blur'); 
+        if(colorClass) stage.classList.remove(colorClass);
+        
+        // OVERLAP: We only wait 200ms before returning!
+        // This ensures the NEXT scene starts shifting into view WHILE the text is flying through the lens.
+        await sleep(200); 
+    }
+
+    function scrollToBottom() {
+        const stream = document.getElementById('chat-stream');
+        stream.scrollTo({ top: stream.scrollHeight, behavior: 'smooth' });
+    }
+
+    // Init Live Time on Lock Screen
+    try {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        const dateStr = now.toLocaleDateString([], {weekday: 'long', month: 'long', day: 'numeric'});
+        document.getElementById('sys-time').innerText = timeStr;
+        document.getElementById('sys-date').innerText = dateStr;
+        document.getElementById('clock').innerText = timeStr;
+    } catch(e) {}
+
+    /* THE EDITORIAL TIMELINE */
+    async function startFilm() {
+        initAudio();
+
+        // 0. Unlock Screen
+        document.getElementById('scene-intro').classList.add('unlocked');
+        playPop();
+        await sleep(800);
+
+        // 1. Enter Missed Call Scene
+        switchScene('scene-call');
+        setCam('c-missed');
+        await sleep(2200);
+        
+        // Show "Call Ended"
+        document.getElementById('call-end-text').style.opacity = '1';
+        await sleep(1500);
+
+        // Interstitial 1: MISSED.
+        setCam('c-intro'); // Pull camera deeply back
+        await showInterstitial('t-missed', 'pulse-red');
+
+        // 2. The WhatsApp Push Transition
+        switchScene('scene-os');
+        setCam('c-flat');
+        await sleep(500);
+        const pn = document.getElementById('push-wa');
+        pn.classList.add('arrive');
+        playPop();
+        await sleep(2000);
+
+        // Tap the notification
+        pn.classList.add('expand-to-app');
+        await sleep(400); // mid-expansion
+        switchScene('scene-chat'); // reveal chat instantly underneath
+        setCam('c-chat');
+        await sleep(1000);
+
+        // 3. Conversation Flow
+        document.getElementById('msg-1').classList.add('show');
+        playPop();
+        await sleep(3500); // Read time Arabic + Eng
+
+        document.getElementById('msg-2').classList.add('show');
+        playDing();
+        scrollToBottom();
+        await sleep(2500);
+
+        document.getElementById('msg-3').classList.add('show');
+        playPop();
+        scrollToBottom();
+        await sleep(4000);
+
+        document.getElementById('msg-4').classList.add('show');
+        playDing();
+        scrollToBottom();
+        await sleep(2500);
+
+        // Booking Card Drops
+        document.getElementById('msg-5').classList.add('show');
+        playPop();
+        scrollToBottom();
+        await sleep(3500);
+
+        // Interstitial 2: NO PATIENT LEFT UNSEEN
+        setCam('c-intro');
+        await showInterstitial('t-zero', 'pulse-gold');
+
+        // 4. Dashboard Alert Reveal
+        setCam('c-alert');
+        switchScene('scene-alert');
+        await sleep(800);
+        document.getElementById('alert-card').classList.add('show');
+        playPop();
+        await sleep(3500);
+
+        // Final Subtle Background Fade
+        setCam('c-intro');
+        document.getElementById('t-unmissable').classList.add('show');
+        await sleep(1500); // Breathe
+
+        // 5. Final Brand Signature
+        setCam('c-flat');
+        switchScene('scene-end');
+        await sleep(1000);
+        document.getElementById('brand-ui').classList.add('show');
+        document.getElementById('island').classList.add('expand'); // micro-interaction at end
+        playDrone();
+        await sleep(600);
+        
+        // Ticker animation for the final proof point
+        const statNum = document.getElementById('stat-num');
+        for(let i=0; i<=17; i++) {
+            statNum.innerText = i;
+            if(i===17) playDing();
+            else playPop();
+            await sleep(40);
+        }
+    }
+</script>
+</body>
+</html>

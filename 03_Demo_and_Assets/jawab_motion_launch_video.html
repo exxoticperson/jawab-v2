@@ -1,0 +1,195 @@
+
+<h2 class="sr-only">Jawab motion graphics launch video — AI-powered revenue recovery for Gulf dental clinics</h2>
+
+<div style="font-family:-apple-system,'Helvetica Neue',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+
+<div id="jscreen" style="background:#050505;width:100%;height:460px;position:relative;overflow:hidden;border-radius:10px;">
+  <div id="jscene" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:opacity 0.4s ease;"></div>
+  <div id="jpbar" style="position:absolute;bottom:0;left:0;height:1.5px;background:#c8a027;width:0%;"></div>
+  <div id="jdots" style="position:absolute;bottom:18px;left:0;right:0;display:flex;justify-content:center;gap:5px;pointer-events:none;"></div>
+  <div id="jprev" style="position:absolute;left:16px;top:50%;margin-top:-16px;width:32px;height:32px;border-radius:50%;border:0.5px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;z-index:5;line-height:1;">&#8249;</div>
+  <div id="jnext" style="position:absolute;right:16px;top:50%;margin-top:-16px;width:32px;height:32px;border-radius:50%;border:0.5px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;z-index:5;line-height:1;">&#8250;</div>
+</div>
+
+<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 2px 0;font-size:11px;color:var(--color-text-secondary);letter-spacing:0.5px;">
+  <span id="jlabel" style="text-transform:uppercase;letter-spacing:2px;"></span>
+  <span id="jcount" style="font-variant-numeric:tabular-nums;"></span>
+</div>
+
+</div>
+
+<script>
+(function(){
+const G='#c8a027',R='#cc3520',W='#ffffff',M='rgba(255,255,255,0.42)',M2='rgba(255,255,255,0.2)';
+
+const SCENES=[
+{
+  label:'The hook',dur:4500,
+  fn:()=>`<div style="text-align:center;padding:0 64px;">
+    <p data-r style="font-size:11px;letter-spacing:5px;color:${M};text-transform:uppercase;margin:0 0 28px;">Gulf dental clinics — right now</p>
+    <p data-r style="font-size:74px;font-weight:700;color:${W};letter-spacing:-3px;line-height:0.95;margin:0;">Your clinic</p>
+    <p data-r style="font-size:74px;font-weight:700;color:${W};letter-spacing:-3px;line-height:0.95;margin:0;">is</p>
+    <p data-r style="font-size:82px;font-weight:700;color:${R};letter-spacing:-3px;line-height:1.05;margin:0;">bleeding.</p>
+  </div>`
+},
+{
+  label:'The scale',dur:5200,
+  fn:()=>`<div style="text-align:center;padding:0 64px;">
+    <p data-r style="font-size:11px;letter-spacing:5px;color:${M};text-transform:uppercase;margin:0 0 20px;">Revenue left on the table — last month</p>
+    <div data-r style="display:flex;align-items:flex-start;justify-content:center;gap:6px;line-height:1;">
+      <span style="font-size:22px;font-weight:500;color:${G};margin-top:16px;">AED</span>
+      <span id="jctr" style="font-size:100px;font-weight:700;color:${G};letter-spacing:-4px;font-variant-numeric:tabular-nums;">0</span>
+    </div>
+    <p data-r style="font-size:13px;color:${M};margin:14px 0 0;font-weight:400;letter-spacing:0.3px;">Conservative estimate. Single location.</p>
+  </div>`,
+  after:()=>{
+    const el=document.getElementById('jctr');if(!el)return;
+    const t=24700,d=2400,s=Date.now();
+    const tick=()=>{const p=Math.min(1,(Date.now()-s)/d);el.textContent=Math.round((1-Math.pow(1-p,3))*t).toLocaleString();if(p<1)requestAnimationFrame(tick);};
+    setTimeout(()=>requestAnimationFrame(tick),500);
+  }
+},
+{
+  label:'The leaks',dur:5500,
+  fn:()=>`<div style="padding:0 52px;width:100%;box-sizing:border-box;">
+    <p data-r style="font-size:11px;letter-spacing:5px;color:${M};text-transform:uppercase;margin:0 0 32px;text-align:center;">Where the money goes</p>
+    <div data-r style="border-left:1.5px solid ${R};padding-left:22px;margin-bottom:26px;">
+      <p style="font-size:20px;font-weight:600;color:${W};margin:0;letter-spacing:-0.3px;">Patients who left and never came back.</p>
+      <p style="font-size:13px;color:${M};margin:6px 0 0;line-height:1.5;">No recall. No follow-up. No revenue.</p>
+    </div>
+    <div data-r style="border-left:1.5px solid ${R};padding-left:22px;margin-bottom:26px;">
+      <p style="font-size:20px;font-weight:600;color:${W};margin:0;letter-spacing:-0.3px;">Treatment plans sitting idle.</p>
+      <p style="font-size:13px;color:${M};margin:6px 0 0;line-height:1.5;">Ready to proceed. Nobody followed up.</p>
+    </div>
+    <div data-r style="border-left:1.5px solid ${R};padding-left:22px;">
+      <p style="font-size:20px;font-weight:600;color:${W};margin:0;letter-spacing:-0.3px;">Missed recalls and lapsed checkups.</p>
+      <p style="font-size:13px;color:${M};margin:6px 0 0;line-height:1.5;">Your database is a goldmine. Untouched.</p>
+    </div>
+  </div>`
+},
+{
+  label:'The reveal',dur:4200,
+  fn:()=>`<div style="text-align:center;padding:0 40px;">
+    <p data-r style="font-size:11px;letter-spacing:6px;color:${M};text-transform:uppercase;margin:0 0 22px;">Introducing</p>
+    <p data-r style="font-size:112px;font-weight:700;color:${W};letter-spacing:-5px;line-height:0.9;margin:0;">JAWAB</p>
+    <div data-r style="width:36px;height:1.5px;background:${G};margin:24px auto 22px;"></div>
+    <p data-r style="font-size:15px;color:${M};margin:0;font-weight:400;letter-spacing:0.8px;">AI Revenue Recovery — Built for the Gulf</p>
+  </div>`
+},
+{
+  label:'What it does',dur:5500,
+  fn:()=>`<div style="text-align:center;padding:0 64px;">
+    <p data-r style="font-size:11px;letter-spacing:5px;color:${M};text-transform:uppercase;margin:0 0 34px;">What Jawab does</p>
+    <p data-r style="font-size:26px;font-weight:600;color:${W};letter-spacing:-0.5px;line-height:1.35;margin:0 0 18px;">Audits where your revenue is leaking.</p>
+    <p data-r style="font-size:26px;font-weight:600;color:${W};letter-spacing:-0.5px;line-height:1.35;margin:0 0 18px;">Contacts your lost patients automatically.</p>
+    <p data-r style="font-size:26px;font-weight:600;color:${W};letter-spacing:-0.5px;line-height:1.35;margin:0 0 0;">Converts them back into appointments.</p>
+    <p data-r style="font-size:13px;color:${G};margin:28px 0 0;letter-spacing:0.8px;text-transform:uppercase;">All of it. Without lifting a finger.</p>
+  </div>`
+},
+{
+  label:'The system',dur:6000,
+  fn:()=>`<div style="width:100%;padding:0 36px;box-sizing:border-box;">
+    <p data-r style="font-size:11px;letter-spacing:5px;color:${M};text-transform:uppercase;margin:0 0 28px;text-align:center;">Three-layer system</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+      <div data-r style="border:0.5px solid rgba(255,255,255,0.12);border-radius:8px;padding:22px 18px;box-sizing:border-box;">
+        <p style="font-size:10px;letter-spacing:4px;color:${G};text-transform:uppercase;margin:0 0 14px;font-weight:500;">01</p>
+        <p style="font-size:22px;font-weight:700;color:${W};letter-spacing:-0.5px;margin:0 0 10px;">AUDIT</p>
+        <p style="font-size:12px;color:${M};margin:0;line-height:1.65;">Deep scan of your patient data. We map every revenue leak before we touch anything.</p>
+      </div>
+      <div data-r style="border:0.5px solid rgba(255,255,255,0.12);border-radius:8px;padding:22px 18px;box-sizing:border-box;">
+        <p style="font-size:10px;letter-spacing:4px;color:${G};text-transform:uppercase;margin:0 0 14px;font-weight:500;">02</p>
+        <p style="font-size:22px;font-weight:700;color:${W};letter-spacing:-0.5px;margin:0 0 10px;">RECOVER</p>
+        <p style="font-size:12px;color:${M};margin:0;line-height:1.65;">AI re-engages lost patients. Re-books them. Zero staff overhead. Zero manual calls.</p>
+      </div>
+      <div data-r style="border:0.5px solid rgba(255,255,255,0.12);border-radius:8px;padding:22px 18px;box-sizing:border-box;">
+        <p style="font-size:10px;letter-spacing:4px;color:${G};text-transform:uppercase;margin:0 0 14px;font-weight:500;">03</p>
+        <p style="font-size:22px;font-weight:700;color:${W};letter-spacing:-0.5px;margin:0 0 10px;">RETAIN</p>
+        <p style="font-size:12px;color:${M};margin:0;line-height:1.65;">Automated recalls and reactivation. Your patients stay engaged. Permanently.</p>
+      </div>
+    </div>
+  </div>`
+},
+{
+  label:'The result',dur:5000,
+  fn:()=>`<div style="text-align:center;padding:0 64px;">
+    <p data-r style="font-size:11px;letter-spacing:5px;color:${M};text-transform:uppercase;margin:0 0 20px;">Average outcome</p>
+    <div data-r style="display:flex;align-items:flex-end;justify-content:center;gap:0;line-height:1;">
+      <span style="font-size:112px;font-weight:700;color:${G};letter-spacing:-5px;">40</span>
+      <span style="font-size:64px;font-weight:700;color:${G};letter-spacing:-2px;margin-bottom:10px;">%</span>
+    </div>
+    <p data-r style="font-size:15px;color:${M};margin:18px 0 0;line-height:1.7;">of lost patient revenue recovered<br>within the first 30 days.</p>
+    <p data-r style="font-size:12px;color:${M2};margin:16px 0 0;letter-spacing:0.5px;">Paid on results. No recovery, no fee.</p>
+  </div>`
+},
+{
+  label:'The close',dur:99999,
+  fn:()=>`<div style="text-align:center;padding:0 60px;">
+    <p data-r style="font-size:11px;letter-spacing:5px;color:${M};text-transform:uppercase;margin:0 0 26px;">Built for the Gulf. Deployed in days.</p>
+    <p data-r style="font-size:72px;font-weight:700;color:${W};letter-spacing:-3px;line-height:0.95;margin:0;">This is</p>
+    <p data-r style="font-size:72px;font-weight:700;color:${G};letter-spacing:-3px;line-height:0.95;margin:0 0 24px;">Jawab.</p>
+    <p data-r style="font-size:17px;color:${M};font-weight:400;margin:0;letter-spacing:0.2px;">Your clinic's unfair advantage.</p>
+    <div data-r style="margin-top:36px;display:flex;gap:10px;justify-content:center;">
+      <div onclick="sendPrompt('I want to book the Jawab revenue audit for my clinic')" style="border:0.5px solid rgba(255,255,255,0.22);border-radius:6px;padding:11px 22px;color:${W};font-size:12px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:inherit;">Get the Audit ↗</div>
+      <div onclick="sendPrompt('Walk me through how Jawab works step by step')" style="background:${G};border-radius:6px;padding:11px 22px;color:#000;font-size:12px;letter-spacing:1.5px;font-weight:700;text-transform:uppercase;cursor:pointer;font-family:inherit;">See it live ↗</div>
+    </div>
+  </div>`
+}
+];
+
+let cur=0,timer=null;
+const sceneEl=document.getElementById('jscene');
+const pbar=document.getElementById('jpbar');
+const dots=document.getElementById('jdots');
+const labelEl=document.getElementById('jlabel');
+const countEl=document.getElementById('jcount');
+
+SCENES.forEach((_,i)=>{
+  const d=document.createElement('div');
+  d.id='jdot'+i;
+  d.style.cssText='width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.28);transition:width 0.3s,border-radius 0.3s,background 0.3s;cursor:pointer;pointer-events:all;';
+  d.onclick=()=>goto(i);
+  dots.appendChild(d);
+});
+
+function updateDots(){
+  SCENES.forEach((_,i)=>{
+    const d=document.getElementById('jdot'+i);if(!d)return;
+    if(i===cur){d.style.width='16px';d.style.borderRadius='2px';d.style.background=G;}
+    else{d.style.width='4px';d.style.borderRadius='50%';d.style.background='rgba(255,255,255,0.28)';}
+  });
+}
+
+function goto(idx){
+  clearTimeout(timer);
+  idx=Math.max(0,Math.min(SCENES.length-1,idx));
+  sceneEl.style.opacity='0';
+  setTimeout(()=>{
+    cur=idx;
+    const s=SCENES[cur];
+    sceneEl.innerHTML=s.fn();
+    sceneEl.style.opacity='1';
+    labelEl.textContent=s.label;
+    countEl.textContent=(cur+1)+' / '+SCENES.length;
+    updateDots();
+    const revs=sceneEl.querySelectorAll('[data-r]');
+    revs.forEach((el,i)=>{
+      el.style.opacity='0';
+      el.style.transform='translateY(12px)';
+      el.style.transition=`opacity 0.75s cubic-bezier(0.16,1,0.3,1) ${i*0.17}s,transform 0.75s cubic-bezier(0.16,1,0.3,1) ${i*0.17}s`;
+      setTimeout(()=>{el.style.opacity='1';el.style.transform='translateY(0)';},60);
+    });
+    if(s.after)setTimeout(s.after,300);
+    pbar.style.transition='none';pbar.style.width='0%';
+    if(s.dur<99999){
+      setTimeout(()=>{pbar.style.transition=`width ${s.dur}ms linear`;pbar.style.width='100%';},80);
+      timer=setTimeout(()=>goto(cur+1),s.dur);
+    }
+  },380);
+}
+
+document.getElementById('jprev').onclick=()=>goto(cur-1);
+document.getElementById('jnext').onclick=()=>goto(cur+1);
+
+goto(0);
+})();
+</script>
