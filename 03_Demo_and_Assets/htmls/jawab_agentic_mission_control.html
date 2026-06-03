@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jawab Agentic Mission Control</title>
+  
+  <!-- Premium Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ----------------------------------------------------
+       Theme Variables & Reset
+       ---------------------------------------------------- */
+    :root {
+      --bg: #05070a;
+      --bg-gradient: radial-gradient(circle at 50% 0%, #0d131f 0%, #05070a 100%);
+      --panel: rgba(13, 20, 30, 0.65);
+      --panel-hover: rgba(18, 28, 42, 0.8);
+      --panel-border: rgba(255, 255, 255, 0.05);
+      --panel-border-strong: rgba(255, 255, 255, 0.12);
+      
+      /* Colors */
+      --text: #f3f5f7;
+      --muted: #8c9ba5;
+      
+      /* Agent & UI Accents */
+      --teal: #00b4d8;
+      --teal-glow: rgba(0, 180, 216, 0.25);
+      --orange: #ff6f4d;
+      --orange-glow: rgba(255, 111, 77, 0.25);
+      --gold: #e5c158;
+      --gold-glow: rgba(229, 193, 88, 0.25);
+      
+      --green: #10b981;
+      --green-glow: rgba(16, 185, 129, 0.3);
+      --red: #f43f5e;
+      
+      /* Fonts & Shadows */
+      --sans: "Sora", sans-serif;
+      --mono: "IBM Plex Mono", monospace;
+      --shadow: 0 16px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0px rgba(255, 255, 255, 0.05);
+      --glow-shadow: 0 0 30px rgba(229, 193, 88, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+        var(--bg-gradient);
+      background-size: 40px 40px, 40px 40px, auto;
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: var(--sans);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: inherit;
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ----------------------------------------------------
+       Layout & Containment
+       ---------------------------------------------------- */
+    .app-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Glassmorphism Panel Base */
+    .glass-card {
+      background: var(--panel);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* ----------------------------------------------------
+       1. Main Mission Control Header
+       ---------------------------------------------------- */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Golden Ambient Highlight behind Header */
+    .header::before {
+      content: "";
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 400px;
+      height: 200px;
+      background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 1;
+    }
+
+    .brand-logo {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #1b2535 0%, #0d141e 100%);
+      border: 2px solid var(--gold);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--gold);
+      box-shadow: 0 0 20px var(--gold-glow);
+      user-select: none;
+    }
+
+    .brand-text h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, #ffffff 0%, #a2afbe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text p {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 1;
+    }
+
+    /* Pulsing "Active Suite" Pill */
+    .pulse-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 99px;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--green);
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.05);
+    }
+
+    .pulse-indicator {
+      width: 8px;
+      height: 8px;
+      background-color: var(--green);
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .pulse-indicator::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: inherit;
+      animation: pulse-ring 1.8s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+    }
+
+    @keyframes pulse-ring {
+      0% {
+        transform: scale(0.5);
+        opacity: 1;
+      }
+      80%, 100% {
+        transform: scale(3);
+        opacity: 0;
+      }
+    }
+
+    .system-health {
+      display: flex;
+      gap: 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--panel-border);
+      padding: 6px 18px;
+      border-radius: 99px;
+      font-size: 13px;
+    }
+
+    .health-stat {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .health-stat span {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .health-stat strong {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* ----------------------------------------------------
+       Main Grid Layout
+       ---------------------------------------------------- */
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .left-column, .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ----------------------------------------------------
+       2. Simulated Terminal Console
+       ---------------------------------------------------- */
+    .terminal-card {
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid var(--panel-border-strong);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    }
+
+    .terminal-header {
+      background: #090c10;
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--panel-border);
+    }
+
+    .terminal-window-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .win-btn {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .win-btn.close { background-color: var(--red); }
+    .win-btn.min { background-color: var(--gold); }
+    .win-btn.max { background-color: var(--green); }
+
+    .terminal-tabs {
+      display: flex;
+      gap: 4px;
+    }
+
+    .terminal-tab {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      color: var(--muted);
+      border: 1px solid transparent;
+    }
+
+    .terminal-tab.active {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .terminal-tab:hover:not(.active) {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .terminal-screen {
+      background: #030508;
+      height: 280px;
+      padding: 18px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: #9cd1bb;
+      position: relative;
+    }
+
+    .terminal-screen::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+    }
+
+    .terminal-log-row {
+      margin-bottom: 6px;
+      white-space: pre-wrap;
+      animation: cmdFadeIn 0.2s ease-out forwards;
+    }
+
+    @keyframes cmdFadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .log-sys { color: var(--muted); }
+    .log-leak { color: var(--teal); }
+    .log-spec { color: var(--orange); }
+    .log-brain { color: var(--gold); }
+    .log-success { color: var(--green); }
+    .log-error { color: var(--red); }
+
+    .terminal-input-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
+      padding: 12px 18px;
+      background: #05070a;
+    }
+
+    .prompt-symbol {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      user-select: none;
+    }
+
+    .terminal-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13px;
+      flex-grow: 1;
+    }
+
+    /* ----------------------------------------------------
+       3. Three-Agent Live View
+       ---------------------------------------------------- */
+    .agents-section {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .agents-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .agents-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .agents-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .agent-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border-top: 2px solid transparent;
+    }
+
+    /* Card glow & border properties for individual agents */
+    .agent-card.leak-hunter {
+      border-top-color: var(--teal);
+    }
+    .agent-card.leak-hunter:hover {
+      box-shadow: 0 12px 30px rgba(0, 180, 216, 0.08), var(--shadow);
+      border-color: rgba(0, 180, 216, 0.3);
+    }
+
+    .agent-card.recovery-specialist {
+      border-top-color: var(--orange);
+    }
+    .agent-card.recovery-specialist:hover {
+      box-shadow: 0 12px 30px rgba(255, 111, 77, 0.08), var(--shadow);
+      border-color: rgba(255, 111, 77, 0.3);
+    }
+
+    .agent-card.clinic-brain {
+      border-top-color: var(--gold);
+    }
+    .agent-card.clinic-brain:hover {
+      box-shadow: 0 12px 30px rgba(229, 193, 88, 0.08), var(--shadow);
+      border-color: rgba(229, 193, 88, 0.3);
+    }
+
+    .agent-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .agent-title h3 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .agent-title p {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Agent status pill indicators */
+    .agent-pill {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 99px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .leak-hunter .agent-pill { background: rgba(0, 180, 216, 0.08); color: var(--teal); border: 1px solid rgba(0, 180, 216, 0.15); }
+    .recovery-specialist .agent-pill { background: rgba(255, 111, 77, 0.08); color: var(--orange); border: 1px solid rgba(255, 111, 77, 0.15); }
+    .clinic-brain .agent-pill { background: rgba(229, 193, 88, 0.08); color: var(--gold); border: 1px solid rgba(229, 193, 88, 0.15); }
+
+    /* Circular visualization elements */
+    .agent-visual {
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Rotating Radar Scanner (Leak Hunter) */
+    .radar-circle {
+      width: 50px;
+      height: 50px;
+      border: 1px solid rgba(0, 180, 216, 0.15);
+      border-radius: 50%;
+      position: relative;
+    }
+    .radar-circle::after {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border: 1px solid transparent;
+      border-top-color: var(--teal);
+      border-radius: 50%;
+      animation: rotate-radar 2s linear infinite;
+    }
+    @keyframes rotate-radar {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Signal waves (Recovery Specialist) */
+    .signal-waves {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 24px;
+    }
+    .wave-bar {
+      width: 3px;
+      background: var(--orange);
+      border-radius: 99px;
+      animation: soundWave 1.2s ease-in-out infinite alternate;
+    }
+    .wave-bar:nth-child(1) { height: 8px; animation-delay: 0.1s; }
+    .wave-bar:nth-child(2) { height: 16px; animation-delay: 0.3s; }
+    .wave-bar:nth-child(3) { height: 24px; animation-delay: 0.5s; }
+    .wave-bar:nth-child(4) { height: 14px; animation-delay: 0.2s; }
+    .wave-bar:nth-child(5) { height: 8px; animation-delay: 0.4s; }
+    
+    @keyframes soundWave {
+      0% { transform: scaleY(0.4); }
+      100% { transform: scaleY(1.2); }
+    }
+
+    /* Revolving Rings (Clinic Brain) */
+    .orbiting-rings {
+      position: relative;
+      width: 48px;
+      height: 48px;
+    }
+    .ring {
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(229, 193, 88, 0.2);
+      border-radius: 50%;
+      animation: orbit 3s linear infinite;
+    }
+    .ring:nth-child(2) {
+      transform: rotateX(70deg) rotateY(20deg);
+      animation-delay: -1s;
+    }
+    .ring:nth-child(3) {
+      transform: rotateX(70deg) rotateY(-20deg);
+      animation-delay: -2s;
+    }
+    @keyframes orbit {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Micro Stats Grid inside Agent Cards */
+    .agent-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 10px 0;
+    }
+
+    .agent-stat-item {
+      text-align: center;
+    }
+
+    .agent-stat-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+
+    .agent-stat-value {
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 2px;
+      color: var(--text);
+    }
+
+    /* Mini log output region inside card */
+    .agent-mini-log {
+      height: 60px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 10px;
+      line-height: 1.5;
+      color: var(--muted);
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: var(--radius-sm);
+      padding: 8px;
+    }
+
+    .agent-action-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .agent-action-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .leak-hunter .agent-action-btn:hover { color: var(--teal); border-color: rgba(0, 180, 216, 0.3); }
+    .recovery-specialist .agent-action-btn:hover { color: var(--orange); border-color: rgba(255, 111, 77, 0.3); }
+    .clinic-brain .agent-action-btn:hover { color: var(--gold); border-color: rgba(229, 193, 88, 0.3); }
+
+    /* ----------------------------------------------------
+       4. Owner Intelligence Dashboard (Right Column)
+       ---------------------------------------------------- */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .metric-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .metric-card.full-width {
+      grid-column: span 2;
+      border-left: 3px solid var(--gold);
+      position: relative;
+    }
+
+    /* Ambient shine for critical stats */
+    .metric-card.full-width::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(229, 193, 88, 0.04), transparent 50%);
+      pointer-events: none;
+    }
+
+    .metric-hdr {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .metric-num {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      line-height: 1.1;
+      color: var(--text);
+    }
+
+    .metric-num.highlight-gold {
+      color: var(--gold);
+      text-shadow: 0 0 20px rgba(229, 193, 88, 0.2);
+    }
+
+    .metric-footer {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sparkline-svg {
+      width: 100px;
+      height: 30px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 9px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 9px;
+      background: linear-gradient(90deg, var(--orange), var(--gold));
+      width: 34.2%;
+      transition: width 1s ease-in-out;
+    }
+
+    /* Active Follow-Up Schedules */
+    .panel-header {
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .followups-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .followup-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: var(--radius-md);
+      transition: all 0.3s ease;
+    }
+
+    .followup-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.08);
+      transform: translateX(2px);
+    }
+
+    .patient-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .followup-info h4 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .followup-info p {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .followup-status {
+      text-align: right;
+    }
+
+    .followup-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 99px;
+      text-transform: uppercase;
+    }
+
+    .followup-badge.wait { background: rgba(0, 180, 216, 0.08); color: var(--teal); border: 1px solid rgba(0, 180, 216, 0.15); }
+    .followup-badge.sent { background: rgba(255, 111, 77, 0.08); color: var(--orange); border: 1px solid rgba(255, 111, 77, 0.15); }
+    .followup-badge.confirmed { background: rgba(16, 185, 129, 0.08); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.15); }
+
+    .followup-time {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* Recent Handoff Reports (Human Takeover) */
+    .handoffs-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .handoff-card {
+      background: rgba(255, 111, 77, 0.02);
+      border: 1px solid rgba(255, 111, 77, 0.1);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+
+    .handoff-card.urgent {
+      border-color: rgba(255, 111, 77, 0.25);
+      background: rgba(255, 111, 77, 0.04);
+      box-shadow: 0 4px 20px rgba(255, 111, 77, 0.05);
+    }
+
+    .handoff-card.urgent::before {
+      content: "URGENT HANDOFF";
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--orange);
+      letter-spacing: 0.1em;
+    }
+
+    .handoff-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .handoff-header h4 {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .handoff-value {
+      font-family: var(--mono);
+      font-size: 11px;
+      background: rgba(255, 111, 77, 0.1);
+      color: var(--orange);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .handoff-chat-bubble {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      padding: 12px;
+      border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
+      font-size: 12.5px;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .handoff-system-action {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      padding-top: 10px;
+    }
+
+    .handoff-system-action strong {
+      color: var(--text);
+    }
+
+    .approve-handoff-btn {
+      align-self: flex-end;
+      padding: 8px 16px;
+      background: var(--orange);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(255, 111, 77, 0.3);
+    }
+
+    .approve-handoff-btn:hover {
+      background: #ff8468;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(255, 111, 77, 0.4);
+    }
+
+    .approve-handoff-btn.confirmed {
+      background: var(--green);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      pointer-events: none;
+    }
+
+    /* ----------------------------------------------------
+       5. Footer & Integration Links
+       ---------------------------------------------------- */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--panel-border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .integration-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(229, 193, 88, 0.2);
+      padding: 6px 14px;
+      border-radius: 99px;
+      background: rgba(229, 193, 88, 0.02);
+      transition: all 0.3s ease;
+    }
+
+    .integration-link:hover {
+      background: rgba(229, 193, 88, 0.08);
+      border-color: var(--gold);
+      box-shadow: 0 0 12px var(--gold-glow);
+    }
+
+    .copyright {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ----------------------------------------------------
+       Responsive Breakpoints
+       ---------------------------------------------------- */
+    @media (max-width: 1200px) {
+      .dashboard-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app-container {
+        padding: 12px;
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header-status {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .agents-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-card.full-width {
+        grid-column: span 1;
+      }
+
+      .footer {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- 1. Main Mission Control Header -->
+    <header class="glass-card header">
+      <div class="header-brand">
+        <div class="brand-logo">ج</div>
+        <div class="brand-text">
+          <h1>Jawab Agentic Mission Control</h1>
+          <p>Autonomous Patient Recovery & Revenue Auditing Suite</p>
+        </div>
+      </div>
+      <div class="header-status">
+        <div class="pulse-pill">
+          <div class="pulse-indicator"></div>
+          Active Suite
+        </div>
+        <div class="system-health">
+          <div class="health-stat">
+            <span>Uptime:</span>
+            <strong>99.98%</strong>
+          </div>
+          <div class="health-stat">
+            <span>API:</span>
+            <strong style="color: var(--green);">CONNECTED</strong>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Grid Layout -->
+    <div class="dashboard-layout">
+      
+      <!-- Left Column: Agentic Operations -->
+      <div class="left-column">
+        
+        <!-- Three-Agent Live View -->
+        <section class="agents-section">
+          <div class="agents-header">
+            <h2>Three-Agent Core Suite</h2>
+            <span class="brand-text"><p>COOPERATING NODES</p></span>
+          </div>
+          <div class="agents-grid">
+            
+            <!-- Agent 1: Leak Hunter -->
+            <article class="glass-card agent-card leak-hunter" id="agent-leak">
+              <div class="agent-meta">
+                <div class="agent-title">
+                  <h3>Leak Hunter</h3>
+                  <p>Database & Call Auditor</p>
+                </div>
+                <div class="agent-pill" id="pill-leak">SCANNING PIMS</div>
+              </div>
+              
+              <div class="agent-visual">
+                <div class="radar-circle"></div>
+              </div>
+              
+              <div class="agent-stats">
+                <div class="agent-stat-item">
+                  <div class="agent-stat-label">Audited</div>
+                  <div class="agent-stat-value" id="stats-leak-audited">1,420</div>
+                </div>
+                <div class="agent-stat-item">
+                  <div class="agent-stat-label">Leaks</div>
+                  <div class="agent-stat-value" id="stats-leak-found" style="color: var(--orange);">184</div>
+                </div>
+                <div class="agent-stat-item">
+                  <div class="agent-stat-label">Audited hr</div>
+                  <div class="agent-stat-value">60/h</div>
+                </div>
+              </div>
+              
+              <div class="agent-mini-log" id="mini-log-leak">
+                [SYSTEM] Ready to audit.<br>
+                [03:48:10] Scanning CallLogs...<br>
+                [03:48:15] Audited 42 dental phone calls.
+              </div>
+              
+              <button class="agent-action-btn" onclick="triggerManualAudit()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                Trigger Manual Audit
+              </button>
+            </article>
+
+            <!-- Agent 2: Recovery Specialist -->
+            <article class="glass-card agent-card recovery-specialist" id="agent-recovery">
+              <div class="agent-meta">
+                <div class="agent-title">
+                  <h3>Recovery Specialist</h3>
+                  <p>WhatsApp Outreach & Sentiment</p>
+                </div>
+                <div class="agent-pill" id="pill-recovery">ACTIVE OUTREACH</div>
+              </div>
+              
+              <div class="agent-visual">
+                <div class="signal-waves">
+                  <span class="wave-bar"></span>
+                  <span class="wave-bar"></span>
+                  <span class="wave-bar"></span>
+                  <span class="wave-bar"></span>
+                  <span class="wave-bar"></span>
+                </div>
+              </div>
+              
+              <div class="agent-stats">
+                <div class="agent-stat-item">
+                  <div class="agent-stat-label">Outreaches</div>
+                  <div class="agent-stat-value" id="stats-rec-sent">112</div>
+                </div>
+                <div class="agent-stat-item">
+                  <div class="agent-stat-label">Replies</div>
+                  <div class="agent-stat-value" id="stats-rec-replies">48</div>
+                </div>
+                <div class="agent-stat-item">
+                  <div class="agent-stat-label">Engaged</div>
+                  <div class="agent-stat-value" style="color: var(--green);">18</div>
+                </div>
+              </div>
+              
+              <div class="agent-mini-log" id="mini-log-recovery">
+                [SYSTEM] WhatsApp API online.<br>
+                [03:48:12] Sent follow-up to PT-8802.<br>
+                [03:48:20] Awaiting sentiment response.
+              </div>
+              
+              <button class="agent-action-btn" onclick="simulateOutreach()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Send Outreach Test
+              </button>
+            </article>
+
+            <!-- Agent 3: Clinic Brain -->
+            <article class="glass-card agent-card clinic-brain" id="agent-brain">
+              <div class="agent-meta">
+                <div class="agent-title">
+                  <h3>Clinic Brain</h3>
+                  <p>Scheduler & Reasoning Engine</p>
+                </div>
+                <div class="agent-pill" id="pill-brain">STANDBY / OK</div>
+              </div>
+              
+              <div class="agent-visual">
+                <div class="orbiting-rings">
+                  <span class="ring"></span>
+                  <span class="ring"></span>
+                  <span class="ring"></span>
+                </div>
+              </div>
+              
+              <div class="agent-stats">
+                <div class="agent-stat-item">
+                  <div class="agent-stat-label">Cognition</div>
+                  <div class="agent-stat-value">GPT-4o</div>
+                </div>
+                <div class="agent-stat-item">
+                  <div class="agent-stat-label">Confirmed</div>
+                  <div class="agent-stat-value" id="stats-brain-confirm" style="color: var(--gold);">29</div>
+                </div>
+                <div class="agent-stat-item">
+                  <div class="agent-stat-label">Intent Match</div>
+                  <div class="agent-stat-value">94.6%</div>
+                </div>
+              </div>
+              
+              <div class="agent-mini-log" id="mini-log-brain">
+                [SYSTEM] KB loaded: 43 clinic rules.<br>
+                [03:47:50] Matched intent "Implants".<br>
+                [03:48:02] Synced Google Calendar slots.
+              </div>
+              
+              <button class="agent-action-btn" onclick="queryClinicBrain()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="13" y2="17"></line></svg>
+                Test Knowledge Query
+              </button>
+            </article>
+
+          </div>
+        </section>
+
+        <!-- Simulated Terminal Console -->
+        <section class="glass-card terminal-card">
+          <div class="terminal-header">
+            <div class="terminal-window-buttons">
+              <span class="win-btn close"></span>
+              <span class="win-btn min"></span>
+              <span class="win-btn max"></span>
+            </div>
+            <div class="terminal-tabs">
+              <button class="terminal-tab active" onclick="setTerminalFilter('all', this)">All logs</button>
+              <button class="terminal-tab" onclick="setTerminalFilter('leak', this)">Leak Hunter</button>
+              <button class="terminal-tab" onclick="setTerminalFilter('recovery', this)">Recovery Spec</button>
+              <button class="terminal-tab" onclick="setTerminalFilter('brain', this)">Clinic Brain</button>
+            </div>
+          </div>
+          <div class="terminal-screen" id="terminal-display">
+            <div class="terminal-log-row log-sys">[SYS] Booting Jawab Agentic Suite...</div>
+            <div class="terminal-log-row log-sys">[SYS] Initializing semantic router and RAG models...</div>
+            <div class="terminal-log-row log-sys">[SYS] Connecting to Clinic Database (PIMS: DentMax)... Success.</div>
+            <div class="terminal-log-row log-success">[SYS] Active Recovery Suite status: ONLINE. All agent threads initialized.</div>
+            <div class="terminal-log-row log-sys">------------------------------------------------------------</div>
+            <div class="terminal-log-row log-sys">Type 'help' to view available interactive simulator commands.</div>
+          </div>
+          <div class="terminal-input-line">
+            <span class="prompt-symbol">jawab-agentic$</span>
+            <input type="text" class="terminal-input" id="terminal-input-box" placeholder="type 'help', 'status', 'audit', 'clear'..." autocomplete="off" onkeydown="handleTerminalCommand(event)">
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Right Column: Owner Intelligence Dashboard -->
+      <div class="right-column">
+        
+        <!-- Owner Intelligence Overview & Counter Metrics -->
+        <section class="glass-card" style="display: flex; flex-direction: column; gap: 20px;">
+          <div class="panel-header" style="margin-bottom: 0;">
+            <h3>Owner Intelligence Dashboard</h3>
+            <span class="followup-badge confirmed">REALTIME AUDIT</span>
+          </div>
+          
+          <div class="metrics-grid">
+            
+            <!-- Large Recovered Revenue Widget -->
+            <div class="glass-card metric-card full-width">
+              <div class="metric-hdr">
+                <span class="metric-title">Recovered Revenue</span>
+                <!-- Custom sparkline chart -->
+                <svg class="sparkline-svg" viewBox="0 0 100 30">
+                  <path d="M 0,25 L 15,22 L 30,24 L 45,15 L 60,18 L 75,5 L 90,8 L 100,2" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="M 0,25 L 15,22 L 30,24 L 45,15 L 60,18 L 75,5 L 90,8 L 100,2 L 100,30 L 0,30 Z" fill="radial-gradient(circle, var(--gold-glow) 0%, transparent 100%)" opacity="0.1"></path>
+                </svg>
+              </div>
+              <div class="metric-num highlight-gold" id="total-revenue">AED 124,500</div>
+              <div class="metric-footer">
+                <span>From 29 recovered high-ticket dental leads</span>
+                <span style="color: var(--green); font-weight: 600;">+14.2% this wk</span>
+              </div>
+            </div>
+            
+            <!-- Conversion Rate -->
+            <div class="glass-card metric-card">
+              <span class="metric-title">Recovery Rate</span>
+              <div class="metric-num" id="recovery-rate">34.2%</div>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="recovery-bar-fill" style="width: 34.2%;"></div>
+              </div>
+              <div class="metric-footer" style="margin-top: 4px;">
+                <span>Industry avg: 4.1%</span>
+              </div>
+            </div>
+
+            <!-- Avg Response Speed -->
+            <div class="glass-card metric-card">
+              <span class="metric-title">Avg Response Speed</span>
+              <div class="metric-num">52s</div>
+              <div style="font-size: 11px; color: var(--green); font-weight: 500;">
+                ⚡ Instantly before lead cools
+              </div>
+              <div class="metric-footer">
+                <span>Auto chatbot response</span>
+              </div>
+            </div>
+            
+          </div>
+        </section>
+
+        <!-- Active Follow-Up Schedules -->
+        <section class="glass-card">
+          <div class="panel-header">
+            <h3>Active Follow-Up Queue</h3>
+            <span class="brand-text"><p>STREAMING 24/7</p></span>
+          </div>
+          
+          <div class="followups-list">
+            
+            <div class="followup-item">
+              <div class="patient-avatar">TH</div>
+              <div class="followup-info">
+                <h4>PT-8802 (Implant - AED 12,000)</h4>
+                <p>Missed call detected. Pitch sent via WhatsApp.</p>
+              </div>
+              <div class="followup-status">
+                <span class="followup-badge wait">Wait Reply</span>
+                <span class="followup-time">Next touch in 12m</span>
+              </div>
+            </div>
+
+            <div class="followup-item">
+              <div class="patient-avatar">LH</div>
+              <div class="followup-info">
+                <h4>PT-9141 (Veneers - AED 25,000)</h4>
+                <p>Clinic Brain analyzing sentiment & objections.</p>
+              </div>
+              <div class="followup-status">
+                <span class="followup-badge sent">Sent Pitch</span>
+                <span class="followup-time">Analyzing intent</span>
+              </div>
+            </div>
+
+            <div class="followup-item">
+              <div class="patient-avatar">ND</div>
+              <div class="followup-info">
+                <h4>PT-7592 (Ortho - AED 8,500)</h4>
+                <p>Confirmed slot: Sat 11:30 AM with Dr. Kamal.</p>
+              </div>
+              <div class="followup-status">
+                <span class="followup-badge confirmed">Confirmed</span>
+                <span class="followup-time">Synced to PMS</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Urgent Handoff Reports (Human Takeover) -->
+        <section class="glass-card">
+          <div class="panel-header">
+            <h3>Recent Human Handoffs</h3>
+            <span style="color: var(--orange); font-size: 11px; font-weight: 600; text-transform: uppercase; font-family: var(--mono);">2 Action Required</span>
+          </div>
+          
+          <div class="handoffs-list" id="handoffs-container">
+            
+            <!-- Handoff 1 -->
+            <div class="handoff-card urgent" id="handoff-card-1">
+              <div class="handoff-header">
+                <div class="patient-avatar" style="border-color: rgba(255, 111, 77, 0.4); color: var(--orange);">PA</div>
+                <div>
+                  <h4>PT-8942 (Implants - AED 15,000)</h4>
+                  <p>Inquiry: Installments & Payment Plans</p>
+                </div>
+                <div class="handoff-value">AED 15K</div>
+              </div>
+              <div class="handoff-chat-bubble">
+                "Is there any installment plan for the AED 15,000 implant package? I can pay AED 5,000 now and the rest over 3 months."
+              </div>
+              <div class="handoff-system-action">
+                <span>System Handoff to Reception: <strong>Send Approved Payment Agreement</strong></span>
+              </div>
+              <button class="approve-handoff-btn" id="btn-handoff-1" onclick="approveHandoff(1, 15000)">
+                Approve Payment Plan & Send Slot
+              </button>
+            </div>
+
+            <!-- Handoff 2 -->
+            <div class="handoff-card" id="handoff-card-2">
+              <div class="handoff-header">
+                <div class="patient-avatar" style="border-color: rgba(255, 111, 77, 0.2); color: var(--orange);">MA</div>
+                <div>
+                  <h4>PT-9011 (Cosmetic - AED 8,200)</h4>
+                  <p>Inquiry: Doctor Availability Saturday</p>
+                </div>
+                <div class="handoff-value">AED 8.2K</div>
+              </div>
+              <div class="handoff-chat-bubble">
+                "I want to book with Dr. Leila directly on Saturday afternoon. Can you check if she has any availability between 2 PM and 5 PM?"
+              </div>
+              <div class="handoff-system-action">
+                <span>System Action: <strong>Pre-allocated Sat 3:30 PM slot</strong></span>
+              </div>
+              <button class="approve-handoff-btn" id="btn-handoff-2" onclick="approveHandoff(2, 8200)">
+                Confirm Saturday Slot Allocation
+              </button>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+    <!-- Integration Links -->
+    <footer class="footer">
+      <div class="footer-links">
+        <a href="../../01_Strategy/Jawab_EXECUTION_DASHBOARD.html" class="integration-link">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Back to Execution Dashboard
+        </a>
+        <a href="#" class="integration-link" style="border-color: rgba(255, 255, 255, 0.08); color: var(--muted);">
+          Open Leads Queue (CSV)
+        </a>
+      </div>
+      <div class="copyright">
+        JAWAB © 2026 // AGENTIC OPERATIONS CONTROL
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ----------------------------------------------------
+       Interactive Simulator Scripts
+       ---------------------------------------------------- -->
+  <script>
+    // System State Variables
+    let currentFilter = 'all';
+    let totalRevenue = 124500;
+    let auditedCallsCount = 1420;
+    let leaksFoundCount = 184;
+    let outreachSentCount = 112;
+    let repliesCount = 48;
+    let confirmedAppointments = 29;
+    let isSimulationRunning = false;
+
+    // Command descriptions
+    const commands = {
+      '/help': 'Display list of available slash commands and descriptions.',
+      '/audit <url>': 'Run a step-by-step mystery shop speed check simulation and output scorecard.',
+      '/grill': 'Simulate patient objection resolution dialogue (price, Saturday slots).',
+      '/schedule <cron>': 'Set up a recurring background mystery shop schedule with a ticking timer.',
+      '/goal <objective>': 'Run a multi-agent workflow simulation showing real-time coordination.',
+      '/calculator <calls> <replies> <value>': 'Run a quick patient recovery ROI calculation in the console.',
+      'status': 'Check current status reports of the 3 active agents.',
+      'clear': 'Clear the terminal console history.'
+    };
+
+    // Update Dashboard Metrics dynamically
+    function updateDashboardMetrics() {
+      document.getElementById('total-revenue').innerText = `AED ${totalRevenue.toLocaleString()}`;
+      document.getElementById('stats-leak-audited').innerText = auditedCallsCount.toLocaleString();
+      document.getElementById('stats-leak-found').innerText = leaksFoundCount.toLocaleString();
+      document.getElementById('stats-rec-sent').innerText = outreachSentCount.toLocaleString();
+      document.getElementById('stats-rec-replies').innerText = repliesCount.toLocaleString();
+      document.getElementById('stats-brain-confirm').innerText = confirmedAppointments.toLocaleString();
+      
+      // Calculate recovery rate with scaling factor to match initial 34.2%
+      let ratePercent = Math.min(100, ((confirmedAppointments / (outreachSentCount || 1)) * 100 * 1.32)).toFixed(1); 
+      document.getElementById('recovery-rate').innerText = `${ratePercent}%`;
+      document.getElementById('recovery-bar-fill').style.width = `${ratePercent}%`;
+    }
+
+    // Logger Utility
+    function appendLog(message, category = 'sys') {
+      const display = document.getElementById('terminal-display');
+      const row = document.createElement('div');
+      
+      const now = new Date();
+      const timeStr = `[${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}]`;
+      
+      row.className = `terminal-log-row log-${category}`;
+      row.innerHTML = `${timeStr} ${message}`;
+      
+      // Determine visibility based on active filter
+      if (currentFilter === 'all') {
+        row.style.display = 'block';
+      } else if (currentFilter === 'leak' && category === 'leak') {
+        row.style.display = 'block';
+      } else if (currentFilter === 'recovery' && (category === 'spec' || category === 'recovery')) {
+        row.style.display = 'block';
+      } else if (currentFilter === 'brain' && category === 'brain') {
+        row.style.display = 'block';
+      } else {
+        row.style.display = 'none';
+      }
+      
+      display.appendChild(row);
+      display.scrollTop = display.scrollHeight;
+
+      // Update specific agent mini-logs based on category
+      if (category === 'leak') {
+        const mini = document.getElementById('mini-log-leak');
+        mini.innerHTML += `<br>${timeStr} ${message}`;
+        mini.scrollTop = mini.scrollHeight;
+      } else if (category === 'spec') {
+        const mini = document.getElementById('mini-log-recovery');
+        mini.innerHTML += `<br>${timeStr} ${message}`;
+        mini.scrollTop = mini.scrollHeight;
+      } else if (category === 'brain') {
+        const mini = document.getElementById('mini-log-brain');
+        mini.innerHTML += `<br>${timeStr} ${message}`;
+        mini.scrollTop = mini.scrollHeight;
+      }
+    }
+
+    // Tab filtering function
+    function setTerminalFilter(filter, tabElement) {
+      currentFilter = filter;
+      const tabs = document.querySelectorAll('.terminal-tab');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      
+      // Highlight selected tab
+      if (tabElement) {
+        tabElement.classList.add('active');
+      } else {
+        // Find tab element manually if not passed
+        tabs.forEach(tab => {
+          if (tab.innerText.toLowerCase().includes(filter)) {
+            tab.classList.add('active');
+          }
+        });
+      }
+      
+      // Filter rows
+      const rows = document.querySelectorAll('.terminal-log-row');
+      rows.forEach(row => {
+        if (filter === 'all') {
+          row.style.display = 'block';
+        } else if (filter === 'leak' && row.classList.contains('log-leak')) {
+          row.style.display = 'block';
+        } else if (filter === 'recovery' && (row.classList.contains('log-spec') || row.classList.contains('log-recovery'))) {
+          row.style.display = 'block';
+        } else if (filter === 'brain' && row.classList.contains('log-brain')) {
+          row.style.display = 'block';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      
+      appendLog(`Filtered console view to: [${filter.toUpperCase()}]`, 'sys');
+    }
+
+    // Terminal command controller
+    function handleTerminalCommand(e) {
+      if (e.key === 'Enter') {
+        const inputField = document.getElementById('terminal-input-box');
+        const rawInput = inputField.value.trim();
+        if (!rawInput) return;
+        
+        // Output user's typed input first
+        const display = document.getElementById('terminal-display');
+        const userRow = document.createElement('div');
+        userRow.className = 'terminal-log-row';
+        userRow.innerHTML = `<span style="color: var(--gold);">jawab-agentic$</span> ${rawInput}`;
+        display.appendChild(userRow);
+        
+        // Parse input: allow leading slash or raw
+        let cleanInput = rawInput;
+        if (cleanInput.startsWith('/')) {
+          cleanInput = cleanInput.substring(1);
+        }
+        
+        const parts = cleanInput.split(/\s+/);
+        const cmd = parts[0].toLowerCase();
+        
+        inputField.value = '';
+        display.scrollTop = display.scrollHeight;
+
+        // Execute command
+        executeCommand(cmd, parts, cleanInput);
+      }
+    }
+
+    function executeCommand(cmd, parts, cleanInput) {
+      if (isSimulationRunning && ['audit', 'grill', 'goal'].includes(cmd)) {
+        appendLog('[SYS] Error: Another simulation is currently running. Please wait for it to complete.', 'error');
+        return;
+      }
+
+      switch(cmd) {
+        case 'help':
+          let helpText = '<br><span style="color: var(--gold); font-weight: bold;">JAWAB CORE AGENTIC COMMAND LINE:</span><br>';
+          for (let c in commands) {
+            helpText += `  <span style="color: var(--gold);">${c.padEnd(38)}</span> - ${commands[c]}<br>`;
+          }
+          appendLog(helpText, 'sys');
+          break;
+          
+        case 'status':
+          appendLog('<br>--- AGENT HEALTH AND METRICS STATUS ---<br>' + 
+                    '  [Leak Hunter]        Status: SCANNING DB // Audited: ' + auditedCallsCount + ' // Leaks: ' + leaksFoundCount + '<br>' +
+                    '  [Recovery Specialist] Status: ACTIVE OUTREACH // Outreach: ' + outreachSentCount + ' // Replies: ' + repliesCount + '<br>' +
+                    '  [Clinic Brain]        Status: STANDBY // Confirmed: ' + confirmedAppointments + ' // NLP Accuracy: 94.6%<br>' +
+                    '---------------------------------------', 'sys');
+          break;
+          
+        case 'audit':
+          const url = parts[1];
+          if (!url) {
+            appendLog('[SYS] Error: Please specify a URL. Usage: <span style="color: var(--gold);">/audit &lt;url&gt;</span>', 'error');
+            break;
+          }
+          runAuditSimulation(url);
+          break;
+          
+        case 'grill':
+          runGrillSimulation();
+          break;
+          
+        case 'schedule':
+          const cronExpr = cleanInput.substring(8).trim() || '*/5 * * * *';
+          runScheduleSimulation(cronExpr);
+          break;
+
+        case 'goal':
+          const objective = cleanInput.substring(4).trim() || 'recover lost patient consults';
+          runGoalSimulation(objective);
+          break;
+
+        case 'calculator':
+          const calls = parseFloat(parts[1]);
+          const replies = parseFloat(parts[2]);
+          const value = parseFloat(parts[3]);
+          
+          if (isNaN(calls) || isNaN(replies) || isNaN(value)) {
+            appendLog('[SYS] Error: Invalid inputs. Usage: <span style="color: var(--gold);">/calculator &lt;calls_monthly&gt; &lt;recovery_rate_percent&gt; &lt;treatment_val&gt;</span>', 'error');
+            appendLog('Example: <span style="color: var(--gold);">/calculator 100 30 15000</span>', 'sys');
+            break;
+          }
+          runCalculatorSimulation(calls, replies, value);
+          break;
+          
+        case 'clear':
+          document.getElementById('terminal-display').innerHTML = '';
+          break;
+          
+        default:
+          appendLog(`Unknown command: '${cmd}'. Type '/help' for options.`, 'error');
+      }
+    }
+
+    // /audit simulation
+    function runAuditSimulation(url) {
+      isSimulationRunning = true;
+      document.getElementById('pill-leak').innerText = 'AUDITING WEBSITE';
+      document.getElementById('pill-leak').style.background = 'rgba(255, 111, 77, 0.1)';
+      
+      appendLog(`[SYS] Initiating audit scan on target URL: <span style="color: var(--teal); font-weight: bold;">${url}</span>...`, 'sys');
+      
+      setTimeout(() => {
+        appendLog(`[Leak Hunter] Connecting to <strong>${url}</strong> server... Success (HTTP 200 OK).`, 'leak');
+        
+        setTimeout(() => {
+          const loadTime = (Math.random() * 2.5 + 3.2).toFixed(1);
+          const riskLevel = loadTime > 4.5 ? 'CRITICAL RISK' : 'MODERATE RISK';
+          const speedColor = loadTime > 4.5 ? 'var(--red)' : 'var(--orange)';
+          appendLog(`[Leak Hunter] Page Speed Index (Mobile): <strong>${loadTime}s</strong>. <span style="color: ${speedColor};">[${riskLevel}: slow load increases bounce rate by ${((loadTime - 2.5) * 18).toFixed(0)}%]</span>`, 'leak');
+          
+          setTimeout(() => {
+            appendLog(`[Leak Hunter] Probing direct messaging pathways... WhatsApp button found (wa.me linkage).`, 'leak');
+            appendLog(`[Leak Hunter] Direct Path Test: Message latency is <strong>14.8 seconds</strong> before trigger. <span style="color: var(--red);">[CRITICAL: Bottleneck detected]</span>`, 'leak');
+            
+            setTimeout(() => {
+              appendLog(`[Leak Hunter] Scraping local business reviews... Found 38 patient reviews. Average rating: 3.9/5.`, 'leak');
+              appendLog(`[Leak Hunter] Sentiment Analysis: 3 negative reviews left unaddressed regarding front desk follow-up.`, 'leak');
+              
+              setTimeout(() => {
+                auditedCallsCount += 15;
+                leaksFoundCount += 2;
+                updateDashboardMetrics();
+                
+                let score = Math.max(45, Math.min(95, Math.round(100 - (loadTime * 8) - 15)));
+                let grade = score > 85 ? 'B' : score > 70 ? 'C' : score > 55 ? 'D' : 'F';
+                let gradeColor = grade === 'B' ? 'var(--green)' : grade === 'C' ? 'var(--gold)' : grade === 'D' ? 'var(--orange)' : 'var(--red)';
+                
+                let scorecard = `<br><span style="color: var(--gold); font-weight: 700;">==================================================</span><br>` +
+                                `<span style="color: var(--gold); font-weight: 700;">          REVENUE AUDIT SCORECARD: ${url}</span><br>` +
+                                `<span style="color: var(--gold); font-weight: 700;">==================================================</span><br>` +
+                                `  Page Speed Index : <span style="color: ${speedColor};">${loadTime}s (${loadTime > 4.5 ? 'POOR' : 'FAIR'})</span><br>` +
+                                `  WhatsApp Path    : <span style="color: var(--green);">ACTIVE (wa.me button present)</span><br>` +
+                                `  WhatsApp Latency : <span style="color: var(--red);">14.8s delay (HIGH DROPOUT RISK)</span><br>` +
+                                `  Unaddressed Leaks: <span style="color: var(--orange);">3 patient reviews warning of ignored chats</span><br>` +
+                                `--------------------------------------------------<br>` +
+                                `  OVERALL AUDIT GRADE   : <strong style="color: ${gradeColor}; font-size: 14px;">[ ${grade} ]</strong> (Score: ${score}/100)<br>` +
+                                `  EST. MONTHLY LEAKAGE  : <strong style="color: var(--orange);">AED 24,000</strong><br>` +
+                                `  RECOMMENDED ACTION    : Integrate Jawab WhatsApp recovery flow to close speed gaps.<br>` +
+                                `<span style="color: var(--gold); font-weight: 700;">==================================================</span>`;
+                appendLog(scorecard, 'success');
+                
+                document.getElementById('pill-leak').innerText = 'SCANNING PIMS';
+                document.getElementById('pill-leak').style.background = '';
+                isSimulationRunning = false;
+              }, 1200);
+            }, 1000);
+          }, 1000);
+        }, 1000);
+      }, 800);
+    }
+
+    // /grill simulation
+    function runGrillSimulation() {
+      isSimulationRunning = true;
+      document.getElementById('pill-recovery').innerText = 'DIALOGUE ACTIVE';
+      document.getElementById('pill-recovery').style.background = 'rgba(255, 111, 77, 0.1)';
+      document.getElementById('pill-brain').innerText = 'REASONING';
+      document.getElementById('pill-brain').style.background = 'rgba(229, 193, 88, 0.1)';
+      
+      appendLog('[SYS] Starting patient objection-handling simulation ("/grill")...', 'sys');
+      
+      setTimeout(() => {
+        appendLog(`<span style="color: #fff; font-weight: 600;">[Patient (PT-4109)]</span> "I received the quote for the implant package (AED 15,000) but it is too high. Do you have any cheaper options or payment plans?"`, 'sys');
+        
+        setTimeout(() => {
+          appendLog(`[Recovery Specialist] objection flagged: pricing pressure. Querying Clinic Brain for flexible financing options...`, 'spec');
+          
+          setTimeout(() => {
+            appendLog(`[Clinic Brain] <code>[RAG KB Lookup]</code> Query: "implant financing and installment policies"...`, 'brain');
+            appendLog(`[Clinic Brain] Match found. Policy: Implants (>AED 10k) qualify for 0% downpayment clinic installments (split over 4 visits).`, 'brain');
+            
+            setTimeout(() => {
+              appendLog(`[Recovery Specialist] Formulating response: <em>"We understand dental implants are a significant investment! To help, we offer an interest-free payment plan where you pay 40% on your first visit and split the remainder over 3 monthly sessions. Would this split make it easier?"</em>`, 'spec');
+              
+              setTimeout(() => {
+                appendLog(`<span style="color: #fff; font-weight: 600;">[Patient (PT-4109)]</span> "Yes, that is much better. But I can only come on Saturday due to my work. Can I book Saturday afternoon?"`, 'sys');
+                
+                setTimeout(() => {
+                  appendLog(`[Recovery Specialist] Saturday slot request. Checking availability with Clinic Brain schedule synchronizer...`, 'spec');
+                  
+                  setTimeout(() => {
+                    appendLog(`[Clinic Brain] <code>[PMS Query]</code> Fetching Saturday afternoon slots for Dr. Leila...`, 'brain');
+                    appendLog(`[Clinic Brain] Found slot: <strong>Saturday at 3:30 PM</strong> with Dr. Leila.`, 'brain');
+                    
+                    setTimeout(() => {
+                      appendLog(`[Recovery Specialist] Pitching appointment slot: <em>"We have Dr. Leila available this Saturday at 3:30 PM. I can hold this Saturday afternoon spot for you for 10 minutes. Shall we lock it in?"</em>`, 'spec');
+                      
+                      setTimeout(() => {
+                        appendLog(`<span style="color: #fff; font-weight: 600;">[Patient (PT-4109)]</span> "Yes please, that Saturday 3:30 PM slot is perfect. Confirm it."`, 'sys');
+                        
+                        setTimeout(() => {
+                          outreachSentCount += 1;
+                          repliesCount += 1;
+                          confirmedAppointments += 1;
+                          totalRevenue += 15000;
+                          updateDashboardMetrics();
+                          
+                          appendLog(`[Clinic Brain] <code>[PMS Sync]</code> Creating booking reference APT-9912 in DentMax database. Slot locked.`, 'brain');
+                          appendLog(`[SYS] <strong style="color: var(--green);">[RECOVERY SUCCESS]</strong> PT-4109 recovered! Revenue recaptured: <strong>AED 15,000</strong>. Saturday slot allocated.`, 'success');
+                          
+                          document.getElementById('pill-recovery').innerText = 'ACTIVE OUTREACH';
+                          document.getElementById('pill-recovery').style.background = '';
+                          document.getElementById('pill-brain').innerText = 'STANDBY / OK';
+                          document.getElementById('pill-brain').style.background = '';
+                          isSimulationRunning = false;
+                        }, 1200);
+                      }, 1500);
+                    }, 1200);
+                  }, 1200);
+                }, 1200);
+              }, 1500);
+            }, 1200);
+          }, 1200);
+        }, 1200);
+      }, 1000);
+    }
+
+    // /schedule simulation
+    function runScheduleSimulation(cronExpr) {
+      appendLog(`[SYS] Scheduling automated mystery shop via cron: <strong style="color: var(--gold);">${cronExpr}</strong>.`, 'sys');
+      appendLog(`[SYS] Active ticking timer initialized. Next automated mystery shop check in 60 seconds...`, 'success');
+      
+      let timerStat = document.getElementById('schedule-timer-stat');
+      if (!timerStat) {
+        const healthDiv = document.querySelector('.system-health');
+        timerStat = document.createElement('div');
+        timerStat.className = 'health-stat';
+        timerStat.id = 'schedule-timer-stat';
+        timerStat.innerHTML = `<span>Next Shop:</span><strong id="schedule-timer-countdown" style="color: var(--gold);">60s</strong>`;
+        healthDiv.appendChild(timerStat);
+      } else {
+        timerStat.style.display = 'flex';
+      }
+      
+      if (window.mysteryShopInterval) {
+        clearInterval(window.mysteryShopInterval);
+      }
+      
+      let secondsLeft = 60;
+      const countdownEl = document.getElementById('schedule-timer-countdown');
+      countdownEl.innerText = `${secondsLeft}s`;
+      
+      window.mysteryShopInterval = setInterval(() => {
+        secondsLeft--;
+        countdownEl.innerText = `${secondsLeft}s`;
+        
+        if (secondsLeft <= 0) {
+          secondsLeft = 60;
+          appendLog(`[SYS] Cron Trigger [${cronExpr}]: Running automated background mystery shop...`, 'sys');
+          
+          setTimeout(() => {
+            const loadTime = (Math.random() * 1.5 + 2.2).toFixed(1);
+            appendLog(`[Leak Hunter] Background check: Load speed ${loadTime}s. WhatsApp Path: OK.`, 'leak');
+            auditedCallsCount += 1;
+            updateDashboardMetrics();
+          }, 500);
+        }
+      }, 1000);
+    }
+
+    // /goal simulation
+    function runGoalSimulation(objective) {
+      isSimulationRunning = true;
+      document.getElementById('pill-leak').innerText = 'GOAL SEARCH';
+      document.getElementById('pill-leak').style.background = 'rgba(0, 180, 216, 0.1)';
+      document.getElementById('pill-recovery').innerText = 'DISPATCHING';
+      document.getElementById('pill-recovery').style.background = 'rgba(255, 111, 77, 0.1)';
+      document.getElementById('pill-brain').innerText = 'COLLABORATING';
+      document.getElementById('pill-brain').style.background = 'rgba(229, 193, 88, 0.1)';
+      
+      appendLog(`[SYS] Launching Multi-Agent workflow simulation for goal: <strong style="color: var(--gold);">${objective}</strong>...`, 'sys');
+      
+      setTimeout(() => {
+        appendLog(`[Leak Hunter] <code>[Goal Scan]</code> Searching DentMax logs for unbooked lost patient leads matching "${objective}"...`, 'leak');
+        
+        setTimeout(() => {
+          appendLog(`[Leak Hunter] Detected unbooked lead: PT-7182 (Veneers - AED 20,000) cancelled appointment 4 days ago with no rebooking.`, 'leak');
+          
+          setTimeout(() => {
+            appendLog(`[Recovery Specialist] Fetching template for "Veneers Recovery". Initializing WhatsApp message payload...`, 'spec');
+            appendLog(`[Recovery Specialist] Message dispatched. Awaiting delivery acknowledgement...`, 'spec');
+            
+            setTimeout(() => {
+              appendLog(`<span style="color: #fff; font-weight: 600;">[Patient (PT-7182)]</span> "Thanks for writing, but I cancelled because I am terrified of how much shaving veneers require. Is it painful?"`, 'sys');
+              
+              setTimeout(() => {
+                appendLog(`[Clinic Brain] Interrogating clinic clinical rules vector database for "Veneer pain & preparation"...`, 'brain');
+                appendLog(`[Clinic Brain] Match found. Protocol: Clinic uses ultra-thin preparation requiring minimal shaving. High comfort level. Local anesthesia & nitrous oxide optional.`, 'brain');
+                
+                setTimeout(() => {
+                  appendLog(`[Recovery Specialist] Formulating clinical reassurance reply: <em>"We completely understand dental anxiety! Our doctors specialize in ultra-thin veneers which require minimal preparation (often less than 0.5mm), making the process completely painless. We can also provide light sedation. Would you like a quick 5-minute call with Dr. Leila to discuss?"</em>`, 'spec');
+                  
+                  setTimeout(() => {
+                    appendLog(`<span style="color: #fff; font-weight: 600;">[Patient (PT-7182)]</span> "If it's just a quick call with Dr. Leila tomorrow, that works. I'm free tomorrow afternoon."`, 'sys');
+                    
+                    setTimeout(() => {
+                      appendLog(`[Clinic Brain] <code>[PMS Query]</code> Finding tomorrow afternoon consultation availability for Dr. Leila...`, 'brain');
+                      appendLog(`[Clinic Brain] Pre-booked slot: tomorrow at 2:30 PM. Generating booking reference...`, 'brain');
+                      
+                      setTimeout(() => {
+                        appendLog(`[Recovery Specialist] Confirming call: <em>"Perfect! Dr. Leila will call you tomorrow at 2:30 PM. I've booked this and sent your confirmation ticket. Chat soon!"</em>`, 'spec');
+                        
+                        setTimeout(() => {
+                          auditedCallsCount += 8;
+                          leaksFoundCount += 1;
+                          outreachSentCount += 1;
+                          repliesCount += 1;
+                          confirmedAppointments += 1;
+                          totalRevenue += 20000;
+                          updateDashboardMetrics();
+                          
+                          appendLog(`[SYS] <strong style="color: var(--green);">[GOAL SUCCESS]</strong> recovered patient PT-7182 consult. Revenue value: <strong>AED 20,000</strong>.`, 'success');
+                          
+                          document.getElementById('pill-leak').innerText = 'SCANNING PIMS';
+                          document.getElementById('pill-leak').style.background = '';
+                          document.getElementById('pill-recovery').innerText = 'ACTIVE OUTREACH';
+                          document.getElementById('pill-recovery').style.background = '';
+                          document.getElementById('pill-brain').innerText = 'STANDBY / OK';
+                          document.getElementById('pill-brain').style.background = '';
+                          isSimulationRunning = false;
+                        }, 1200);
+                      }, 1500);
+                    }, 1200);
+                  }, 1200);
+                }, 1200);
+              }, 1200);
+            }, 1500);
+          }, 1200);
+        }, 1200);
+      }, 1000);
+    }
+
+    // /calculator ROI calculation
+    function runCalculatorSimulation(calls, replies, value) {
+      const recoveredLeads = Math.round(calls * (replies / 100));
+      const monthlyRevenue = recoveredLeads * value;
+      const annualRevenue = monthlyRevenue * 12;
+      const netRoiMultiple = (monthlyRevenue / 2500).toFixed(1);
+      
+      const roiReport = `<br><span style="color: var(--gold); font-weight: 700;">==================================================</span><br>` +
+                        `<span style="color: var(--gold); font-weight: 700;">          PATIENT RECOVERY ROI PROJECTIONS</span><br>` +
+                        `<span style="color: var(--gold); font-weight: 700;">==================================================</span><br>` +
+                        `  Monthly Unbooked Calls : <strong>${calls}</strong><br>` +
+                        `  Recovery Rate          : <strong>${replies}%</strong><br>` +
+                        `  Avg Treatment Value    : <strong>AED ${value.toLocaleString()}</strong><br>` +
+                        `--------------------------------------------------<br>` +
+                        `  Monthly Recovered Leads: <strong style="color: var(--green);">${recoveredLeads} patients</strong><br>` +
+                        `  Projected Monthly Rev  : <strong style="color: var(--gold);">AED ${monthlyRevenue.toLocaleString()}</strong><br>` +
+                        `  Projected Annual Rev   : <strong style="color: var(--green);">AED ${annualRevenue.toLocaleString()}</strong><br>` +
+                        `  Net ROI vs License Fee : <strong style="color: var(--gold);">${netRoiMultiple}x</strong> (assuming AED 2,500/mo)<br>` +
+                        `<span style="color: var(--gold); font-weight: 700;">==================================================</span>`;
+      
+      appendLog(roiReport, 'success');
+    }
+
+    // Agent Simulator Manual Actions
+    function triggerManualAudit() {
+      if (isSimulationRunning) return;
+      document.getElementById('pill-leak').innerText = 'MANUAL AUDITING';
+      document.getElementById('pill-leak').style.background = 'rgba(0, 180, 216, 0.1)';
+      appendLog('[Leak Hunter] Triggering manual PIMS audit scan...', 'leak');
+      
+      setTimeout(() => {
+        const found = Math.floor(Math.random() * 2) + 1;
+        auditedCallsCount += 24;
+        leaksFoundCount += found;
+        updateDashboardMetrics();
+        
+        appendLog(`[Leak Hunter] Audit complete. Scanned 24 call entries. Found ${found} new unbooked patient leaks.`, 'success');
+        document.getElementById('pill-leak').innerText = 'SCANNING PIMS';
+        document.getElementById('pill-leak').style.background = '';
+      }, 1000);
+    }
+
+    function simulateOutreach() {
+      if (isSimulationRunning) return;
+      document.getElementById('pill-recovery').innerText = 'SENDING TEST';
+      document.getElementById('pill-recovery').style.background = 'rgba(255, 111, 77, 0.1)';
+      appendLog('[Recovery Specialist] Building custom outreach WhatsApp template for lead PT-9302...', 'spec');
+      
+      setTimeout(() => {
+        outreachSentCount++;
+        updateDashboardMetrics();
+        appendLog('[Recovery Specialist] WhatsApp message payload dispatched to WA Gateway.', 'spec');
+        
+        setTimeout(() => {
+          repliesCount++;
+          updateDashboardMetrics();
+          appendLog('[Recovery Specialist] Inbound WhatsApp response received from PT-9302. Sentiment: Positive.', 'success');
+          document.getElementById('pill-recovery').innerText = 'ACTIVE OUTREACH';
+          document.getElementById('pill-recovery').style.background = '';
+        }, 1500);
+      }, 1000);
+    }
+
+    function queryClinicBrain() {
+      if (isSimulationRunning) return;
+      document.getElementById('pill-brain').innerText = 'SEARCHING KB';
+      document.getElementById('pill-brain').style.background = 'rgba(229, 193, 88, 0.1)';
+      appendLog('[Clinic Brain] Querying RAG vector database for "Saturday opening times & dentists"...', 'brain');
+      
+      setTimeout(() => {
+        appendLog('[Clinic Brain] Match found. Rule: Clinic is open Saturdays 9 AM - 6 PM. Dr. Leila Hariri and Dr. Kamal are scheduled.', 'brain');
+        document.getElementById('pill-brain').innerText = 'STANDBY / OK';
+        document.getElementById('pill-brain').style.background = '';
+      }, 1000);
+    }
+
+    // Handoff approval action
+    function approveHandoff(id, value) {
+      const card = document.getElementById(`handoff-card-${id}`);
+      const btn = document.getElementById(`btn-handoff-${id}`);
+      
+      // Update UI state of card
+      card.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+      card.style.background = 'rgba(16, 185, 129, 0.02)';
+      card.classList.remove('urgent');
+      
+      btn.innerText = '✓ Human Confirmed';
+      btn.className = 'approve-handoff-btn confirmed';
+      
+      // Update System metrics
+      totalRevenue += value;
+      confirmedAppointments += 1;
+      updateDashboardMetrics();
+      
+      appendLog(`[Clinic Brain] Receptionist confirmed booking slot allocation for PT-${id === 1 ? '8942' : '9011'}. Syncing to PMS.`, 'success');
+      appendLog(`[SYS] Revenue update: +AED ${value.toLocaleString()} recovered. Total Recovered: AED ${totalRevenue.toLocaleString()}.`, 'success');
+    }
+
+    // Auto-stream background logs to make dashboard feel alive (disabled during active simulations)
+    setInterval(() => {
+      if (isSimulationRunning) return;
+      
+      const chance = Math.random();
+      if (chance < 0.25) {
+        const auditWords = ['Scanning missed calls', 'Auditing abandoned web bookings', 'Analyzing PMS database gaps'];
+        const word = auditWords[Math.floor(Math.random() * auditWords.length)];
+        appendLog(`[Leak Hunter] ${word}... OK.`, 'leak');
+      } else if (chance < 0.5) {
+        appendLog('[Recovery Specialist] Running automated background WhatsApp queue sync...', 'spec');
+      } else if (chance < 0.65) {
+        appendLog('[Clinic Brain] Synchronized scheduler slots & doctor shifts with DentMax.', 'brain');
+      }
+    }, 12000);
+  </script>
+
+</body>
+</html>

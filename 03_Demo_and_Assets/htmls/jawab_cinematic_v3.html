@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jawab | The Recovery Sequence</title>
+    
+    <!-- Premium Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600;800&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP for robust timeline animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. FOUNDATION & RESET
+           ========================================================================== */
+        :root {
+            --bg-deep: #030305;
+            --gold: #D4AF37;
+            --gold-bright: #FADB5F;
+            --text-main: #FFFFFF;
+            --text-dim: #86868B; /* Apple's exact dim gray */
+            --glass-bg: rgba(20, 20, 22, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* High-End Texture Background */
+        .environment {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(circle at 50% 40%, rgba(212, 175, 55, 0.08) 0%, transparent 60%),
+                url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop'); /* Premium dark marble/obsidian texture */
+            background-size: cover;
+            background-position: center;
+            opacity: 0.8;
+            z-index: 0;
+        }
+        .vignette {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, transparent 30%, #000000 100%);
+            z-index: 1; pointer-events: none;
+        }
+
+        /* ==========================================================================
+           2. CONNECTION LINES (SVG PERCENTAGE BASED - UNBREAKABLE)
+           ========================================================================== */
+        .svg-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 5; pointer-events: none;
+        }
+        .conn-line {
+            fill: none;
+            stroke: url(#gold-grad);
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            opacity: 0.5;
+            /* Animated later */
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 0; 
+        }
+        .pulse-dot {
+            fill: var(--gold-bright);
+            filter: drop-shadow(0 0 5px var(--gold));
+            opacity: 0;
+        }
+
+        /* ==========================================================================
+           3. FLOATING GLASS PANELS (The "1.png" aesthetics)
+           ========================================================================== */
+        .panel-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10; pointer-events: none;
+        }
+        .glass-panel {
+            position: absolute;
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: 
+                0 30px 60px rgba(0,0,0,0.6),
+                inset 0 1px 0 rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 24px;
+            min-width: 260px;
+        }
+        
+        .p-title { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 4px; }
+        .p-ar { font-family: 'Tajawal'; font-size: 14px; color: var(--text-dim); margin-bottom: 12px; }
+        .p-val { font-family: 'Outfit'; font-size: 32px; font-weight: 600; color: #fff; }
+        .p-val.gold { color: var(--gold); }
+
+        /* Specific Panel Placements */
+        #panel-routing { top: 20%; right: 10%; }
+        #panel-revenue { top: 40%; right: 5%; }
+        #panel-lifecycle { top: 65%; right: 15%; }
+
+        /* Left Side Text */
+        .hero-text {
+            position: absolute; left: 8%; top: 45%; transform: translateY(-50%);
+            z-index: 10;
+        }
+        .ht-title { font-family: 'Outfit'; font-size: 6rem; font-weight: 300; letter-spacing: 2px; color: var(--gold); line-height: 1; }
+        .ht-ar { font-family: 'Tajawal'; font-size: 4rem; color: var(--text-dim); margin-top: -10px; margin-bottom: 20px; }
+        .ht-sub { font-size: 1.5rem; color: #fff; font-weight: 400; margin-bottom: 10px; }
+        .ht-desc { font-size: 1.1rem; color: var(--text-dim); line-height: 1.6; max-width: 350px; }
+
+        /* ==========================================================================
+           4. PHOTOREALISTIC IPHONE & SCREEN
+           ========================================================================== */
+        .iphone-wrapper {
+            position: absolute;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            width: 320px; height: 680px;
+            /* Box-shadow magic to simulate Titanium bevel */
+            background: #000;
+            border-radius: 50px;
+            box-shadow: 
+                inset 0 0 0 2px #444,
+                inset 0 0 0 6px #000,
+                inset 0 0 0 7px rgba(255,255,255,0.2),
+                inset 0 0 0 10px #111,
+                0 40px 80px rgba(0,0,0,0.8),
+                0 0 60px rgba(212,175,55,0.1);
+            padding: 12px;
+        }
+        
+        /* The notch */
+        .dynamic-island {
+            position: absolute; top: 22px; left: 50%; transform: translateX(-50%);
+            width: 110px; height: 30px; background: #000; border-radius: 20px; z-index: 100;
+        }
+
+        .screen {
+            width: 100%; height: 100%;
+            background: #050505;
+            border-radius: 38px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Screen Layers (Scenes inside the phone) */
+        .screen-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            opacity: 0; pointer-events: none;
+        }
+        .screen-layer.active { opacity: 1; pointer-events: auto; }
+
+        /* -- LAYER 1: DASHBOARD -- */
+        #ui-dash { background: #0a0a0c; padding: 60px 20px 20px; }
+        .dash-h1 { font-family: 'Outfit'; font-size: 24px; color: var(--gold); }
+        .dash-p { font-family: 'Tajawal'; font-size: 16px; color: var(--text-dim); margin-bottom: 30px; }
+        
+        .dash-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px; padding: 16px; margin-bottom: 16px;
+        }
+        .dc-title { font-size: 12px; color: var(--text-dim); }
+        .dc-val { font-family: 'Outfit'; font-size: 28px; color: #fff; margin-top: 4px; }
+        
+        /* -- LAYER 2: WHATSAPP -- */
+        #ui-wa { background: #0b141a; }
+        .wa-head { background: #202c33; padding: 50px 16px 12px; display: flex; align-items: center; gap: 12px; }
+        .wa-av { width: 36px; height: 36px; background: #333; border-radius: 50%; }
+        .wa-name { font-size: 15px; color: #fff; font-weight: 500; }
+        .wa-body { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 14px; opacity: 0; transform: translateY(10px); }
+        .msg-in { background: #202c33; color: #e9edef; align-self: flex-start; border-top-left-radius: 4px; }
+        .msg-out { background: #005c4b; color: #e9edef; align-self: flex-end; border-top-right-radius: 4px; }
+        .m-ar { font-family: 'Tajawal'; font-size: 15px; direction: rtl; margin-bottom: 4px; }
+
+        /* -- LAYER 3: VOICE AGENT -- */
+        #ui-voice { background: radial-gradient(circle at center, #1a1a24 0%, #050505 100%); align-items: center; justify-content: center; padding: 20px;}
+        .v-ring { width: 140px; height: 140px; border-radius: 50%; border: 2px solid rgba(212,175,55,0.2); display: flex; align-items: center; justify-content: center; position: relative; }
+        .v-ring::after { content: ''; position: absolute; width: 100%; height: 100%; border-radius: 50%; background: var(--gold-glow); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.4); opacity: 0; } }
+        .v-transcript { margin-top: 40px; width: 100%; text-align: center; }
+        .v-line { font-size: 15px; margin-bottom: 12px; opacity: 0; transform: translateY(10px); }
+        .v-patient { color: #fff; }
+        .v-ai { color: var(--gold); }
+
+        /* ==========================================================================
+           5. NOTIFICATIONS & CONTROLS
+           ========================================================================== */
+        .notification {
+            position: absolute; top: 60px; left: 16px; right: 16px;
+            background: rgba(30,30,30,0.8); backdrop-filter: blur(20px);
+            border-radius: 20px; padding: 14px; display: flex; gap: 12px;
+            opacity: 0; transform: translateY(-20px); z-index: 200;
+        }
+        .n-icon { width: 36px; height: 36px; border-radius: 10px; background: #FF453A; display:flex; align-items:center; justify-content:center; }
+        .n-text h4 { font-size: 14px; color: #fff; margin-bottom: 2px;}
+        .n-text p { font-size: 13px; color: rgba(255,255,255,0.7); }
+
+        .play-btn {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            background: rgba(20,20,22,0.8); backdrop-filter: blur(10px);
+            border: 1px solid var(--gold); color: var(--gold);
+            padding: 16px 40px; border-radius: 40px;
+            font-family: 'Outfit'; font-size: 16px; font-weight: 600; letter-spacing: 2px;
+            cursor: pointer; z-index: 1000;
+            transition: all 0.3s;
+        }
+        .play-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 30px var(--gold-glow); }
+
+    </style>
+</head>
+<body>
+
+    <!-- 1. ENVIRONMENT -->
+    <div class="environment"></div>
+    <div class="vignette"></div>
+
+    <!-- 2. SVG CONNECTIONS (Percentage based mapping from Center Phone to Panels) -->
+    <svg class="svg-canvas">
+        <defs>
+            <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.8" />
+                <stop offset="100%" stop-color="#D4AF37" stop-opacity="0" />
+            </linearGradient>
+        </defs>
+        <!-- Phone is at 50% 50%. Routing panel is at 90% 20% -->
+        <path class="conn-line" d="M 50% 50% C 70% 50%, 70% 25%, 90% 25%" id="path-routing" />
+        <!-- Revenue panel is at 95% 40% -->
+        <path class="conn-line" d="M 50% 50% C 70% 50%, 75% 45%, 95% 45%" id="path-revenue" />
+        <!-- Lifecycle panel is at 85% 65% -->
+        <path class="conn-line" d="M 50% 50% C 65% 50%, 65% 70%, 85% 70%" id="path-lifecycle" />
+    </svg>
+
+    <!-- 3. HERO TEXT -->
+    <div class="hero-text">
+        <div class="ht-title">Jawab</div>
+        <div class="ht-ar">جــــواب</div>
+        <div class="ht-sub">AI Clinic Intelligence</div>
+        <div class="ht-desc">Never miss a patient.<br>Recover more. Effortlessly.</div>
+    </div>
+
+    <!-- 4. FLOATING PANELS -->
+    <div class="panel-container">
+        <div class="glass-panel floating" id="panel-routing">
+            <div class="p-title">Intelligent Routing</div>
+            <div class="p-ar">توجيه ذكي</div>
+            <div class="p-val" style="font-size:24px;">Active <span style="color:#30D158;">●</span></div>
+        </div>
+        
+        <div class="glass-panel floating" id="panel-revenue">
+            <div class="p-title">Recovered Revenue</div>
+            <div class="p-ar">الإيرادات المستردة</div>
+            <div class="p-val gold" id="rev-counter">AED 126,800</div>
+        </div>
+
+        <div class="glass-panel floating" id="panel-lifecycle">
+            <div class="p-title">Patient Lifecycle</div>
+            <div class="p-ar">دورة المريض</div>
+            <div class="p-val">62% Return</div>
+        </div>
+    </div>
+
+    <!-- 5. CENTRAL IPHONE -->
+    <div class="iphone-wrapper floating-alt">
+        <div class="dynamic-island"></div>
+        <div class="screen">
+            
+            <!-- LAYER 1: DASHBOARD -->
+            <div class="screen-layer active" id="ui-dash">
+                <div class="dash-h1">Jawab</div>
+                <div class="dash-p">جــــواب</div>
+                <div class="dash-card">
+                    <div class="dc-title">Live Conversations</div>
+                    <div class="dc-val">24</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dc-title">Appointment Recovery</div>
+                    <div class="dc-val">78%</div>
+                </div>
+            </div>
+
+            <!-- LAYER 2: WHATSAPP -->
+            <div class="screen-layer" id="ui-wa">
+                <div class="wa-head">
+                    <div class="wa-av"></div>
+                    <div class="wa-name">Patient</div>
+                </div>
+                <div class="wa-body">
+                    <div class="msg msg-out" id="wm1">
+                        <div class="m-ar">مرحباً! لاحظنا اتصالك. كيف نساعدك؟</div>
+                        <div>We missed your call. How can we help?</div>
+                    </div>
+                    <div class="msg msg-in" id="wm2">
+                        <div class="m-ar">احتاج موعد استشارة</div>
+                    </div>
+                    <div class="msg msg-out" id="wm3" style="border: 1px solid var(--gold); background: rgba(212,175,55,0.1);">
+                        <div style="color:var(--gold); font-weight:bold; margin-bottom:4px;">⚡ Booked</div>
+                        <div class="m-ar">تم تأكيد الموعد غداً.</div>
+                        <div>Confirmed for tomorrow.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LAYER 3: VOICE AGENT -->
+            <div class="screen-layer" id="ui-voice">
+                <div style="color:var(--gold); font-family:'Outfit'; font-size:18px; margin-bottom:40px;">Voice Intelligence</div>
+                <div class="v-ring">
+                    <svg style="width:30px; fill:var(--gold);" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                </div>
+                <div class="v-transcript">
+                    <div class="v-line v-patient" id="vt1">"Do you do implants?"</div>
+                    <div class="v-line v-ai" id="vt2">"Yes. Dr. Michael is available tomorrow."</div>
+                </div>
+            </div>
+
+            <!-- NOTIFICATION OVERLAY -->
+            <div class="notification" id="notif">
+                <div class="n-icon">
+                    <svg style="width:20px; fill:#fff;" viewBox="0 0 24 24"><path d="M16.7 14.8l-2.4-1.2c-.3-.2-.7-.1-1 .2l-1.3 1.8c-2.4-1.2-4.4-3.2-5.6-5.6l1.8-1.3c.3-.2.4-.6.2-1L7.2 5.3c-.2-.4-.6-.5-1-.3L3.8 6.5C3.3 6.8 3 7.3 3 7.8c0 7.8 6.4 14.2 14.2 14.2.6 0 1.1-.3 1.3-.8l1.5-2.4c.1-.4 0-.8-.3-1z"/></svg>
+                </div>
+                <div class="n-text">
+                    <h4>Missed Call</h4>
+                    <p>New Patient Lead</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <button class="play-btn" id="start-btn" onclick="runSequence()">START RECOVERY SEQUENCE</button>
+
+    <script>
+        // --- CONTINUOUS FLOATING PHYSICS ---
+        gsap.utils.toArray('.floating').forEach((el, i) => {
+            gsap.to(el, { y: "-=15", x: "+=5", duration: 3 + i, repeat: -1, yoyo: true, ease: "sine.inOut" });
+        });
+        gsap.to('.floating-alt', { y: "+=10", duration: 4, repeat: -1, yoyo: true, ease: "sine.inOut" });
+
+        // --- THE CINEMATIC TIMELINE SEQUENCE ---
+        function runSequence() {
+            document.getElementById('start-btn').style.display = 'none';
+            const tl = gsap.timeline();
+
+            // SCENE 2: The Leak (Missed Call)
+            tl.to("#notif", { opacity: 1, y: 0, duration: 0.6, ease: "back.out" })
+              // Flash the routing panel to show AI intercepted it
+              .to("#panel-routing", { borderColor: "var(--gold)", boxShadow: "0 0 40px var(--gold-glow)", duration: 0.3, yoyo: true, repeat: 3 }, "+=1");
+
+            // SCENE 3: WhatsApp Recovery
+            tl.to("#notif", { opacity: 0, y: -20, duration: 0.4 }, "+=0.5")
+              // Crossfade phone screens
+              .to("#ui-dash", { opacity: 0, duration: 0.4 })
+              .to("#ui-wa", { opacity: 1, duration: 0.4 }, "-=0.2");
+            
+            // Chat typing
+            tl.to("#wm1", { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, "+=0.5")
+              .to("#wm2", { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, "+=1.5")
+              .to("#wm3", { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, "+=1.5");
+
+            // SCENE 4: Voice Recovery
+            tl.to("#ui-wa", { opacity: 0, duration: 0.4 }, "+=2")
+              .to("#ui-voice", { opacity: 1, duration: 0.4 }, "-=0.2");
+            
+            tl.to("#vt1", { opacity: 1, y: 0, duration: 0.4 }, "+=0.5")
+              .to("#vt2", { opacity: 1, y: 0, duration: 0.4 }, "+=1.5");
+
+            // SCENE 5: The Impact (Return to Dash)
+            tl.to("#ui-voice", { opacity: 0, duration: 0.4 }, "+=2.5")
+              .to("#ui-dash", { opacity: 1, duration: 0.4 }, "-=0.2");
+
+            // The Grand Reveal on the Floating Panel
+            tl.to("#panel-revenue", { 
+                scale: 1.1, 
+                borderColor: "var(--gold)", 
+                boxShadow: "0 0 60px var(--gold-glow)", 
+                duration: 0.5 
+            }, "+=0.5");
+
+            // Number Roll
+            let rev = { val: 126800 };
+            tl.to(rev, {
+                val: 130300,
+                duration: 2,
+                ease: "power3.out",
+                onUpdate: () => {
+                    document.getElementById('rev-counter').innerHTML = "AED " + Math.floor(rev.val).toLocaleString();
+                }
+            });
+
+            // Settle down
+            tl.to("#panel-revenue", { 
+                scale: 1, 
+                borderColor: "var(--glass-border)", 
+                boxShadow: "0 30px 60px rgba(0,0,0,0.6)", 
+                duration: 0.5 
+            }, "+=1");
+        }
+    </script>
+
+</body>
+</html>

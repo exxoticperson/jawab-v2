@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jawab Reel | Hyper-Kinetic Overload</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;800;900&family=Outfit:wght@200;300;400;600;800;900&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. CORE VARIABLES & SETUP
+           ========================================================================== */
+        :root {
+            --gold: #D4AF37; --gold-neon: #FCE68D; --red-alert: #FF2A2A; --red-glow: rgba(255, 42, 42, 0.4);
+            --bg-dark: #030303; --glass: rgba(15, 15, 18, 0.6); --white: #FFFFFF;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html { width: 100%; height: 100%; background: #000; font-family: 'Inter', sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+
+        /* 9:16 Canvas Base */
+        #reel-canvas { width: 400px; height: 711px; background: var(--bg-dark); position: relative; overflow: hidden; box-shadow: 0 0 100px rgba(212,175,55,0.05); }
+
+        /* ==========================================================================
+           2. GLOBAL EFFECTS & SVG FILTERS
+           ========================================================================== */
+        #canvas-particles { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; opacity: 0; }
+        .grid-layer { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 50px 50px; z-index: 0; transform: perspective(1000px) rotateX(60deg) translateY(0); opacity: 0; }
+        .strobe-layer { position: absolute; width: 100%; height: 100%; background: #fff; z-index: 999; opacity: 0; pointer-events: none; mix-blend-mode: overlay; }
+        .vignette { position: absolute; width: 100%; height: 100%; background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.9) 100%); z-index: 500; pointer-events: none; }
+        .scanline { position: absolute; width: 100%; height: 3px; background: rgba(255,255,255,0.2); z-index: 600; opacity: 0; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .noise-overlay { position: absolute; width: 100%; height: 100%; background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noise)" opacity="0.1"/%3E%3C/svg%3E'); z-index: 700; pointer-events: none; mix-blend-mode: overlay; opacity: 0.5; }
+
+        /* ==========================================================================
+           3. SCENE 1: THE KINETIC HOOK (0s - 3s)
+           ========================================================================== */
+        #scene-hook { position: absolute; width: 100%; height: 100%; z-index: 10; display: flex; justify-content: center; align-items: center; flex-direction: column; opacity: 0; }
+        .flash-word { font-family: 'Space Grotesk', sans-serif; font-size: 5rem; font-weight: 900; color: #fff; text-transform: uppercase; position: absolute; opacity: 0; text-align: center; line-height: 0.9; }
+        .flash-word span { color: var(--red-alert); display: block; font-size: 7rem; text-shadow: 0 0 40px var(--red-glow); }
+        .rapid-images { position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; opacity: 0; background-size: cover; background-position: center; filter: grayscale(100%) contrast(1.5) brightness(0.4); }
+
+        /* ==========================================================================
+           4. SCENE 2: THE DATA AGITATION (3s - 7s)
+           ========================================================================== */
+        #scene-data { position: absolute; width: 100%; height: 100%; z-index: 20; padding: 30px; display: flex; flex-direction: column; justify-content: center; opacity: 0; }
+        .data-hud { width: 100%; border: 1px solid rgba(255,42,42,0.3); background: rgba(20,0,0,0.6); backdrop-filter: blur(10px); padding: 20px; border-radius: 12px; position: relative; overflow: hidden; transform: scale(1.2); opacity: 0; }
+        .dh-title { font-size: 0.8rem; color: var(--red-alert); letter-spacing: 4px; text-transform: uppercase; font-weight: 800; margin-bottom: 10px; }
+        .dh-counter { font-family: 'Outfit'; font-size: 4.5rem; font-weight: 300; color: #fff; line-height: 1; margin-bottom: 5px; }
+        .dh-sub { font-size: 0.9rem; color: rgba(255,255,255,0.5); }
+        .heartbeat-graph { width: 100%; height: 60px; margin-top: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); position: relative; }
+        .hb-line { fill: none; stroke: var(--red-alert); stroke-width: 2; stroke-dasharray: 1000; stroke-dashoffset: 1000; filter: drop-shadow(0 0 5px var(--red-alert)); }
+        .warning-banner { position: absolute; top: 20px; left: -30px; background: var(--red-alert); color: #000; font-weight: 900; font-size: 0.7rem; padding: 5px 40px; transform: rotate(-45deg); letter-spacing: 2px; }
+
+        /* ==========================================================================
+           5. SCENE 3: THE JAWAB REVEAL (7s - 12s)
+           ========================================================================== */
+        #scene-reveal { position: absolute; width: 100%; height: 100%; z-index: 30; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; background: radial-gradient(circle at center, rgba(212,175,55,0.15) 0%, transparent 60%); }
+        .reveal-logo-svg { width: 220px; opacity: 0; transform: scale(0.5); filter: drop-shadow(0 0 40px rgba(212,175,55,0.4)); }
+        .reveal-title { font-family: 'Outfit'; font-size: 2.8rem; font-weight: 900; color: #fff; margin-top: 30px; letter-spacing: -1px; text-align: center; line-height: 1.1; opacity: 0; clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); }
+        .reveal-title span { color: var(--gold); }
+        .reveal-desc { font-size: 1rem; color: rgba(255,255,255,0.7); margin-top: 15px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; opacity: 0; }
+
+        /* ==========================================================================
+           6. SCENE 4: THE ACTION MULTIPLEX (12s - 20s)
+           ========================================================================== */
+        #scene-multiplex { position: absolute; width: 100%; height: 100%; z-index: 40; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; opacity: 0; }
+        .mx-header { font-family: 'Space Grotesk'; font-size: 1.5rem; font-weight: 900; color: #fff; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+        .mx-header span { color: var(--gold); }
+        
+        .mx-stream { width: 100%; background: rgba(20,20,25,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; position: relative; overflow: hidden; opacity: 0; transform: translateX(-50px); backdrop-filter: blur(10px); }
+        .mx-stream::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background: var(--gold); }
+        .mxs-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;}
+        .mxs-tag { font-size: 0.6rem; font-weight: 800; letter-spacing: 2px; color: #fff; background: #333; padding: 3px 8px; border-radius: 10px; }
+        .mxs-tag.whatsapp { background: #25D366; color: #000; }
+        .mxs-tag.voice { background: #FF2A2A; color: #fff; }
+        .mxs-tag.ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .mxs-time { font-family: 'Outfit'; font-size: 0.7rem; color: #888; }
+        
+        .mxs-chat { display: flex; flex-direction: column; gap: 8px; }
+        .mxs-bubble { padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; max-width: 90%; opacity: 0; transform: translateY(10px); }
+        .mxs-in { background: #222; color: #ddd; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .mxs-out { background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.3); color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .mxs-secured { position: absolute; right: 10px; bottom: 10px; color: var(--gold); font-weight: 900; font-size: 1.2rem; transform: scale(5); opacity: 0; filter: blur(10px); }
+
+        .mx-revenue { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background: rgba(0,0,0,0.9); border: 2px solid var(--gold); padding: 30px; border-radius: 50%; width: 220px; height: 220px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 0 100px rgba(212,175,55,0.3); z-index: 100; opacity: 0; }
+        .mxr-title { font-size: 0.7rem; color: var(--gold); font-weight: 800; letter-spacing: 3px; text-transform: uppercase; }
+        .mxr-val { font-family: 'Outfit'; font-size: 2.5rem; font-weight: 300; color: #fff; margin-top: 5px; line-height: 1; }
+
+        /* ==========================================================================
+           7. SCENE 5: THE MASTER PLAN (20s - 26s)
+           ========================================================================== */
+        #scene-plan { position: absolute; width: 100%; height: 100%; z-index: 50; padding: 40px 30px; display: flex; flex-direction: column; justify-content: center; background: var(--bg-dark); opacity: 0; }
+        .plan-header { font-family: 'Space Grotesk'; font-size: 2.2rem; font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 40px; }
+        .plan-step { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 25px; opacity: 0; transform: translateX(30px); }
+        .ps-num { width: 30px; height: 30px; border-radius: 50%; background: var(--gold); color: #000; display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; }
+        .ps-text h4 { font-family: 'Outfit'; font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;}
+        .ps-text p { font-size: 0.85rem; color: #aaa; line-height: 1.4; }
+        .plan-line { position: absolute; left: 44px; top: 160px; width: 2px; height: 0; background: rgba(212,175,55,0.3); z-index: -1; }
+
+        /* ==========================================================================
+           8. SCENE 6: THE CTA (26s - 30s)
+           ========================================================================== */
+        #scene-cta { position: absolute; width: 100%; height: 100%; z-index: 60; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 30px; opacity: 0; }
+        .cta-box { border: 2px solid rgba(255,255,255,0.1); padding: 40px 20px; border-radius: 20px; width: 100%; background: radial-gradient(circle at top, rgba(212,175,55,0.1) 0%, transparent 80%); transform: scale(0.9); opacity: 0; }
+        .cta-title { font-family: 'Space Grotesk'; font-size: 2.5rem; font-weight: 900; color: #fff; line-height: 1.1; text-transform: uppercase; margin-bottom: 20px; }
+        .cta-title span { color: var(--gold); }
+        .cta-btn { display: inline-block; background: var(--gold); color: #000; font-family: 'Outfit'; font-weight: 800; font-size: 1.2rem; padding: 15px 30px; border-radius: 10px; text-transform: uppercase; letter-spacing: 2px; margin-top: 20px; }
+        .cta-footer { font-size: 0.8rem; color: #666; margin-top: 20px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; }
+
+        /* Initializer */
+        #play-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: #000; z-index: 1000; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-direction: column; }
+        .play-ring { width: 80px; height: 80px; border-radius: 50%; background: var(--gold); display: flex; justify-content: center; align-items: center; transition: all 0.3s; box-shadow: 0 0 50px rgba(212,175,55,0.4); }
+        .play-ring:hover { transform: scale(1.1); }
+        .play-ring svg { width: 30px; fill: #000; margin-left: 5px; }
+        .play-text { font-family: 'Space Grotesk'; font-weight: 900; letter-spacing: 4px; font-size: 14px; color: #fff; margin-top: 30px; text-transform: uppercase; text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+    </style>
+</head>
+<body>
+
+    <div id="reel-canvas">
+        <canvas id="canvas-particles"></canvas>
+        <div class="grid-layer" id="bg-grid"></div>
+        <div class="vignette"></div>
+        <div class="noise-overlay"></div>
+        <div class="scanline" id="scan-bar"></div>
+        <div class="strobe-layer" id="strobe"></div>
+
+        <!-- SCENE 1: THE HOOK -->
+        <div id="scene-hook">
+            <div class="rapid-images" id="r-img" style="background-image: url('../generated_visuals/fb_ad_empty_chair_1777765574404.png');"></div>
+            <div class="flash-word" id="fw1">STOP</div>
+            <div class="flash-word" id="fw2">SCROLLING</div>
+            <div class="flash-word" id="fw3">YOUR CLINIC IS<br><span>BLEEDING</span></div>
+        </div>
+
+        <!-- SCENE 2: THE DATA AGITATION -->
+        <div id="scene-data">
+            <div class="data-hud" id="d-hud">
+                <div class="warning-banner">CRITICAL LEAK</div>
+                <div class="dh-title">Unrecovered Patient Value</div>
+                <div class="dh-counter" id="d-count">AED 0</div>
+                <div class="dh-sub">Lost to missed calls in last 30 days</div>
+                <svg class="heartbeat-graph" viewBox="0 0 300 60">
+                    <path class="hb-line" id="hb-path" d="M0,30 L50,30 L60,10 L70,50 L80,20 L90,30 L300,30" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- SCENE 3: THE REVEAL -->
+        <div id="scene-reveal">
+            <svg class="reveal-logo-svg" id="r-logo" viewBox="0 0 200 60">
+                <g transform="translate(0, 5)"><circle cx="20" cy="25" r="15" fill="none" stroke="#D4AF37" stroke-width="2.5"/><circle cx="32" cy="25" r="15" fill="none" stroke="#D4AF37" stroke-width="2.5" opacity="0.4"/></g>
+                <text x="60" y="40" font-family="'Outfit'" font-size="44" font-weight="600" fill="#D4AF37" letter-spacing="1">Jawab</text>
+            </svg>
+            <div class="reveal-title" id="r-title">DUBAI'S FIRST<br><span>AI RECOVERY</span><br>AGENT.</div>
+            <div class="reveal-desc" id="r-desc">Always On. Always Closing.</div>
+        </div>
+
+        <!-- SCENE 4: THE ACTION MULTIPLEX -->
+        <div id="scene-multiplex">
+            <div class="mx-header" id="mx-head">Processing <span>Simultaneously</span></div>
+            
+            <div class="mx-stream" id="mxs1">
+                <div class="mxs-top"><div class="mxs-tag whatsapp">WHATSAPP AI</div><div class="mxs-time">2:14 AM</div></div>
+                <div class="mxs-chat">
+                    <div class="mxs-bubble mxs-in" id="mxs1-1">Do you do veneers?</div>
+                    <div class="mxs-bubble mxs-out" id="mxs1-2">Yes! We have a VIP slot tmrw.</div>
+                </div>
+                <div class="mxs-secured" id="sec1">SECURED</div>
+            </div>
+
+            <div class="mx-stream" id="mxs2">
+                <div class="mxs-top"><div class="mxs-tag ig">INSTAGRAM AI</div><div class="mxs-time">2:14 AM</div></div>
+                <div class="mxs-chat">
+                    <div class="mxs-bubble mxs-in" id="mxs2-1">Price for implants?</div>
+                    <div class="mxs-bubble mxs-out" id="mxs2-2">AED 8K. Book a free 3D scan?</div>
+                </div>
+                <div class="mxs-secured" id="sec2">SECURED</div>
+            </div>
+
+            <div class="mx-stream" id="mxs3">
+                <div class="mxs-top"><div class="mxs-tag voice">VOICE AI</div><div class="mxs-time">2:15 AM</div></div>
+                <div class="mxs-chat">
+                    <div class="mxs-bubble mxs-in" id="mxs3-1">"I need an emergency appt."</div>
+                    <div class="mxs-bubble mxs-out" id="mxs3-2">"Booking confirmed for 9 AM."</div>
+                </div>
+                <div class="mxs-secured" id="sec3" style="color:var(--red-alert);">SECURED</div>
+            </div>
+
+            <div class="mx-revenue" id="mx-rev">
+                <div class="mxr-title">Revenue Recovered</div>
+                <div class="mxr-val" id="mxr-num">0</div>
+            </div>
+        </div>
+
+        <!-- SCENE 5: THE PLAN -->
+        <div id="scene-plan">
+            <div class="plan-header" id="pl-head">HOW IT<br>WORKS.</div>
+            <div class="plan-line" id="pl-line"></div>
+            
+            <div class="plan-step" id="pl1">
+                <div class="ps-num">1</div>
+                <div class="ps-text"><h4>Capture Everything</h4><p>Jawab intercepts missed calls and DMs instantly.</p></div>
+            </div>
+            <div class="plan-step" id="pl2">
+                <div class="ps-num">2</div>
+                <div class="ps-text"><h4>AI Persuasion</h4><p>Converses fluently in Khaleeji & English to qualify leads.</p></div>
+            </div>
+            <div class="plan-step" id="pl3">
+                <div class="ps-num">3</div>
+                <div class="ps-text"><h4>Secure Booking</h4><p>Schedules directly into your clinic's calendar 24/7.</p></div>
+            </div>
+        </div>
+
+        <!-- SCENE 6: THE CTA -->
+        <div id="scene-cta">
+            <div class="cta-box" id="cta-b">
+                <div class="cta-title">CLAIM YOUR<br><span>TERRITORY.</span></div>
+                <p style="color:#aaa; font-size:1rem; margin-bottom: 20px;">Before your competitors do.</p>
+                <div class="cta-btn">INSTALL JAWAB</div>
+                <div class="cta-footer">LINK IN BIO • SAVE THIS POST</div>
+            </div>
+        </div>
+
+        <!-- INITIALIZER -->
+        <div id="play-overlay" onclick="startHyperReel()">
+            <div class="play-ring"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="play-text">INITIATE OVERLOAD SEQUENCE</div>
+        </div>
+    </div>
+
+    <!-- SVG Filters for extreme glitching -->
+    <svg style="display:none;">
+        <filter id="rgb-split">
+            <feOffset dx="5" dy="0" in="SourceGraphic" result="red" />
+            <feOffset dx="-5" dy="0" in="SourceGraphic" result="cyan" />
+            <feColorMatrix type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" in="red" result="red-colored" />
+            <feColorMatrix type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" in="cyan" result="cyan-colored" />
+            <feBlend mode="screen" in="red-colored" in2="cyan-colored" result="combined" />
+            <feBlend mode="screen" in="combined" in2="SourceGraphic" />
+        </filter>
+    </svg>
+
+    <script>
+        // ==========================================================================
+        // 1. CANVAS PARTICLE ENGINE (Adds Massive Complexity & Code Length)
+        // ==========================================================================
+        const canvas = document.getElementById('canvas-particles');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 400; canvas.height = 711;
+        let particles = [];
+        let engineState = { mode: 'idle', speedMultiplier: 1, coreX: 200, coreY: 355 };
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 2; this.vy = (Math.random() - 0.5) * 2;
+                this.size = Math.random() * 2 + 0.5; this.color = `rgba(212, 175, 55, ${Math.random()*0.5+0.1})`;
+            }
+            update() {
+                if(engineState.mode === 'chaos') {
+                    this.vx += (Math.random() - 0.5) * 5; this.vy += (Math.random() - 0.5) * 5;
+                } else if(engineState.mode === 'converge') {
+                    let dx = engineState.coreX - this.x; let dy = engineState.coreY - this.y;
+                    this.vx += dx * 0.02; this.vy += dy * 0.02;
+                    this.vx *= 0.9; this.vy *= 0.9;
+                } else if(engineState.mode === 'flow') {
+                    this.vy -= 0.5 * engineState.speedMultiplier;
+                }
+                this.x += this.vx * engineState.speedMultiplier; this.y += this.vy * engineState.speedMultiplier;
+                
+                if(this.x < 0) this.x = canvas.width; if(this.x > canvas.width) this.x = 0;
+                if(this.y < 0) this.y = canvas.height; if(this.y > canvas.height) this.y = 0;
+            }
+            draw() {
+                ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+            }
+        }
+        for(let i=0; i<150; i++) particles.push(new Particle());
+        function renderParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(renderParticles);
+        }
+        renderParticles();
+
+        // ==========================================================================
+        // 2. HELPER FUNCTIONS FOR EFFECTS
+        // ==========================================================================
+        function strobeFlash(tl, time) { tl.set("#strobe", {opacity: 1}, time).set("#strobe", {opacity: 0}, time + 0.05); }
+        function glitchElement(tl, target, time) {
+            tl.to(target, { filter: "url(#rgb-split)", duration: 0.1, x: 10, y: -5, ease: "rough" }, time)
+              .to(target, { filter: "none", duration: 0.1, x: 0, y: 0 }, time + 0.1);
+        }
+
+        // ==========================================================================
+        // 3. THE MASTER HYPER-KINETIC TIMELINE
+        // ==========================================================================
+        function startHyperReel() {
+            document.getElementById('play-overlay').style.display = 'none';
+            const tl = gsap.timeline();
+
+            // Setup
+            gsap.to("#bg-grid", { opacity: 0.3, duration: 1 });
+            gsap.to("#canvas-particles", { opacity: 1, duration: 1 });
+            engineState.mode = 'flow'; engineState.speedMultiplier = 2;
+
+            // --- SCENE 1: THE HOOK (0s - 3.5s) ---
+            tl.to("#scene-hook", { opacity: 1, duration: 0.1 })
+              .to("#r-img", { opacity: 0.5, scale: 1.2, duration: 3, ease: "power1.out" }, 0);
+            
+            // Kinetic Text Cuts
+            strobeFlash(tl, 0.2);
+            tl.set("#fw1", { opacity: 1, scale: 2 }, 0.2).to("#fw1", { scale: 1, duration: 0.2, ease: "power4.out" }, 0.2).set("#fw1", { opacity: 0 }, 0.6);
+            
+            strobeFlash(tl, 0.6);
+            tl.set("#fw2", { opacity: 1, scale: 2 }, 0.6).to("#fw2", { scale: 1, duration: 0.2, ease: "power4.out" }, 0.6).set("#fw2", { opacity: 0 }, 1.0);
+            
+            strobeFlash(tl, 1.0);
+            tl.set("#fw3", { opacity: 1, scale: 0.5 }, 1.0).to("#fw3", { scale: 1, duration: 0.5, ease: "back.out(2)" }, 1.0);
+            glitchElement(tl, "#fw3", 1.5); glitchElement(tl, "#fw3", 2.0);
+            
+            // Chaos transition
+            tl.call(() => engineState.mode = 'chaos', null, 2.5);
+            tl.to("#scene-hook", { opacity: 0, scale: 1.5, filter: "blur(20px)", duration: 0.5, ease: "power4.in" }, 3.0);
+            strobeFlash(tl, 3.4);
+
+            // --- SCENE 2: THE DATA AGITATION (3.5s - 7.5s) ---
+            tl.set("#scene-data", { opacity: 1 }, 3.5);
+            tl.to("#d-hud", { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.5)" }, 3.5);
+            
+            let data = { money: 0 };
+            tl.to(data, { 
+                money: 1240500, duration: 3, ease: "power4.inOut",
+                onUpdate: () => document.getElementById('d-count').innerText = "AED " + Math.floor(data.money).toLocaleString()
+            }, 3.8);
+            
+            // Flatlining heartbeat
+            tl.to("#hb-path", { strokeDashoffset: 0, duration: 2, ease: "linear" }, 4.0);
+            tl.to("#hb-path", { stroke: "#555", duration: 0.1 }, 6.0); // Flatline death
+            glitchElement(tl, "#d-hud", 6.5);
+            tl.to("#scene-data", { opacity: 0, scale: 0.8, y: 100, duration: 0.5, ease: "power4.in" }, 7.0);
+
+            // --- SCENE 3: THE REVEAL (7.5s - 12.5s) ---
+            tl.call(() => engineState.mode = 'converge', null, 7.3);
+            tl.set("#scene-reveal", { opacity: 1 }, 7.5);
+            
+            // Logo formation
+            tl.to("#r-logo", { opacity: 1, scale: 1, duration: 2, ease: "elastic.out(1, 0.4)" }, 7.5);
+            strobeFlash(tl, 7.6);
+            
+            // Masked title reveal
+            tl.to("#r-title", { clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)", opacity: 1, duration: 1.2, ease: "power4.out" }, 8.5);
+            tl.to("#r-desc", { opacity: 1, y: -10, duration: 1, ease: "power2.out" }, 9.5);
+            
+            tl.to("#scene-reveal", { opacity: 0, filter: "blur(10px)", scale: 1.2, duration: 0.6, ease: "power4.in" }, 12.0);
+
+            // --- SCENE 4: THE MULTIPLEX (12.5s - 20s) ---
+            tl.call(() => { engineState.mode = 'flow'; engineState.speedMultiplier = 0.5; }, null, 12.5);
+            tl.set("#scene-multiplex", { opacity: 1 }, 12.5);
+            tl.from("#mx-head", { opacity: 0, y: -20, duration: 0.5 }, 12.5);
+
+            // Cascading streams popping in
+            tl.to("#mxs1", { opacity: 1, x: 0, duration: 0.6, ease: "back.out(1.2)" }, 13.0);
+            tl.to("#mxs2", { opacity: 1, x: 0, duration: 0.6, ease: "back.out(1.2)" }, 13.5);
+            tl.to("#mxs3", { opacity: 1, x: 0, duration: 0.6, ease: "back.out(1.2)" }, 14.0);
+
+            // Rapid fire chat animations
+            tl.to("#mxs1-1", { opacity: 1, y: 0, duration: 0.3 }, 14.5).to("#mxs1-2", { opacity: 1, y: 0, duration: 0.3 }, 14.8);
+            tl.to("#mxs2-1", { opacity: 1, y: 0, duration: 0.3 }, 14.7).to("#mxs2-2", { opacity: 1, y: 0, duration: 0.3 }, 15.0);
+            tl.to("#mxs3-1", { opacity: 1, y: 0, duration: 0.3 }, 14.9).to("#mxs3-2", { opacity: 1, y: 0, duration: 0.3 }, 15.2);
+
+            // Simultaneous "SECURED" explosions
+            tl.to(["#sec1", "#sec2", "#sec3"], { opacity: 0.8, scale: 1, filter: "blur(0px)", duration: 0.4, stagger: 0.1, ease: "elastic.out(1, 0.5)" }, 15.8);
+            glitchElement(tl, "#scene-multiplex", 16.5);
+
+            // Massive Revenue Override
+            strobeFlash(tl, 17.0);
+            tl.to("#mx-rev", { opacity: 1, scale: 1, duration: 1, ease: "back.out(1.5)" }, 17.0);
+            
+            let rev = { val: 0 };
+            tl.to(rev, {
+                val: 45000, duration: 1.5, ease: "power4.out",
+                onUpdate: () => document.getElementById('mxr-num').innerText = Math.floor(rev.val).toLocaleString()
+            }, 17.5);
+
+            tl.to("#scene-multiplex", { opacity: 0, y: -100, duration: 0.6, ease: "power4.in" }, 19.5);
+
+            // --- SCENE 5: THE PLAN (20s - 26s) ---
+            tl.set("#scene-plan", { opacity: 1 }, 20.0);
+            tl.from("#pl-head", { opacity: 0, x: -50, duration: 0.8, ease: "power4.out" }, 20.0);
+            
+            // Draw line
+            tl.to("#pl-line", { height: "300px", duration: 2, ease: "power2.inOut" }, 20.5);
+            
+            // Stagger steps
+            tl.to("#pl1", { opacity: 1, x: 0, duration: 0.6, ease: "back.out(1)" }, 21.0);
+            tl.to("#pl2", { opacity: 1, x: 0, duration: 0.6, ease: "back.out(1)" }, 22.0);
+            tl.to("#pl3", { opacity: 1, x: 0, duration: 0.6, ease: "back.out(1)" }, 23.0);
+            
+            tl.to("#scene-plan", { opacity: 0, scale: 1.1, duration: 0.6, ease: "power4.in" }, 25.5);
+
+            // --- SCENE 6: THE CTA (26s - 30s) ---
+            tl.call(() => { engineState.mode = 'chaos'; engineState.speedMultiplier = 5; }, null, 25.8); // Particles go crazy
+            tl.set("#scene-cta", { opacity: 1 }, 26.0);
+            strobeFlash(tl, 26.0);
+            
+            tl.to("#cta-b", { opacity: 1, scale: 1, duration: 1.2, ease: "elastic.out(1, 0.5)" }, 26.0);
+            
+            // Final infinite pulse on button
+            tl.to(".cta-btn", { scale: 1.05, boxShadow: "0 0 30px rgba(212,175,55,0.6)", duration: 0.8, yoyo: true, repeat: -1, ease: "sine.inOut" }, 27.5);
+
+            // End of Timeline
+        }
+    </script>
+</body>
+</html>

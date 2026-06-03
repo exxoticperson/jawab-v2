@@ -108,14 +108,44 @@ Output format:
 - new skill recommendation when repetition is real
 - short routing note
 
+## Jawab Agentic: Deployed Agent Roles & Rules
+
+For client deployments of the premium Jawab Agentic tier (AED 8,500 setup), the system deploys three specialized autonomous agents that coordinate with each other and the clinic's staff.
+
+### 1. Mystery Shop Auditor Agent
+- **Ownership**: Technical setup by `Jawab-Ops`; persona scripts by `Jawab-Outreach`.
+- **Trigger**: Runs autonomously 3 times per week at randomized times (peak hours, lunch breaks, and after-hours).
+- **Behavior**: Uses virtual numbers and diverse patient personas (e.g., cosmetic consultation, emergency crown, booking reschedule) to test WhatsApp, phone lines, and web forms.
+- **Reporting**: Measures exact response times, language accuracy (Arabic/English), and path friction. Pushes raw audit logs to the Daily WhatsApp Brief Agent.
+- **Guardrail**: Never tests the same clinic channel more than once in a 24-hour window to avoid disrupting normal staff operations.
+
+### 2. WhatsApp Recovery Agent
+- **Ownership**: Configured by `Jawab-Ops` using the clinic-approved handbook curated by `Jawab-Assets`.
+- **Trigger**: Activated when a patient thread is flagged as "dropped" (e.g., no response to a treatment plan within 24 hours, missed call backup, or after-hours WhatsApp message).
+- **Behavior**: Engages the patient in bilingual (Arabic/English) natural chat. Qualifies patient interest, answers procedure/pricing FAQs, and pushes them to book.
+- **Handoff Rules**:
+  - **Medical Advice / Diagnosis**: The agent must reply: *"For your safety, I will have our clinical team contact you directly to discuss this details."* and sets status to `STAFF_HANDOFF`.
+  - **Frustration / Complaints**: Halts automated messages instantly and sends a high-priority alert to the clinic staff.
+  - **Booking**: Logs details in the recovery tracker and schedules a staff verification check.
+
+### 3. Daily WhatsApp Brief Agent
+- **Ownership**: Setup and formatting verified by `Jawab-Ops` and `Jawab-Assets`.
+- **Trigger**: Runs automatically every morning at 8:00 AM (local clinic time).
+- **Behavior**: Consolidates and formats data from the Auditor and Recovery Agent from the previous 24 hours.
+- **Output**: Pushes a structured summary via WhatsApp to the clinic owner containing:
+  - *Leak Alerts*: Audit response time failures or broken paths.
+  - *Recoveries*: Number of patients qualified and booked, with estimated saved revenue.
+  - *Staff Tasks*: Highlighted manual handoffs or unresolved complex patient inquiries.
+
 ## Rules
 
 - Only `Jawab-Leads` changes lead ranking or enrichment logic.
-- Only `Jawab-Outreach` writes outbound copy.
-- Only `Jawab-Assets` creates collateral.
-- Only `Jawab-Ops` changes delivery mechanics.
+- Only `Jawab-Outreach` writes outbound copy and designs Mystery Shop personas.
+- Only `Jawab-Assets` creates collateral and approves client handbooks.
+- Only `Jawab-Ops` changes delivery mechanics, setups Jawab Agentic integrations, and monitors agent status.
 - Only `Skill-Writer` decides whether a recurring workflow should become a reusable local skill.
 - Only `Jawab-OS` changes strategy.
+- All deployed Jawab Agentic runs must strictly adhere to the Medical Advice and Frustration handoff rules.
 
 ## Daily Rhythm
 

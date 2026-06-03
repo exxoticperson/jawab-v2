@@ -77,6 +77,18 @@ Includes:
 - AI Staff Handoff Summary
 - weekly Jawab Intelligence Report
 
+### Jawab Agentic
+
+Price: AED 8,500 setup, then AED 3,500/month recurring fees.
+
+Purpose: Premium agentic tier featuring autonomous mystery auditing, automated WhatsApp recovery agents, and daily strategic briefings.
+
+Includes:
+
+- **Autonomous Mystery Shop Audit**: Periodically/autonomously audits the clinic's response paths (calls, WhatsApp, web forms) by posing as a patient, generating instant friction and leak reports.
+- **WhatsApp Recovery Agent**: An advanced AI agent that runs on WhatsApp, engages with dropped or unresponsive leads, answers FAQs, qualifies them, and directly books them into the clinic calendar.
+- **Daily WhatsApp Brief**: A daily summary sent to the clinic owner/manager via WhatsApp, detailing leaks found, recovered patients, and tasks to assign to the staff.
+
 ### Jawab Voice
 
 Price: AED `2,000` setup + AED `1,500/month`.
@@ -173,6 +185,18 @@ Fair concern. Jawab only uses the minimum information needed to qualify and rout
 
 Not in the first version, intentionally. PMS integrations add months of complexity and cost. Jawab works alongside your current workflow: staff gets a clear WhatsApp or Sheet summary and books the patient in the system they already use.
 
+### "Why is the Jawab Agentic setup fee AED 8,500?"
+
+The AED 8,500 setup fee covers the end-to-end custom configuration, persona building, and calibration of three coordinated AI agents for your clinic: the Mystery Shop Auditor (which simulates patient inquiries), the WhatsApp Recovery Agent (which needs a customized knowledge base for your clinical procedures, pricing, and insurance), and the Daily Briefing engine. This ensures absolute safety, localized language patterns, and zero disruptions.
+
+### "Will the Mystery Shop Auditor confuse or overload our staff?"
+
+No. The Auditor is set to run only 3 times per week at randomized intervals. It does not spam your system. It is designed to act exactly like a real patient to test your team's real-world response times and follow-up quality. If a test completes, the details are compiled directly in your daily owner brief rather than clogging your inbox.
+
+### "Is an autonomous WhatsApp Recovery Agent safe for our patient relationships?"
+
+Yes, it has strict clinical guardrails. The agent is trained on your custom clinic handbook. It only qualifies patient interest, explains general pricing ranges, and schedules consultations. It never gives medical advice or diagnoses. If a patient requires human empathy or asks a question outside the pre-approved playbook, the agent immediately stops and does a clean handoff to your team.
+
 ## Follow-Up Sequence
 
 ### Day 1
@@ -212,6 +236,32 @@ Asset: new audit finding, proof asset, content, or case study.
 Message:
 
 `I noticed one more thing since my last audit: [new finding]. We are now using Jawab to catch exactly this type of leakage. Worth revisiting?`
+
+## Jawab Agentic Outreach Messaging
+
+Use these scripts when pitching the premium Jawab Agentic tier to high-volume or high-ticket elective clinics.
+
+### Cold Outreach (WhatsApp / IG DM)
+
+`Hi Dr. [Doctor_Name], noticed your clinic has exceptional reviews but it took [X hours] to get a reply to our WhatsApp test, and we couldn't get a call through after-hours.
+
+We built Jawab Agentic specifically to fix this leakage for premium clinics:
+1. An autonomous Mystery Shop Auditor that tests your response paths.
+2. A 24/7 WhatsApp Recovery Agent that answers FAQs and books patients.
+3. A Daily WhatsApp Brief sent directly to your phone with recovered revenue numbers.
+
+Setup is AED 8,500. Would you like a 60-second video demo showing how our WhatsApp recovery agent books an implant patient?`
+
+### Gulf Arabic Outreach Variant
+
+`مرحباً دكتور [Name]، لاحظت إن استجابة الواتساب بالعيادة تأخذ وقت طويل، وبعض المراجعين يروحون لعيادات ثانية بسبب التأخير.
+
+مع باقة Jawab Agentic، نوفر لك ٣ عملاء ذكاء اصطناعي مخصصين لعيادتك:
+١. عميل Mystery Shop يقوم بفحص مسار الحجز تلقائياً ويبين لك نقاط التسريب.
+٢. عميل WhatsApp Recovery يرد على استفسارات المرضى ويحجز المواعيد على مدار الساعة.
+٣. ملخص يومي يوصلك على الواتساب الصباح بجدول المواعيد المحجوزة والإيرادات المستردة.
+
+بإمكاننا البدء بـ 8,500 درهم للتأسيس. هل يناسبك أرسل لك ديمو قصير يوضح كيف يشتغل وكيف يرجع المرضى؟`
 
 ## Client Onboarding Protocol
 

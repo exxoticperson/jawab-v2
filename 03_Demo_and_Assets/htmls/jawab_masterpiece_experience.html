@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jawab | The Growth Engine</title>
+    
+    <!-- Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Outfit:wght@200;400;600;800;900&display=swap" rel="stylesheet">
+    
+    <!-- GSAP Core & Plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <style>
+        /* =========================================
+           VARIABLES & RESET
+           ========================================= */
+        :root {
+            --obsidian: #030303;
+            --obsidian-light: #111111;
+            --gold: #D4AF37;
+            --gold-light: #F3E5AB;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --gold-glow-intense: rgba(212, 175, 55, 0.8);
+            --text-main: #ffffff;
+            --text-dim: #8a8a8a;
+            --glass: rgba(255, 255, 255, 0.02);
+            --border-glow: rgba(212, 175, 55, 0.2);
+            --easing: cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; /* Custom cursor */
+        }
+
+        body, html {
+            background-color: var(--obsidian);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            width: 100%;
+            overscroll-behavior: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--obsidian);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 4px;
+        }
+
+        /* =========================================
+           CUSTOM CURSOR
+           ========================================= */
+        #cursor-dot,
+        #cursor-ring {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        #cursor-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--gold);
+        }
+        #cursor-ring {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--gold-glow);
+            transition: width 0.3s var(--easing), height 0.3s var(--easing), border-color 0.3s var(--easing);
+        }
+        .hover-target:hover ~ #cursor-ring {
+            width: 60px;
+            height: 60px;
+            border-color: var(--gold);
+            background-color: rgba(212, 175, 55, 0.1);
+        }
+
+        /* =========================================
+           PRELOADER
+           ========================================= */
+        #preloader {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--obsidian);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .loader-text {
+            font-family: 'Outfit', sans-serif;
+            color: var(--gold);
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .loader-bar-container {
+            width: 300px;
+            height: 2px;
+            background: #222;
+            overflow: hidden;
+        }
+        .loader-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--gold);
+            box-shadow: 0 0 20px var(--gold);
+        }
+        .loader-data {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            font-family: monospace;
+        }
+
+        /* =========================================
+           CANVAS ENGINE
+           ========================================= */
+        #fluid-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* =========================================
+           GLOBAL LAYOUT
+           ========================================= */
+        .smooth-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-padding {
+            padding: 10vw 5vw;
+        }
+
+        .title-massive {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: clamp(4rem, 10vw, 12rem);
+            line-height: 0.9;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0.2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title-gold {
+            background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0px 10px 40px var(--gold-glow);
+        }
+
+        .subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(1.2rem, 2vw, 2.5rem);
+            color: var(--text-dim);
+            font-weight: 300;
+            max-width: 800px;
+            margin-top: 30px;
+            line-height: 1.5;
+        }
+
+        .text-split {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+        }
+        .text-split .word {
+            display: inline-block;
+            transform: translateY(110%);
+            opacity: 0;
+        }
+
+        /* =========================================
+           SECTION 1: HERO
+           ========================================= */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+        }
+        .scroll-line {
+            width: 1px;
+            height: 60px;
+            background: rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .scroll-line::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: 0; width: 100%; height: 50%;
+            background: var(--gold);
+            animation: scrollDown 2s infinite cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        @keyframes scrollDown {
+            0% { top: -50%; }
+            100% { top: 150%; }
+        }
+
+        /* =========================================
+           SECTION 2: HORIZONTAL SCROLL STORY (THE LEAK)
+           ========================================= */
+        .story-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            background: linear-gradient(90deg, var(--obsidian) 0%, #080808 50%, var(--obsidian) 100%);
+        }
+        .story-track {
+            display: flex;
+            width: max-content;
+            padding: 0 50vw;
+        }
+        .story-panel {
+            width: 400px;
+            height: 500px;
+            margin-right: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 30px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            position: relative;
+        }
+        .story-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at top right, rgba(255,255,255,0.05), transparent 60%);
+            border-radius: 30px;
+        }
+        .story-time {
+            font-family: 'Outfit';
+            font-size: 1.5rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+        .story-text {
+            font-size: 2rem;
+            font-weight: 300;
+            line-height: 1.3;
+        }
+        .story-highlight {
+            color: #ff4d4d;
+            font-weight: 600;
+        }
+
+        /* =========================================
+           SECTION 3: IMAGE COMPARISON SLIDER
+           ========================================= */
+        .comparison-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .slider-container {
+            position: relative;
+            width: 90%;
+            max-width: 1200px;
+            height: 60vh;
+            margin-top: 80px;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+            border: 1px solid var(--border-glow);
+        }
+        .slider-img {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .slider-img.before {
+            filter: grayscale(100%) brightness(0.4) blur(3px);
+        }
+        .slider-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 50%; height: 100%;
+            overflow: hidden;
+            border-right: 2px solid var(--gold);
+            box-shadow: 5px 0 30px var(--gold-glow);
+        }
+        .slider-handle {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px; height: 50px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: ew-resize;
+            z-index: 10;
+        }
+        .slider-label {
+            position: absolute;
+            bottom: 30px;
+            padding: 10px 30px;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            font-family: 'Outfit';
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+        }
+        .label-left { left: 30px; color: var(--text-dim); }
+        .label-right { right: 30px; color: var(--gold); }
+
+        /* =========================================
+           SECTION 4: 3D ARCHITECTURE (THE SYSTEM)
+           ========================================= */
+        .architecture-section {
+            perspective: 2000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .arch-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 800px;
+            transform-style: preserve-3d;
+            margin-top: 100px;
+        }
+        .arch-layer {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 100%;
+            padding: 60px;
+            background: rgba(10,10,10,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            backdrop-filter: blur(20px);
+            transform: translate(-50%, -50%) rotateX(60deg) rotateZ(-45deg);
+            transition: all 1s var(--easing);
+            box-shadow: -20px 20px 50px rgba(0,0,0,0.8);
+        }
+        .arch-layer::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            border-radius: 30px;
+            pointer-events: none;
+        }
+        .arch-num { font-family: 'Outfit'; font-size: 5rem; color: var(--gold); font-weight: 900; opacity: 0.3; position: absolute; top: 20px; right: 40px; }
+        .arch-title { font-family: 'Outfit'; font-size: 3rem; margin-bottom: 20px; }
+        .arch-desc { font-size: 1.2rem; color: var(--text-dim); max-width: 400px; }
+        
+        .layer-1 { border-color: rgba(255,255,255,0.1); transform: translate(-50%, -50%) rotateX(60deg) rotateZ(-45deg) translateZ(-200px); }
+        .layer-2 { border-color: rgba(212, 175, 55, 0.3); transform: translate(-50%, -50%) rotateX(60deg) rotateZ(-45deg) translateZ(0px); }
+        .layer-3 { border-color: var(--gold); transform: translate(-50%, -50%) rotateX(60deg) rotateZ(-45deg) translateZ(200px); box-shadow: -20px 20px 100px var(--gold-glow); }
+
+        /* =========================================
+           SECTION 5: INTERACTIVE CALCULATOR
+           ========================================= */
+        .calc-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            background: #080808;
+            border-top: 1px solid #1a1a1a;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .calc-text {
+            flex: 1;
+            min-width: 400px;
+            padding-right: 50px;
+        }
+        .calc-box {
+            flex: 1;
+            min-width: 400px;
+            background: var(--obsidian-light);
+            border: 1px solid var(--gold-glow);
+            border-radius: 40px;
+            padding: 50px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+        .calc-row {
+            margin-bottom: 30px;
+        }
+        .calc-label {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Outfit';
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            margin-bottom: 15px;
+        }
+        .calc-val { color: var(--gold); font-weight: 800; }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 30px;
+            width: 30px;
+            border-radius: 50%;
+            background: var(--gold);
+            cursor: pointer;
+            margin-top: -12px;
+            box-shadow: 0 0 20px var(--gold-glow);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #222;
+            border-radius: 10px;
+        }
+        .calc-total {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .total-label { font-size: 1.5rem; color: #fff; }
+        .total-amount { font-family: 'Outfit'; font-size: 4rem; color: var(--gold); font-weight: 900; text-shadow: 0 0 40px var(--gold-glow); }
+
+        /* =========================================
+           SECTION 6: CTA & GUARANTEE
+           ========================================= */
+        .cta-section {
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: radial-gradient(circle at center, rgba(212,175,55,0.05) 0%, var(--obsidian) 60%);
+        }
+        
+        .shield-icon {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 40px;
+            filter: drop-shadow(0 0 30px var(--gold-glow));
+        }
+
+        .cta-btn-wrapper {
+            position: relative;
+            margin-top: 60px;
+        }
+        .cta-btn {
+            display: inline-block;
+            padding: 25px 60px;
+            background: transparent;
+            color: var(--gold);
+            font-family: 'Outfit';
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border: 2px solid var(--gold);
+            border-radius: 60px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s var(--easing);
+            z-index: 1;
+        }
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: var(--gold);
+            transition: all 0.5s var(--easing);
+            z-index: -1;
+        }
+        .cta-btn:hover::before { left: 0; }
+        .cta-btn:hover { color: var(--obsidian); box-shadow: 0 0 60px var(--gold-glow-intense); transform: scale(1.05); }
+
+    </style>
+</head>
+<body>
+
+    <!-- CUSTOM CURSOR -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
+    <!-- PRELOADER -->
+    <div id="preloader">
+        <div class="loader-text">Initializing Audit</div>
+        <div class="loader-bar-container"><div class="loader-bar"></div></div>
+        <div class="loader-data">Loading Assets... <span id="load-pct">0%</span></div>
+    </div>
+
+    <!-- WEBGL-LIKE CANVAS ENGINE -->
+    <canvas id="fluid-canvas"></canvas>
+
+    <div class="smooth-content">
+        
+        <!-- HERO -->
+        <section class="hero section-padding">
+            <h1 class="title-massive text-split hero-title">
+                <span class="word">THE</span><br>
+                <span class="word title-gold">SILENT</span><br>
+                <span class="word">LEAK.</span>
+            </h1>
+            <p class="subtitle text-split hero-sub">
+                <span class="word">Most</span> <span class="word">agencies</span> <span class="word">fix</span> <span class="word">your</span> <span class="word">ads.</span><br>
+                <span class="word">We</span> <span class="word">fix</span> <span class="word">the</span> <span class="word">infrastructure</span> <span class="word">that</span> <span class="word">loses</span> <span class="word">the</span> <span class="word">patient.</span>
+            </p>
+            <div class="scroll-indicator">
+                <span style="font-family:'Outfit'; font-size:10px; letter-spacing:2px; color:var(--text-dim)">INITIATE AUDIT</span>
+                <div class="scroll-line"></div>
+            </div>
+        </section>
+
+        <!-- HORIZONTAL STORY (THE PAIN) -->
+        <section class="story-container">
+            <div class="story-track">
+                <div class="story-panel">
+                    <div class="story-time">09:00 PM</div>
+                    <p class="story-text">A high-ticket patient searches for <strong>"Veneers in Dubai"</strong>.</p>
+                </div>
+                <div class="story-panel">
+                    <div class="story-time">09:02 PM</div>
+                    <p class="story-text">They click your Instagram ad and land on your profile.</p>
+                </div>
+                <div class="story-panel">
+                    <div class="story-time">09:04 PM</div>
+                    <p class="story-text">They call the clinic. The front desk is closed.</p>
+                </div>
+                <div class="story-panel">
+                    <div class="story-time">09:05 PM</div>
+                    <p class="story-text">They send a WhatsApp message. <span class="story-highlight">No automated response.</span></p>
+                </div>
+                <div class="story-panel" style="border-color: var(--gold); box-shadow: 0 0 50px rgba(212,175,55,0.2);">
+                    <div class="story-time" style="color: #ff4d4d">09:08 PM</div>
+                    <p class="story-text">They message the clinic down the street. <br><br><span style="color:var(--gold); font-weight:600">AED 30,000 lost in 8 minutes.</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTERACTIVE COMPARISON (AI VISIBILITY) -->
+        <section class="comparison-section section-padding">
+            <h2 class="title-massive text-split" style="font-size: clamp(3rem, 6vw, 6rem);">
+                <span class="word">THE</span> <span class="word title-gold">GHOST</span> <span class="word">TOWN</span>
+            </h2>
+            <p class="subtitle text-split" style="margin-bottom: 50px;">
+                <span class="word">AI</span> <span class="word">tools</span> <span class="word">like</span> <span class="word">ChatGPT</span> <span class="word">are</span> <span class="word">recommending</span> <span class="word">clinics.</span> <span class="word">Are</span> <span class="word">you</span> <span class="word">visible?</span>
+            </p>
+
+            <div class="slider-container hover-target" id="slider">
+                <!-- Using generic unsplash tech/medical abstract image -->
+                <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=2000&auto=format&fit=crop" class="slider-img before" alt="Invisible Clinic">
+                <div class="slider-overlay" id="slider-overlay">
+                    <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=2000&auto=format&fit=crop" class="slider-img after" style="filter: brightness(1.2) contrast(1.2) drop-shadow(0 0 20px #D4AF37);" alt="Visible Clinic">
+                </div>
+                <div class="slider-handle" id="slider-handle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" style="transform: rotate(180deg)"><path d="M15 18l-6-6 6-6"/></svg>
+                </div>
+                <div class="slider-label label-left">WITHOUT JAWAB</div>
+                <div class="slider-label label-right">WITH JAWAB ARO</div>
+            </div>
+        </section>
+
+        <!-- 3D ARCHITECTURE -->
+        <section class="architecture-section section-padding">
+            <h2 class="title-massive text-split" style="font-size: clamp(3rem, 6vw, 6rem);">
+                <span class="word">THE</span> <span class="word title-gold">SYSTEM</span>
+            </h2>
+            <p class="subtitle">A 3-layered infrastructure designed to plug every hole in your patient acquisition funnel.</p>
+            
+            <div class="arch-container hover-target">
+                <div class="arch-layer layer-1">
+                    <div class="arch-num">01</div>
+                    <h3 class="arch-title">Discovery (ARO)</h3>
+                    <p class="arch-desc">We optimize your digital footprint so ChatGPT, Perplexity, and AI Search Overviews recommend you as the #1 authority in the UAE.</p>
+                </div>
+                <div class="arch-layer layer-2">
+                    <div class="arch-num">02</div>
+                    <h3 class="arch-title">Conversion</h3>
+                    <p class="arch-desc">We rebuild your landing environments for zero friction. If a patient clicks, they book. Period.</p>
+                </div>
+                <div class="arch-layer layer-3">
+                    <div class="arch-num">03</div>
+                    <h3 class="arch-title" style="color: var(--gold)">Recovery</h3>
+                    <p class="arch-desc">The Jawab Safety Net. Every missed call, delayed DM, or abandoned WhatsApp is caught and engaged within 60 seconds.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- LIVE CALCULATOR -->
+        <section class="calc-section section-padding">
+            <div class="calc-text">
+                <h2 class="title-massive title-gold text-split" style="font-size: clamp(3rem, 5vw, 5rem); text-align:left;">
+                    <span class="word">DO</span> <span class="word">THE</span> <span class="word">MATH.</span>
+                </h2>
+                <p class="subtitle" style="text-align:left; margin-top: 20px;">Calculate exactly what a 12-hour response gap is costing your clinic every single month.</p>
+            </div>
+            
+            <div class="calc-box hover-target">
+                <div class="calc-row">
+                    <div class="calc-label"><span>Missed Calls / Messages per Week</span> <span class="calc-val" id="val-missed">15</span></div>
+                    <input type="range" id="range-missed" min="1" max="100" value="15">
+                </div>
+                <div class="calc-row">
+                    <div class="calc-label"><span>Average Case Value (AED)</span> <span class="calc-val" id="val-aov">3,500</span></div>
+                    <input type="range" id="range-aov" min="500" max="25000" step="500" value="3500">
+                </div>
+                <div class="calc-row">
+                    <div class="calc-label"><span>Jawab Recovery Rate</span> <span class="calc-val">20%</span></div>
+                    <!-- Fixed rate for realistic expectation -->
+                    <div style="width:100%; height:6px; background:var(--gold); border-radius:10px; opacity:0.5;"></div>
+                </div>
+                
+                <div class="calc-total">
+                    <div class="total-label">Revenue Recovered (Monthly)</div>
+                    <div class="total-amount">AED <span id="total-revenue">42,000</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA & GUARANTEE -->
+        <section class="cta-section section-padding">
+            <!-- Shield SVG -->
+            <svg class="shield-icon" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="M12 8v4" stroke-width="2"/>
+                <circle cx="12" cy="16" r="1" fill="#D4AF37"/>
+            </svg>
+
+            <h2 class="title-massive text-split" style="font-size: clamp(3rem, 6vw, 7rem);">
+                <span class="word">ZERO</span> <span class="word title-gold">RISK.</span>
+            </h2>
+            <p class="subtitle" style="max-width: 900px; text-align: center;">
+                If Jawab doesn't surface at least <strong>5 missed patient opportunities</strong> in the first 14 days, you pay absolutely nothing. We eat the setup cost.
+            </p>
+
+            <div class="cta-btn-wrapper hover-target">
+                <a href="#" class="cta-btn">CLAIM YOUR AUDIT</a>
+            </div>
+        </section>
+        
+    </div>
+
+    <!-- =========================================
+         JAVASCRIPT ENGINE
+         ========================================= -->
+    <script>
+        // --- CUSTOM CURSOR ---
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorRing = document.getElementById('cursor-ring');
+        
+        window.addEventListener('mousemove', (e) => {
+            gsap.to(cursorDot, { x: e.clientX, y: e.clientY, duration: 0.1 });
+            gsap.to(cursorRing, { x: e.clientX, y: e.clientY, duration: 0.3, ease: "power2.out" });
+        });
+
+        // --- PRELOADER LOGIC ---
+        let loadPct = 0;
+        const loadText = document.getElementById('load-pct');
+        const loadBar = document.querySelector('.loader-bar');
+        
+        let loadInterval = setInterval(() => {
+            loadPct += Math.floor(Math.random() * 10) + 1;
+            if(loadPct >= 100) {
+                loadPct = 100;
+                clearInterval(loadInterval);
+                initAnimations();
+            }
+            loadText.innerText = loadPct + '%';
+            loadBar.style.width = loadPct + '%';
+        }, 150);
+
+        function initAnimations() {
+            // Hide Loader
+            gsap.to("#preloader", { 
+                yPercent: -100, 
+                duration: 1.5, 
+                ease: "power4.inOut",
+                onComplete: () => {
+                    document.body.style.overflowY = 'auto';
+                    startHero();
+                }
+            });
+        }
+
+        document.body.style.overflowY = 'hidden'; // Lock scroll during load
+
+        // --- GSAP SETUP ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        function startHero() {
+            gsap.to(".hero-title .word", {
+                y: 0, opacity: 1, duration: 1.2, stagger: 0.2, ease: "power4.out"
+            });
+            gsap.to(".hero-sub .word", {
+                y: 0, opacity: 1, duration: 0.8, stagger: 0.05, ease: "power3.out", delay: 0.8
+            });
+            gsap.to(".scroll-indicator", { opacity: 1, duration: 1, delay: 1.5 });
+        }
+
+        // --- HORIZONTAL SCROLL (STORY) ---
+        const storyTrack = document.querySelector('.story-track');
+        let trackWidth = storyTrack.scrollWidth - window.innerWidth;
+        
+        gsap.to(storyTrack, {
+            x: -trackWidth,
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".story-container",
+                pin: true,
+                scrub: 1,
+                end: () => "+=" + trackWidth
+            }
+        });
+
+        // --- 3D ARCHITECTURE SCROLL ---
+        ScrollTrigger.create({
+            trigger: ".architecture-section",
+            start: "top top",
+            end: "+=1500",
+            pin: true,
+            scrub: 1,
+            animation: gsap.timeline()
+                // Bring layer 1 to front, fade others
+                .to(".layer-1", { transform: "translate(-50%, -50%) rotateX(0deg) rotateZ(0deg) translateZ(100px)", opacity: 1 }, 0)
+                .to(".layer-2", { opacity: 0 }, 0)
+                .to(".layer-3", { opacity: 0 }, 0)
+                // Layer 2
+                .to(".layer-2", { transform: "translate(-50%, -50%) rotateX(0deg) rotateZ(0deg) translateZ(100px)", opacity: 1 }, 1)
+                .to(".layer-1", { opacity: 0 }, 1)
+                // Layer 3
+                .to(".layer-3", { transform: "translate(-50%, -50%) rotateX(0deg) rotateZ(0deg) translateZ(100px)", opacity: 1 }, 2)
+                .to(".layer-2", { opacity: 0 }, 2)
+        });
+
+        // --- TEXT REVEALS ON SCROLL ---
+        gsap.utils.toArray('.title-massive').forEach(title => {
+            if(!title.classList.contains('hero-title')) {
+                gsap.to(title.querySelectorAll('.word'), {
+                    y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: "power4.out",
+                    scrollTrigger: { trigger: title, start: "top 80%" }
+                });
+            }
+        });
+
+        // --- IMAGE SLIDER LOGIC ---
+        const sliderContainer = document.getElementById('slider');
+        const sliderOverlay = document.getElementById('slider-overlay');
+        const sliderHandle = document.getElementById('slider-handle');
+        let isSliding = false;
+
+        sliderContainer.addEventListener('mousedown', () => isSliding = true);
+        window.addEventListener('mouseup', () => isSliding = false);
+        window.addEventListener('mousemove', (e) => {
+            if (!isSliding) return;
+            const rect = sliderContainer.getBoundingClientRect();
+            let x = e.clientX - rect.left;
+            if (x < 0) x = 0;
+            if (x > rect.width) x = rect.width;
+            let pct = (x / rect.width) * 100;
+            sliderOverlay.style.width = `${pct}%`;
+            sliderHandle.style.left = `${pct}%`;
+        });
+
+        // --- CALCULATOR LOGIC ---
+        const rMissed = document.getElementById('range-missed');
+        const vMissed = document.getElementById('val-missed');
+        const rAOV = document.getElementById('range-aov');
+        const vAOV = document.getElementById('val-aov');
+        const tRev = document.getElementById('total-revenue');
+
+        function updateCalc() {
+            let missed = parseInt(rMissed.value);
+            let aov = parseInt(rAOV.value);
+            vMissed.innerText = missed;
+            vAOV.innerText = aov.toLocaleString();
+            
+            // Formula: (Missed per week * 4 weeks) * 20% recovery * AOV
+            let monthlyRecovered = Math.round((missed * 4) * 0.20 * aov);
+            
+            // Animate number change
+            gsap.to(tRev, {
+                innerHTML: monthlyRecovered,
+                duration: 0.5,
+                snap: { innerHTML: 1 },
+                onUpdate: function() {
+                    tRev.innerHTML = Number(tRev.innerHTML).toLocaleString();
+                }
+            });
+        }
+        rMissed.addEventListener('input', updateCalc);
+        rAOV.addEventListener('input', updateCalc);
+
+        // --- COMPLEX CANVAS ENGINE (LIQUID GOLD / OBSIDIAN) ---
+        const canvas = document.getElementById('fluid-canvas');
+        const ctx = canvas.getContext('2d');
+        let w, h, particles = [];
+        let mouse = { x: null, y: null, radius: 150 };
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * w;
+                this.y = Math.random() * h;
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.size = Math.random() * 2 + 1;
+                this.density = (Math.random() * 30) + 1;
+                this.color = Math.random() > 0.8 ? '#D4AF37' : 'rgba(255,255,255,0.05)';
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fill();
+            }
+            update() {
+                // Mouse interaction
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                let forceDirectionX = dx / distance;
+                let forceDirectionY = dy / distance;
+                let maxDistance = mouse.radius;
+                let force = (maxDistance - distance) / maxDistance;
+                let directionX = forceDirectionX * force * this.density;
+                let directionY = forceDirectionY * force * this.density;
+
+                if (distance < mouse.radius) {
+                    this.x -= directionX;
+                    this.y -= directionY;
+                } else {
+                    if (this.x !== this.baseX) {
+                        let dx = this.x - this.baseX;
+                        this.x -= dx / 20;
+                    }
+                    if (this.y !== this.baseY) {
+                        let dy = this.y - this.baseY;
+                        this.y -= dy / 20;
+                    }
+                }
+
+                // Scroll gravity effect
+                this.y -= window.scrollY * 0.001 * this.size;
+                if(this.y < 0) this.y = h;
+                if(this.y > h) this.y = 0;
+            }
+        }
+
+        function initCanvas() {
+            particles = [];
+            for (let i = 0; i < 400; i++) {
+                particles.push(new Particle());
+            }
+        }
+        initCanvas();
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, w, h);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            // Draw connecting lines for tech feel
+            connectParticles();
+            requestAnimationFrame(animateCanvas);
+        }
+
+        function connectParticles() {
+            let opacityValue = 1;
+            for (let a = 0; a < particles.length; a++) {
+                for (let b = a; b < particles.length; b++) {
+                    let dx = particles[a].x - particles[b].x;
+                    let dy = particles[a].y - particles[b].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 50 && particles[a].color === '#D4AF37') {
+                        opacityValue = 1 - (distance/50);
+                        ctx.strokeStyle = `rgba(212, 175, 55, ${opacityValue * 0.2})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(particles[b].x, particles[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+        animateCanvas();
+
+    </script>
+</body>
+</html>

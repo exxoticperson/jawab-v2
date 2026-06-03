@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jawab | The Recovery Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root {
+            /* Branding */
+            --bg-deep: #050507;
+            --gold: #D4AF37;
+            --gold-glow: rgba(212, 175, 55, 0.3);
+            
+            /* Native iOS Colors */
+            --ios-bg: #000000;
+            --wa-dark-bg: #0b141a;
+            --wa-dark-header: #202c33;
+            --wa-msg-in: #202c33;
+            --wa-msg-out: #005c4b;
+            --wa-text: #e9edef;
+            --wa-meta: #8696a0;
+            --wa-blue-tick: #53bdeb;
+            --ios-blue: #0A84FF;
+            --ios-red: #FF453A;
+            --ios-green: #30D158;
+
+            /* Easing */
+            --apple-ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        
+        body {
+            background-color: var(--bg-deep);
+            color: #fff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 2000px;
+        }
+
+        /* --- BACKGROUND MESH --- */
+        .ambient-mesh {
+            position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: 
+                radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.02) 0%, transparent 30%);
+            z-index: 0;
+            pointer-events: none;
+            animation: mesh-rotate 60s linear infinite;
+        }
+        @keyframes mesh-rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- SCENE CONTAINER --- */
+        .stage {
+            position: relative;
+            width: 100%; height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* --- HARDWARE: HYPER-REAL IPHONE --- */
+        .iphone-frame {
+            position: relative;
+            width: 380px; height: 820px;
+            background: #000;
+            border-radius: 55px;
+            box-shadow: 
+                inset 0 0 0 2px #555, /* inner bezel edge */
+                inset 0 0 0 8px #000, /* thick black bezel */
+                inset 0 0 0 10px #333, /* titanium inner rim */
+                inset 0 0 0 11px #111, /* titanium outer rim */
+                0 40px 100px -20px rgba(0,0,0,0.9), /* deep drop shadow */
+                0 0 40px rgba(212,175,55,0.1); /* subtle gold ambient */
+            transform-style: preserve-3d;
+            transform: scale(0.9);
+            z-index: 20;
+            overflow: hidden;
+        }
+
+        /* Screen Area (inside the bezel) */
+        .screen {
+            position: absolute;
+            top: 8px; left: 8px; right: 8px; bottom: 8px;
+            background: var(--ios-bg);
+            border-radius: 47px;
+            overflow: hidden;
+            clip-path: inset(0 0 0 0 round 47px);
+        }
+
+        /* Dynamic Island */
+        .dynamic-island {
+            position: absolute;
+            top: 11px; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 35px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 9999;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 12px;
+        }
+
+        .cam-dot { width: 10px; height: 10px; border-radius: 50%; background: #111; box-shadow: inset 0 0 2px #fff; }
+        .sensor-dot { width: 10px; height: 10px; border-radius: 50%; background: #0a0a0a; }
+
+        /* Hardware Glare/Reflection */
+        .screen-glare {
+            position: absolute; top: 0; left: 0; width: 150%; height: 100%;
+            background: linear-gradient(105deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.03) 45%, rgba(255,255,255,0) 60%);
+            z-index: 9000; pointer-events: none;
+        }
+
+        /* iOS Status Bar */
+        .status-bar {
+            position: absolute; top: 0; left: 0; width: 100%; height: 50px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; font-family: -apple-system, sans-serif;
+            font-size: 15px; font-weight: 600; color: #fff; z-index: 900;
+        }
+        .home-indicator {
+            position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+            width: 130px; height: 5px; background: rgba(255,255,255,0.5); border-radius: 10px; z-index: 900;
+        }
+
+        /* --- UI LAYERS --- */
+        .ui-layer {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            display: none; flex-direction: column;
+        }
+        .ui-layer.active { display: flex; }
+
+        /* 1. LOCK SCREEN */
+        .lock-screen {
+            background: linear-gradient(180deg, #1a1a2e 0%, #000 100%);
+            padding-top: 80px; align-items: center;
+        }
+        .lock-icon { width: 20px; height: 20px; fill: #fff; margin-bottom: 10px; }
+        .lock-time { font-size: 76px; font-weight: 300; font-family: -apple-system; letter-spacing: -2px; line-height: 1; }
+        .lock-date { font-size: 20px; font-weight: 400; color: rgba(255,255,255,0.8); margin-top: 5px; }
+
+        .notification-stack {
+            width: 100%; padding: 0 16px; margin-top: 40px;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .notif {
+            background: rgba(30, 30, 30, 0.6); backdrop-filter: blur(20px);
+            border-radius: 20px; padding: 16px; display: flex; gap: 12px;
+            opacity: 0; transform: translateY(20px);
+        }
+        .notif-icon-missed { width: 38px; height: 38px; border-radius: 10px; background: var(--ios-red); display:flex; align-items:center; justify-content:center; }
+        .notif-icon-wa { width: 38px; height: 38px; border-radius: 10px; background: #25D366; display:flex; align-items:center; justify-content:center; }
+        .notif-icon-missed svg, .notif-icon-wa svg { fill: #fff; width: 22px; height: 22px; }
+        
+        .notif-content { flex: 1; }
+        .notif-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .notif-app { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; }
+        .notif-time { font-size: 13px; color: rgba(255,255,255,0.5); }
+        .notif-title { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+        .notif-desc { font-size: 15px; color: rgba(255,255,255,0.8); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        /* 2. WHATSAPP UI */
+        .wa-screen { background: var(--wa-dark-bg); }
+        .wa-bg {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background-color: var(--wa-dark-bg);
+            /* Authentic WhatsApp Dark Mode Doodle Pattern */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 100 100"><g fill="%23ffffff" fill-opacity="0.03"><path d="M10 10c0-5 5-5 5-5s5 0 5 5-5 5-5 5-5 0-5-5zm20 30c0-5 5-5 5-5s5 0 5 5-5 5-5 5-5 0-5-5zm40-20c0-5 5-5 5-5s5 0 5 5-5 5-5 5-5 0-5-5z"/></g></svg>');
+            z-index: 0; opacity: 0.8;
+        }
+
+        .wa-header {
+            position: relative; z-index: 10;
+            background: var(--wa-dark-header);
+            padding: 55px 10px 10px; display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .wah-left { display: flex; align-items: center; gap: 8px; }
+        .wa-back { color: var(--ios-blue); font-size: 32px; font-weight: 300; line-height: 1; padding-bottom: 4px; }
+        .wa-avatar { width: 36px; height: 36px; border-radius: 50%; background: #444; overflow: hidden; }
+        .wa-avatar img { width:100%; height:100%; object-fit: cover; }
+        .wa-title-box { display: flex; flex-direction: column; }
+        .wa-name { font-size: 16px; font-weight: 600; }
+        .wa-status { font-size: 12px; color: var(--wa-meta); margin-top: 2px;}
+        .wah-right { display: flex; gap: 16px; color: var(--ios-blue); }
+        .wah-right svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 1.5; fill: none; }
+
+        .wa-chat-area {
+            flex: 1; position: relative; z-index: 5;
+            padding: 20px 14px; display: flex; flex-direction: column; gap: 8px;
+            overflow: hidden;
+        }
+        .wa-date {
+            align-self: center; background: #182229; color: var(--wa-meta);
+            padding: 6px 12px; border-radius: 10px; font-size: 12px; font-weight: 500;
+            margin-bottom: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* Message Bubbles */
+        .bubble {
+            max-width: 85%; padding: 8px 10px; border-radius: 12px;
+            font-size: 15px; line-height: 1.4; position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+            opacity: 0; transform: translateY(20px) scale(0.95);
+            transform-origin: bottom center;
+        }
+        .bubble-in { background: var(--wa-msg-in); color: var(--wa-text); align-self: flex-start; border-top-left-radius: 0; }
+        .bubble-out { background: var(--wa-msg-out); color: var(--wa-text); align-self: flex-end; border-top-right-radius: 0; }
+        
+        .b-text-ar { font-family: 'Tajawal', sans-serif; direction: rtl; text-align: right; font-size: 16px; margin-bottom: 4px; }
+        .b-text-en { font-size: 14px; color: rgba(255,255,255,0.7); }
+        .b-meta { font-size: 11px; color: var(--wa-meta); float: right; margin-top: 4px; margin-left: 10px; display: flex; align-items: center; gap: 4px; }
+        .tick { width: 16px; height: 16px; fill: var(--wa-blue-tick); }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            background: var(--wa-msg-out); align-self: flex-end; padding: 12px 16px; border-radius: 20px; border-top-right-radius: 0;
+            display: none; align-items: center; gap: 4px; width: fit-content;
+        }
+        .dot { width: 6px; height: 6px; background: rgba(255,255,255,0.6); border-radius: 50%; }
+
+        /* Rich Card (Booking) */
+        .wa-card {
+            background: rgba(0,0,0,0.2); border-left: 4px solid var(--gold);
+            border-radius: 8px; padding: 12px; margin-top: 8px;
+        }
+        .wac-title { font-weight: 600; color: #fff; font-size: 15px; margin-bottom: 4px; }
+        .wac-desc { font-size: 13px; color: rgba(255,255,255,0.7); }
+
+        .wa-footer {
+            position: relative; z-index: 10;
+            background: var(--wa-dark-header); padding: 10px 14px 34px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .wa-plus { color: var(--wa-meta); font-size: 32px; font-weight: 300; line-height: 1; }
+        .wa-input-box { flex: 1; background: #2a3942; border-radius: 24px; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; }
+        .wa-input-box span { color: var(--wa-meta); font-size: 15px; }
+        .wa-input-box svg { fill: var(--wa-meta); width: 20px; height: 20px; }
+        .wa-mic { width: 40px; height: 40px; border-radius: 50%; background: #00a884; display: flex; justify-content: center; align-items: center; }
+        .wa-mic svg { fill: #fff; width: 18px; height: 18px; }
+
+        /* --- THE DASHBOARD LAYER (Appears outside the phone) --- */
+        .dashboard-panel {
+            position: absolute; right: 5%; top: 50%; transform: translateY(-50%) translateZ(-500px);
+            width: 500px; height: 600px;
+            background: rgba(10, 10, 12, 0.8); backdrop-filter: blur(40px);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 30px;
+            padding: 40px; box-shadow: 0 40px 100px rgba(0,0,0,0.9);
+            opacity: 0; pointer-events: none;
+            display: flex; flex-direction: column;
+        }
+        .dash-header { display: flex; align-items: center; gap: 16px; margin-bottom: 40px; }
+        .dash-logo { font-family: 'Outfit'; font-weight: 800; font-size: 24px; color: var(--gold); letter-spacing: 2px; }
+        .dash-badge { background: rgba(212,175,55,0.1); color: var(--gold); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid rgba(212,175,55,0.3); }
+        
+        .dash-metric { margin-bottom: 40px; }
+        .metric-title { font-size: 14px; color: var(--wa-meta); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .metric-val { font-family: 'Outfit'; font-size: 64px; font-weight: 800; color: #fff; line-height: 1; text-shadow: 0 0 40px rgba(255,255,255,0.2); }
+        .metric-val span { color: var(--gold); }
+        
+        .dash-feed-title { font-size: 14px; color: #fff; font-weight: 600; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .feed-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .fi-left h4 { font-size: 15px; font-weight: 500; color: #fff; }
+        .fi-left p { font-size: 13px; color: var(--wa-meta); margin-top: 4px; }
+        .fi-right { font-family: 'Outfit'; font-size: 18px; font-weight: 600; color: var(--ios-green); }
+
+        /* Play Button Overlay */
+        #play-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 10000; cursor: pointer;
+        }
+        .play-btn {
+            width: 80px; height: 80px; border-radius: 50%; background: var(--gold);
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 50px var(--gold-glow); transition: transform 0.3s;
+        }
+        .play-btn svg { width: 30px; height: 30px; fill: #000; margin-left: 5px; }
+        #play-overlay:hover .play-btn { transform: scale(1.1); }
+        .play-text { font-family: 'Outfit'; font-size: 24px; font-weight: 600; color: #fff; margin-top: 24px; letter-spacing: 2px; }
+
+        /* Typography Callouts */
+        .callout {
+            position: absolute; font-family: 'Outfit'; font-size: 8rem; font-weight: 900;
+            color: rgba(255,255,255,0.03); white-space: nowrap; pointer-events: none;
+            z-index: 0; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            opacity: 0; text-transform: uppercase; letter-spacing: -2px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-mesh"></div>
+
+    <div id="play-overlay" onclick="startExperience()">
+        <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="play-text">INITIATE RECOVERY SEQUENCE</div>
+    </div>
+
+    <!-- BACKGROUND CALLOUTS -->
+    <div class="callout" id="co-missed" style="color: rgba(255, 69, 58, 0.05);">THE LEAK.</div>
+    <div class="callout" id="co-recovered" style="color: rgba(212, 175, 55, 0.05);">RECOVERED.</div>
+
+    <div class="stage">
+        
+        <!-- DASHBOARD (Revealed at end) -->
+        <div class="dashboard-panel" id="dashboard">
+            <div class="dash-header">
+                <div class="dash-logo">JAWAB</div>
+                <div class="dash-badge">LIVE RECOVERY ENGINE</div>
+            </div>
+            <div class="dash-metric">
+                <div class="metric-title">Revenue Saved (Today)</div>
+                <div class="metric-val"><span>AED</span> 14,500</div>
+            </div>
+            <div class="dash-feed-title">Recovery Feed</div>
+            <div class="feed-item">
+                <div class="fi-left">
+                    <h4>M. Al Otaibi</h4>
+                    <p>Orthodontics Consult • 9:02 PM</p>
+                </div>
+                <div class="fi-right">+ AED 3,500</div>
+            </div>
+            <div class="feed-item" style="opacity: 0.5">
+                <div class="fi-left">
+                    <h4>Sara Khalid</h4>
+                    <p>Veneers Inquiry • 6:45 PM</p>
+                </div>
+                <div class="fi-right">+ AED 11,000</div>
+            </div>
+        </div>
+
+        <!-- IPHONE HARDWARE -->
+        <div class="iphone-frame" id="iphone">
+            <div class="screen-glare"></div>
+            
+            <div class="screen">
+                <div class="status-bar">
+                    <div id="clock">21:00</div>
+                    <div style="display:flex; gap:5px; align-items:center;">
+                        <svg width="16" height="10" viewBox="0 0 16 10" fill="none"><path d="M15 3C15 3 13.5 1 8 1C2.5 1 1 3 1 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><path d="M12 5.5C12 5.5 10.5 4 8 4C5.5 4 4 5.5 4 5.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><path d="M9 8.5C9 8.5 8.5 8 8 8C7.5 8 7 8.5 7 8.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+                        <svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x="1" y="1" width="18" height="9" rx="2" stroke="#fff" stroke-width="1"/><rect x="2" y="2" width="13" height="7" rx="1" fill="#fff"/><path d="M21 4V7" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    </div>
+                </div>
+                <div class="dynamic-island">
+                    <div class="cam-dot"></div>
+                    <div class="sensor-dot"></div>
+                </div>
+                <div class="home-indicator"></div>
+
+                <!-- UI: LOCK SCREEN -->
+                <div class="ui-layer lock-screen active" id="ui-lock">
+                    <svg class="lock-icon" viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9v-2a6 6 0 10-12 0v2H4v14h16V8h-2zm-2 0H8v-2a4 4 0 118 0v2z"/></svg>
+                    <div class="lock-time">21:00</div>
+                    <div class="lock-date">Tuesday, March 24</div>
+
+                    <div class="notification-stack">
+                        <!-- Missed Call Notif -->
+                        <div class="notif" id="notif-1">
+                            <div class="notif-icon-missed">
+                                <svg viewBox="0 0 24 24"><path d="M16.7 14.8l-2.4-1.2c-.3-.2-.7-.1-1 .2l-1.3 1.8c-2.4-1.2-4.4-3.2-5.6-5.6l1.8-1.3c.3-.2.4-.6.2-1L7.2 5.3c-.2-.4-.6-.5-1-.3L3.8 6.5C3.3 6.8 3 7.3 3 7.8c0 7.8 6.4 14.2 14.2 14.2.6 0 1.1-.3 1.3-.8l1.5-2.4c.1-.4 0-.8-.3-1z" fill="#fff"/></svg>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-header"><span class="notif-app">Phone</span><span class="notif-time">now</span></div>
+                                <div class="notif-title">Missed Call</div>
+                                <div class="notif-desc">Mohammed Al Otaibi</div>
+                            </div>
+                        </div>
+
+                        <!-- Jawab WhatsApp Notif (Appears Later) -->
+                        <div class="notif" id="notif-2">
+                            <div class="notif-icon-wa">
+                                <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.488-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51h-.57c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+489:                             </div>
+490:                             <div class="notif-content">
+491:                                 <div class="notif-header"><span class="notif-app">WhatsApp</span><span class="notif-time">now</span></div>
+492:                                 <div class="notif-title">Jawab Recovery</div>
+493:                                 <div class="notif-desc">Automated outreach deployed to missed caller.</div>
+494:                             </div>
+495:                         </div>
+496:                     </div>
+497:                 </div>
+498: 
+499:                 <!-- UI: WHATSAPP CHAT -->
+500:                 <div class="ui-layer wa-screen" id="ui-chat">
+501:                     <div class="wa-bg"></div>
+502:                     <div class="wa-header">
+503:                         <div class="wah-left">
+504:                             <div class="wa-back">‹</div>
+505:                             <div class="wa-avatar">
+506:                                 <!-- Generic premium dental clinic logo -->
+507:                                 <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=100&auto=format&fit=crop" alt="Clinic">
+508:                             </div>
+509:                             <div class="wa-title-box">
+510:                                 <div class="wa-name">Smile Dental Clinic</div>
+511:                                 <div class="wa-status" id="wa-status">online</div>
+512:                             </div>
+513:                         </div>
+514:                         <div class="wah-right">
+515:                             <svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v-4z"/><rect x="3" y="6" width="12" height="12" rx="2"/></svg>
+516:                             <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+517:                         </div>
+518:                     </div>
+519: 
+520:                     <div class="wa-chat-area" id="chat-stream">
+521:                         <div class="wa-date">TODAY</div>
+522:                         
+523:                         <!-- Typers -->
+524:                         <div class="typing-indicator" id="typing">
+525:                             <div class="dot" style="animation: bounce 1.4s infinite ease-in-out both;"></div>
+526:                             <div class="dot" style="animation: bounce 1.4s infinite ease-in-out both; animation-delay: 0.2s;"></div>
+527:                             <div class="dot" style="animation: bounce 1.4s infinite ease-in-out both; animation-delay: 0.4s;"></div>
+528:                         </div>
+529: 
+530:                         <!-- M1 -->
+531:                         <div class="bubble bubble-out" id="m1">
+532:                             <div class="b-text-ar">مرحباً! لاحظنا اتصالك بعيادتنا والخطوط كانت مشغولة. كيف نقدر نساعدك؟</div>
+533:                             <div class="b-text-en">Hi! We noticed you called but our lines were busy. How can we help you?</div>
+534:                             <div class="b-meta">21:01 <svg class="tick"><path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l1.32 1.267c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/><path d="M9.796 3.316l-.478-.372a.365.365 0 0 0-.51.063L3.45 9.879a.32.32 0 0 1-.484.033L1.35 8.356a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l2.235 2.146c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/></svg></div>
+535:                         </div>
+536: 
+537:                         <!-- M2 -->
+538:                         <div class="bubble bubble-in" id="m2">
+539:                             <div class="b-text-ar">كنت استفسر عن مواعيد تقويم الاطفال</div>
+540:                             <div class="b-meta">21:02</div>
+541:                         </div>
+542: 
+543:                         <!-- M3 -->
+544:                         <div class="bubble bubble-out" id="m3" style="border-top-right-radius: 4px;">
+545:                             <div class="b-text-ar">د. سارة متوفرة غداً للاستشارة. هل يناسبك الساعة 4 عصراً؟</div>
+546:                             <div class="b-text-en">Dr. Sara is available tomorrow for a consult. Does 4:00 PM work?</div>
+547:                             <div class="b-meta">21:02 <svg class="tick"><path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l1.32 1.267c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/><path d="M9.796 3.316l-.478-.372a.365.365 0 0 0-.51.063L3.45 9.879a.32.32 0 0 1-.484.033L1.35 8.356a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l2.235 2.146c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/></svg></div>
+548:                         </div>
+549: 
+550:                         <!-- M4 -->
+551:                         <div class="bubble bubble-in" id="m4">
+552:                             <div class="b-text-ar">اي ممتاز، تم</div>
+553:                             <div class="b-meta">21:02</div>
+554:                         </div>
+555: 
+556:                         <!-- M5 (Booking) -->
+557:                         <div class="bubble bubble-out" id="m5" style="border-top-right-radius: 4px;">
+558:                             <div class="b-text-ar">تم تأكيد الموعد. نراك غداً!</div>
+559:                             <div class="wa-card">
+560:                                 <div class="wac-title">موعد مؤكد (Confirmed)</div>
+561:                                 <div class="wac-desc">استشارة تقويم أطفال<br>الثلاثاء — 4:00 PM</div>
+562:                             </div>
+563:                             <div class="b-meta">21:03 <svg class="tick"><path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l1.32 1.267c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/><path d="M9.796 3.316l-.478-.372a.365.365 0 0 0-.51.063L3.45 9.879a.32.32 0 0 1-.484.033L1.35 8.356a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l2.235 2.146c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/></svg></div>
+564:                         </div>
+565:                     </div>
+566: 
+567:                     <div class="wa-footer">
+568:                         <div class="wa-plus">+</div>
+569:                         <div class="wa-input-box">
+570:                             <span>Message</span>
+571:                             <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+572:                         </div>
+573:                         <div class="wa-mic"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg></div>
+574:                     </div>
+575:                 </div>
+576: 
+577:             </div>
+578:         </div>
+579:     </div>
+580: 
+581:     <style>
+582:         @keyframes bounce {
+583:             0%, 80%, 100% { transform: scale(0); }
+584:             40% { transform: scale(1); }
+585:         }
+586:     </style>
+587: 
+588:     <script>
+589:         const sleep = ms => new Promise(r => setTimeout(r, ms));
+590:         const tl = gsap.timeline();
+591: 
+592:         // Audio (synthesized for browser compatibility without files)
+593:         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+594:         function playThud() {
+595:             const o = audioCtx.createOscillator();
+596:             const g = audioCtx.createGain();
+597:             o.type = 'sine';
+598:             o.frequency.setValueAtTime(100, audioCtx.currentTime);
+599:             o.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.1);
+600:             g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+601:             g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+602:             o.connect(g); g.connect(audioCtx.destination);
+603:             o.start(); o.stop(audioCtx.currentTime + 0.1);
+604:         }
+605:         function playPop() {
+606:             const o = audioCtx.createOscillator();
+607:             const g = audioCtx.createGain();
+608:             o.type = 'sine';
+609:             o.frequency.setValueAtTime(600, audioCtx.currentTime);
+610:             o.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.05);
+611:             g.gain.setValueAtTime(0.05, audioCtx.currentTime);
+612:             g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+613:             o.connect(g); g.connect(audioCtx.destination);
+614:             o.start(); o.stop(audioCtx.currentTime + 0.05);
+615:         }
+616: 
+617:         async function startExperience() {
+618:             // Init audio context on user gesture
+619:             audioCtx.resume();
+620:             
+621:             // Remove overlay
+622:             gsap.to("#play-overlay", { opacity: 0, duration: 0.5, onComplete: () => document.getElementById('play-overlay').style.display = 'none' });
+623: 
+624:             // Callout: THE LEAK
+625:             gsap.to("#co-missed", { opacity: 1, scale: 1.1, duration: 2, ease: "power2.out" });
+626: 
+627:             // 1. MISSED CALL NOTIF
+628:             await sleep(1000);
+629:             gsap.to("#notif-1", { opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.5)" });
+630:             playThud();
+631:             
+632:             // 2. WHATSAPP RECOVERY TRIGGERED
+633:             await sleep(2000);
+634:             gsap.to("#notif-2", { opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.5)" });
+635:             playThud();
+636: 
+637:             // 3. ENTER APP (Simulate tap)
+638:             await sleep(1500);
+639:             gsap.to("#notif-2", { scale: 0.95, duration: 0.1, yoyo: true, repeat: 1 });
+640:             playPop();
+641:             await sleep(200);
+642:             
+643:             // Transition to WhatsApp UI
+644:             document.getElementById('ui-chat').classList.add('active');
+645:             gsap.fromTo("#ui-chat", 
+646:                 { opacity: 0, scale: 1.1 }, 
+647:                 { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }
+648:             );
+649:             gsap.to("#co-missed", { opacity: 0, duration: 1 });
+650: 
+651:             // 4. CHAT SEQUENCE
+652:             const stream = document.getElementById('chat-stream');
+653:             const typing = document.getElementById('typing');
+654:             const status = document.getElementById('wa-status');
+655: 
+656:             async function showMsg(id) {
+657:                 const msg = document.getElementById(id);
+658:                 gsap.to(msg, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(1.2)" });
+659:                 playPop();
+660:                 stream.scrollTo({ top: stream.scrollHeight, behavior: 'smooth' });
+661:             }
+662: 
+663:             async function simulateTyping(duration, isJawab = true) {
+664:                 status.innerText = isJawab ? 'typing...' : 'online';
+665:                 if(isJawab) {
+666:                     typing.style.display = 'flex';
+667:                     stream.appendChild(typing); // Move to bottom
+668:                     stream.scrollTo({ top: stream.scrollHeight, behavior: 'smooth' });
+669:                 }
+670:                 await sleep(duration);
+671:                 typing.style.display = 'none';
+672:                 status.innerText = 'online';
+673:             }
+674: 
+675:             await sleep(1000);
+676:             
+677:             // Jawab typing M1
+678:             await simulateTyping(1500, true);
+679:             await showMsg('m1');
+680:             
+681:             // Patient thinking...
+682:             await sleep(2500);
+683:             status.innerText = 'typing...'; // Patient typing (no dots shown on our side)
+684:             await sleep(2000);
+685:             status.innerText = 'online';
+686:             await showMsg('m2');
+687: 
+688:             // Jawab M3
+689:             await sleep(800);
+690:             await simulateTyping(2000, true);
+691:             await showMsg('m3');
+692: 
+693:             // Patient M4
+694:             await sleep(2000);
+695:             await showMsg('m4');
+696: 
+697:             // Jawab M5 Booking
+698:             await sleep(1000);
+699:             await simulateTyping(1800, true);
+700:             await showMsg('m5');
+701:             
+702:             // 5. THE PULL BACK (REVEAL DASHBOARD)
+703:             await sleep(2500);
+704:             
+705:             // Callout: RECOVERED
+706:             gsap.to("#co-recovered", { opacity: 1, scale: 1.1, duration: 2, ease: "power2.out" });
+707:             
+708:             // Shrink and move phone left
+709:             gsap.to("#iphone", {
+710:                 x: "-300px",
+711:                 scale: 0.75,
+712:                 rotateY: 15,
+713:                 rotateX: 5,
+714:                 duration: 2.5,
+715:                 ease: "power3.inOut"
+716:             });
+717: 
+718:             // Fade in dashboard right
+719:             gsap.to("#dashboard", {
+720:                 opacity: 1,
+721:                 z: 0, // TranslateZ from -500 to 0
+722:                 duration: 2.5,
+723:                 ease: "power3.out",
+724:                 delay: 0.5
+725:             });
+726:             playThud();
+727:         }
+728:     </script>
+729: </body>
+730: </html>

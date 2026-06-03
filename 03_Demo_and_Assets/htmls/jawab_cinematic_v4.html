@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jawab | The Recovery Sequence V4</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600;800&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. FOUNDATION & RESET
+           ========================================================================== */
+        :root {
+            --bg-deep: #030305;
+            --gold: #D4AF37;
+            --gold-bright: #FADB5F;
+            --text-main: #FFFFFF;
+            --text-dim: #86868B;
+            --glass-bg: rgba(20, 20, 22, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --wa-bg: #0b141a;
+            --wa-out: #005c4b;
+            --wa-in: #202c33;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            width: 100vw; height: 100vh;
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            perspective: 2000px;
+        }
+
+        /* --- PRELOADER --- */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .preloader-logo { width: 180px; filter: drop-shadow(0 0 20px rgba(212,175,55,0.3)); opacity: 0; }
+        .preloader-pulse {
+            width: 50px; height: 2px; background: var(--gold); margin-top: 30px;
+            transform-origin: left; transform: scaleX(0);
+        }
+
+        /* --- ENVIRONMENT --- */
+        .environment {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(circle at 50% 40%, rgba(212, 175, 55, 0.08) 0%, transparent 60%),
+                url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop'); 
+            background-size: cover; background-position: center;
+            opacity: 0.8; z-index: 0;
+        }
+        .vignette {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, transparent 30%, #000000 100%);
+            z-index: 1; pointer-events: none;
+        }
+
+        /* --- SVG CONNECTIONS --- */
+        .svg-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 5; pointer-events: none;
+        }
+        .conn-line {
+            fill: none; stroke: url(#gold-grad); stroke-width: 1.5; stroke-linecap: round; opacity: 0.5;
+            stroke-dasharray: 1000; stroke-dashoffset: 0; 
+        }
+
+        /* --- FLOATING PANELS --- */
+        .panel-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+        .glass-panel {
+            position: absolute; background: var(--glass-bg);
+            backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15);
+            border-radius: 20px; padding: 24px; min-width: 260px;
+        }
+        .p-title { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 4px; }
+        .p-ar { font-family: 'Tajawal'; font-size: 14px; color: var(--text-dim); margin-bottom: 12px; }
+        .p-val { font-family: 'Outfit'; font-size: 32px; font-weight: 600; color: #fff; }
+        .p-val.gold { color: var(--gold); }
+
+        /* Panel Placements */
+        #panel-routing { top: 15%; right: 10%; }
+        #panel-revenue { top: 40%; right: 5%; }
+        #panel-lifecycle { top: 70%; right: 15%; }
+
+        /* Left Side Text */
+        .hero-text { position: absolute; left: 8%; top: 45%; transform: translateY(-50%); z-index: 10; }
+        .ht-title { font-family: 'Outfit'; font-size: 6rem; font-weight: 300; letter-spacing: 2px; color: var(--gold); line-height: 1; }
+        .ht-ar { font-family: 'Tajawal'; font-size: 4rem; color: var(--text-dim); margin-top: -10px; margin-bottom: 20px; }
+        .ht-sub { font-size: 1.5rem; color: #fff; font-weight: 400; margin-bottom: 10px; }
+        .ht-desc { font-size: 1.1rem; color: var(--text-dim); line-height: 1.6; max-width: 350px; }
+
+        /* ==========================================================================
+           4. ZOOMED-OUT IPHONE HARDWARE
+           ========================================================================== */
+        .iphone-wrapper {
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            z-index: 20; width: 270px; height: 575px; /* Zoomed out (Smaller) */
+            background: #000; border-radius: 45px;
+            box-shadow: 
+                inset 0 0 0 2px #444, inset 0 0 0 6px #000,
+                inset 0 0 0 7px rgba(255,255,255,0.2), inset 0 0 0 10px #111,
+                0 40px 80px rgba(0,0,0,0.8), 0 0 60px rgba(212,175,55,0.1);
+            padding: 10px; transform-style: preserve-3d;
+        }
+        .dynamic-island {
+            position: absolute; top: 18px; left: 50%; transform: translateX(-50%);
+            width: 90px; height: 26px; background: #000; border-radius: 20px; z-index: 100;
+        }
+        .screen {
+            width: 100%; height: 100%; background: #050505;
+            border-radius: 35px; position: relative; overflow: hidden;
+        }
+
+        /* Screen Layers */
+        .screen-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; opacity: 0; pointer-events: none;
+        }
+        .screen-layer.active { opacity: 1; pointer-events: auto; }
+
+        /* -- LAYER 1: DASHBOARD -- */
+        #ui-dash { background: #0a0a0c; padding: 50px 16px 20px; }
+        .dash-h1 { font-family: 'Outfit'; font-size: 20px; color: var(--gold); }
+        .dash-p { font-family: 'Tajawal'; font-size: 14px; color: var(--text-dim); margin-bottom: 24px; }
+        .dash-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+        .dc-title { font-size: 11px; color: var(--text-dim); }
+        .dc-val { font-family: 'Outfit'; font-size: 24px; color: #fff; margin-top: 4px; }
+        
+        /* -- LAYER 2: WHATSAPP (COMPLEX SCENARIO) -- */
+        #ui-wa { background: var(--wa-bg); }
+        /* WA Doodle Background */
+        .wa-doodle { position:absolute; top:0;left:0;width:100%;height:100%; opacity:0.03; z-index:0; pointer-events:none; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><g fill="%23ffffff"><path d="M10 10h10v10H10zM30 30h10v10H30zM50 50h10v10H50zM70 70h10v10H70z"/></g></svg>'); }
+        
+        .wa-head { position:relative; z-index:10; background: #202c33; padding: 45px 12px 10px; display: flex; align-items: center; gap: 10px; }
+        .wa-av { width: 32px; height: 32px; background: #444; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size:12px; color:#fff; }
+        .wa-name { font-size: 14px; color: #fff; font-weight: 500; }
+        
+        .wa-body { position:relative; z-index:5; flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+        .msg { max-width: 88%; padding: 8px 10px; border-radius: 10px; font-size: 12px; opacity: 0; transform: translateY(10px); }
+        .msg-in { background: var(--wa-in); color: #e9edef; align-self: flex-start; border-top-left-radius: 4px; }
+        .msg-out { background: var(--wa-out); color: #e9edef; align-self: flex-end; border-top-right-radius: 4px; }
+        
+        .typing { display: none; align-self: flex-end; background: var(--wa-out); padding: 8px 12px; border-radius: 12px; border-top-right-radius: 4px; gap: 3px; align-items: center; }
+        .typing .dot { width: 4px; height: 4px; background: rgba(255,255,255,0.6); border-radius: 50%; animation: bounce 1s infinite; }
+        .typing .dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+        /* -- LAYER 3: VOICE AGENT -- */
+        #ui-voice { background: radial-gradient(circle at center, #1a1a24 0%, #050505 100%); align-items: center; justify-content: center; padding: 15px;}
+        .v-ring { width: 120px; height: 120px; border-radius: 50%; border: 2px solid rgba(212,175,55,0.2); display: flex; align-items: center; justify-content: center; position: relative; }
+        .v-ring::after { content: ''; position: absolute; width: 100%; height: 100%; border-radius: 50%; background: var(--gold-glow); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.4); opacity: 0; } }
+        .v-transcript { margin-top: 30px; width: 100%; text-align: center; display:flex; flex-direction:column; gap:8px;}
+        .v-line { font-size: 13px; opacity: 0; transform: translateY(10px); }
+        .v-patient { color: #fff; }
+        .v-ai { color: var(--gold); }
+
+        /* ==========================================================================
+           5. NOTIFICATIONS & CONTROLS
+           ========================================================================== */
+        .notification {
+            position: absolute; top: 50px; left: 12px; right: 12px;
+            background: rgba(30,30,30,0.85); backdrop-filter: blur(20px);
+            border-radius: 16px; padding: 12px; display: flex; gap: 10px;
+            opacity: 0; transform: translateY(-20px); z-index: 200; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .n-icon { width: 32px; height: 32px; border-radius: 8px; background: #FF453A; display:flex; align-items:center; justify-content:center; }
+        .n-text h4 { font-size: 13px; color: #fff; margin-bottom: 2px;}
+        .n-text p { font-size: 12px; color: rgba(255,255,255,0.7); }
+
+        .play-btn {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            background: rgba(20,20,22,0.8); backdrop-filter: blur(10px);
+            border: 1px solid var(--gold); color: var(--gold);
+            padding: 16px 40px; border-radius: 40px;
+            font-family: 'Outfit'; font-size: 16px; font-weight: 600; letter-spacing: 2px;
+            cursor: pointer; z-index: 1000; transition: all 0.3s;
+        }
+        .play-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 30px var(--gold-glow); }
+
+    </style>
+</head>
+<body>
+
+    <!-- 0. PRELOADER -->
+    <div id="preloader">
+        <img src="../logo 2.png" alt="Jawab Logo" class="preloader-logo" onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='block';">
+        <div id="fallback-logo" style="display:none; font-family:'Outfit'; font-size:40px; color:var(--gold);">JAWAB</div>
+        <div class="preloader-pulse" id="p-bar"></div>
+    </div>
+
+    <!-- 1. ENVIRONMENT -->
+    <div class="environment"></div>
+    <div class="vignette"></div>
+
+    <!-- 2. SVG CONNECTIONS -->
+    <svg class="svg-canvas">
+        <defs>
+            <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.8" />
+                <stop offset="100%" stop-color="#D4AF37" stop-opacity="0" />
+            </linearGradient>
+        </defs>
+        <path class="conn-line" d="M 50% 50% C 70% 50%, 70% 20%, 90% 20%" id="path-routing" />
+        <path class="conn-line" d="M 50% 50% C 70% 50%, 75% 45%, 95% 45%" id="path-revenue" />
+        <path class="conn-line" d="M 50% 50% C 65% 50%, 65% 75%, 85% 75%" id="path-lifecycle" />
+    </svg>
+
+    <!-- 3. HERO TEXT -->
+    <div class="hero-text">
+        <div class="ht-title">Jawab</div>
+        <div class="ht-ar">جــــواب</div>
+        <div class="ht-sub">AI Clinic Intelligence</div>
+        <div class="ht-desc">Never miss a patient.<br>Recover more. Effortlessly.</div>
+    </div>
+
+    <!-- 4. FLOATING PANELS -->
+    <div class="panel-container">
+        <div class="glass-panel floating" id="panel-routing">
+            <div class="p-title">Intelligent Routing</div>
+            <div class="p-ar">توجيه ذكي</div>
+            <div class="p-val" style="font-size:20px;">Active <span style="color:#30D158;">●</span></div>
+        </div>
+        
+        <div class="glass-panel floating" id="panel-revenue">
+            <div class="p-title">Recovered Revenue</div>
+            <div class="p-ar">الإيرادات المستردة</div>
+            <div class="p-val gold" id="rev-counter">AED 126,800</div>
+        </div>
+
+        <div class="glass-panel floating" id="panel-lifecycle">
+            <div class="p-title">Patient Lifecycle</div>
+            <div class="p-ar">دورة المريض</div>
+            <div class="p-val">62% Return</div>
+        </div>
+    </div>
+
+    <!-- 5. CENTRAL IPHONE -->
+    <div class="iphone-wrapper floating-alt" id="main-phone">
+        <div class="dynamic-island"></div>
+        <div class="screen">
+            
+            <!-- LAYER 1: DASHBOARD -->
+            <div class="screen-layer active" id="ui-dash">
+                <div class="dash-h1">Jawab</div>
+                <div class="dash-p">جــــواب</div>
+                <div class="dash-card">
+                    <div class="dc-title">Live Conversations</div>
+                    <div class="dc-val">24</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dc-title">Appointment Recovery</div>
+                    <div class="dc-val">78%</div>
+                </div>
+            </div>
+
+            <!-- LAYER 2: WHATSAPP COMPLEX -->
+            <div class="screen-layer" id="ui-wa">
+                <div class="wa-doodle"></div>
+                <div class="wa-head">
+                    <div class="wa-av">M</div>
+                    <div class="wa-name">Mohammed Al Otaibi</div>
+                </div>
+                <div class="wa-body" id="chat-stream">
+                    <!-- Msg 1: AI Outbound -->
+                    <div class="msg msg-out" id="wm1">
+                        Hi Mohammed! We saw we missed your call. How can we help you today?
+                    </div>
+                    <!-- Msg 2: Patient Inbound -->
+                    <div class="msg msg-in" id="wm2">
+                        I need a veneers consultation. Do you have anything today?
+                    </div>
+                    <!-- Msg 3: AI Complex Handling -->
+                    <div class="msg msg-out" id="wm3">
+                        Dr. Michael is fully booked today, but I have a priority slot tomorrow at 10:00 AM or 4:00 PM. Would either work?
+                    </div>
+                    <!-- Msg 4: Patient Inbound -->
+                    <div class="msg msg-in" id="wm4">
+                        10 AM works for me.
+                    </div>
+                    <!-- Msg 5: AI Confirmation -->
+                    <div class="msg msg-out" id="wm5" style="border: 1px solid var(--gold); background: rgba(212,175,55,0.15);">
+                        <div style="color:var(--gold); font-weight:bold; margin-bottom:4px;">⚡ Auto-Booked</div>
+                        Perfect! Your consultation is confirmed for tomorrow at 10:00 AM.
+                    </div>
+                    
+                    <div class="typing" id="w-typing">
+                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LAYER 3: VOICE AGENT COMPLEX -->
+            <div class="screen-layer" id="ui-voice">
+                <div style="color:var(--gold); font-family:'Outfit'; font-size:16px; margin-bottom:30px;">Voice Intelligence</div>
+                <div class="v-ring">
+                    <svg style="width:24px; fill:var(--gold);" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                </div>
+                <div class="v-transcript" id="voice-stream">
+                    <div class="v-line v-patient" id="vt1">"I'm calling to ask about the price for dental implants?"</div>
+                    <div class="v-line v-ai" id="vt2">"Our Swiss implants start at AED 4,500. We offer a free 3D scan on your first visit. Should I book that?"</div>
+                    <div class="v-line v-patient" id="vt3">"Yes, please book it."</div>
+                </div>
+            </div>
+
+            <!-- NOTIFICATION -->
+            <div class="notification" id="notif">
+                <div class="n-icon">
+                    <svg style="width:16px; fill:#fff;" viewBox="0 0 24 24"><path d="M16.7 14.8l-2.4-1.2c-.3-.2-.7-.1-1 .2l-1.3 1.8c-2.4-1.2-4.4-3.2-5.6-5.6l1.8-1.3c.3-.2.4-.6.2-1L7.2 5.3c-.2-.4-.6-.5-1-.3L3.8 6.5C3.3 6.8 3 7.3 3 7.8c0 7.8 6.4 14.2 14.2 14.2.6 0 1.1-.3 1.3-.8l1.5-2.4c.1-.4 0-.8-.3-1z"/></svg>
+                </div>
+                <div class="n-text">
+                    <h4>Missed Call</h4>
+                    <p>Mohammed Al Otaibi</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <button class="play-btn" id="start-btn" style="display:none;" onclick="runSequence()">START RECOVERY SEQUENCE</button>
+
+    <script>
+        // --- 0. PRELOADER ANIMATION ---
+        window.onload = () => {
+            const tlPre = gsap.timeline();
+            tlPre.to(".preloader-logo", { opacity: 1, duration: 1, ease: "power2.out" })
+                 .to("#p-bar", { scaleX: 1, duration: 1.5, ease: "power3.inOut" })
+                 .to("#preloader", { opacity: 0, duration: 0.8, ease: "power2.inOut", onComplete: () => {
+                     document.getElementById('preloader').style.display = 'none';
+                     document.getElementById('start-btn').style.display = 'block';
+                 }});
+        };
+
+        // --- 1. CONTINUOUS PHYSICS ---
+        gsap.utils.toArray('.floating').forEach((el, i) => {
+            gsap.to(el, { y: "-=15", x: "+=5", duration: 3 + i, repeat: -1, yoyo: true, ease: "sine.inOut" });
+        });
+        gsap.to('.floating-alt', { y: "+=10", duration: 4, repeat: -1, yoyo: true, ease: "sine.inOut" });
+
+        // --- 2. CINEMATIC TIMELINE V4 (With Phone Flying) ---
+        function runSequence() {
+            document.getElementById('start-btn').style.display = 'none';
+            const tl = gsap.timeline();
+
+            // ACT 1: The Dramatic Missed Call
+            tl.to("#notif", { opacity: 1, y: 0, duration: 0.6, ease: "back.out" })
+              // Phone tilts dramatically to show importance
+              .to("#main-phone", { rotateY: -15, rotateX: 5, scale: 1.05, duration: 1, ease: "power3.out" }, "-=0.4")
+              .to("#panel-routing", { borderColor: "var(--gold)", boxShadow: "0 0 40px var(--gold-glow)", duration: 0.3, yoyo: true, repeat: 3 }, "+=0.5");
+
+            // ACT 2: Complex WhatsApp Recovery
+            tl.to("#notif", { opacity: 0, y: -20, duration: 0.4 }, "+=0.5")
+              // Phone flies to left to make room for reading, straightens out
+              .to("#main-phone", { x: "-20%", rotateY: 0, rotateX: 0, duration: 1, ease: "power3.inOut" }, "-=0.4")
+              .to("#ui-dash", { opacity: 0, duration: 0.4 }, "-=0.5")
+              .to("#ui-wa", { opacity: 1, duration: 0.4 }, "-=0.2");
+            
+            // Helper for chat scroll
+            const stream = document.getElementById('chat-stream');
+            function scrollChat() { stream.scrollTop = stream.scrollHeight; }
+
+            // Message Flow
+            tl.to("#w-typing", { display: "flex", duration: 0.1 })
+              .to("#w-typing", { display: "none", duration: 0.1 }, "+=1")
+              .to("#wm1", { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", onStart: scrollChat })
+              
+              .to("#wm2", { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", onStart: scrollChat }, "+=1")
+              
+              .to("#w-typing", { display: "flex", duration: 0.1 })
+              .to("#w-typing", { display: "none", duration: 0.1 }, "+=1.5")
+              .to("#wm3", { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", onStart: scrollChat })
+              
+              .to("#wm4", { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", onStart: scrollChat }, "+=1.5")
+              
+              .to("#w-typing", { display: "flex", duration: 0.1 })
+              .to("#w-typing", { display: "none", duration: 0.1 }, "+=1")
+              .to("#wm5", { opacity: 1, y: 0, duration: 0.5, ease: "back.out", onStart: scrollChat });
+
+            // ACT 3: Complex Voice Recovery
+            // Phone flies slightly right
+            tl.to("#main-phone", { x: "10%", rotateY: 10, duration: 1.2, ease: "power3.inOut" }, "+=2")
+              .to("#ui-wa", { opacity: 0, duration: 0.4 }, "-=1")
+              .to("#ui-voice", { opacity: 1, duration: 0.4 }, "-=0.6");
+            
+            tl.to("#vt1", { opacity: 1, y: 0, duration: 0.4 }, "+=0.5")
+              .to("#vt2", { opacity: 1, y: 0, duration: 0.4 }, "+=1.5")
+              .to("#vt3", { opacity: 1, y: 0, duration: 0.4 }, "+=1.5");
+
+            // ACT 4: The Impact
+            // Phone returns to dead center
+            tl.to("#main-phone", { x: "0%", rotateY: 0, scale: 1, duration: 1.5, ease: "power3.inOut" }, "+=2")
+              .to("#ui-voice", { opacity: 0, duration: 0.4 }, "-=1")
+              .to("#ui-dash", { opacity: 1, duration: 0.4 }, "-=0.6");
+
+            // The Grand Reveal on the Floating Panel
+            tl.to("#panel-revenue", { 
+                scale: 1.15, 
+                borderColor: "var(--gold)", 
+                boxShadow: "0 0 80px var(--gold-glow)", 
+                duration: 0.6 
+            }, "+=0.5");
+
+            // Huge Number Roll (+15,000 for implants)
+            let rev = { val: 126800 };
+            tl.to(rev, {
+                val: 141800,
+                duration: 2.5,
+                ease: "power3.out",
+                onUpdate: () => {
+                    document.getElementById('rev-counter').innerHTML = "AED " + Math.floor(rev.val).toLocaleString();
+                }
+            });
+
+            // Final settle
+            tl.to("#panel-revenue", { 
+                scale: 1, 
+                borderColor: "var(--glass-border)", 
+                boxShadow: "0 30px 60px rgba(0,0,0,0.6)", 
+                duration: 0.8 
+            }, "+=1");
+        }
+    </script>
+
+</body>
+</html>

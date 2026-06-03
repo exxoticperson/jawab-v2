@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jawab | Cinematic Experience V5 (The Final Cut)</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@200;300;400;600;800&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. CORE VARIABLES & RESET
+           ========================================================================== */
+        :root {
+            --bg-deep: #020202; --gold: #D4AF37; --gold-light: #FCE68D;
+            --text-main: #FFFFFF; --text-dim: #86868B;
+            --glass-bg: rgba(15, 15, 18, 0.4); --glass-border: rgba(255, 255, 255, 0.08);
+            --wa-bg: #0b141a; --wa-out: #005c4b; --wa-in: #202c33;
+            --ig-bg: #000000; --ig-out: #3797F0; --ig-in: #262626;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+        body {
+            background-color: var(--bg-deep); color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            width: 100vw; height: 100vh; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            perspective: 2500px;
+        }
+
+        /* Ambient Cinematic Dust */
+        .ambient-dust { position: absolute; width: 3px; height: 3px; background: rgba(212,175,55,0.3); border-radius: 50%; box-shadow: 0 0 10px rgba(212,175,55,0.8); pointer-events: none; z-index: 2; }
+
+        /* ==========================================================================
+           2. PRELOADER
+           ========================================================================== */
+        #preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+        .jawab-vector { width: 220px; height: 80px; opacity: 0; position: relative; }
+        .jv-ring1 { fill: none; stroke: var(--gold); stroke-width: 2.5; stroke-dasharray: 100; stroke-dashoffset: 100; }
+        .jv-ring2 { fill: none; stroke: var(--gold); stroke-width: 2.5; stroke-dasharray: 100; stroke-dashoffset: 100; opacity: 0.5; }
+        .jv-text-en { font-family: 'Outfit'; font-size: 42px; font-weight: 300; fill: var(--gold); letter-spacing: 2px; opacity: 0; }
+        .jv-text-ar { font-family: 'Tajawal'; font-size: 22px; fill: var(--text-dim); opacity: 0; }
+
+        /* ==========================================================================
+           3. ENVIRONMENT
+           ========================================================================== */
+        #scene-container { position: absolute; width: 100%; height: 100%; transform-style: preserve-3d; opacity: 0; }
+        .environment { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.08) 0%, transparent 80%); background-color: var(--bg-deep); z-index: 0; }
+        .grid-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 60px 60px; z-index: 1; pointer-events: none; transform: perspective(600px) rotateX(60deg) translateY(-100px) translateZ(-250px); opacity: 0.4; }
+
+        /* ==========================================================================
+           4. FLOATING PANELS
+           ========================================================================== */
+        .svg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
+        .conn-line { fill: none; stroke: var(--gold); stroke-width: 1.5; opacity: 0.3; }
+        .panel-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; transform: translateZ(0px); }
+        .glass-panel { position: absolute; background: var(--glass-bg); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); border: 1px solid var(--glass-border); box-shadow: 0 40px 100px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1); border-radius: 24px; padding: 20px 24px; min-width: 240px; }
+        .p-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .p-title-box { display: flex; flex-direction: column; }
+        .p-title { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; font-weight: 600; }
+        .p-ar { font-family: 'Tajawal'; font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+        .p-icon { width: 24px; height: 24px; border-radius: 6px; background: rgba(212,175,55,0.15); display:flex; align-items:center; justify-content:center; color: var(--gold); font-size: 12px; }
+        .p-val { font-family: 'Outfit'; font-size: 32px; font-weight: 300; color: #fff; letter-spacing: -1px; }
+        .p-val.gold { color: var(--gold); font-weight: 400; text-shadow: 0 0 30px rgba(212,175,55,0.4); }
+
+        #panel-routing { top: 12%; right: 4%; }
+        #panel-revenue { top: 38%; right: 3%; }
+        #panel-lifecycle { top: 68%; right: 6%; }
+        #panel-insight { top: 35%; left: 4%; opacity: 0; transform: translateX(-30px); border-color: rgba(212,175,55,0.4); box-shadow: 0 0 40px rgba(212,175,55,0.1); }
+        .triage-label { font-size: 9px; color: var(--text-dim); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;}
+        .triage-data { font-size: 16px; color: #fff; font-weight: 500; margin-bottom: 12px; }
+        .triage-data.green { color: #30D158; font-family: 'Outfit'; font-size: 22px; }
+
+        /* ==========================================================================
+           5. INITIALIZE TRIGGER
+           ========================================================================== */
+        .start-trigger { position: absolute; bottom: 6%; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 15px; cursor: pointer; z-index: 1000; opacity: 0; pointer-events: none; }
+        .st-ring { width: 60px; height: 60px; border-radius: 50%; border: 1px solid rgba(212,175,55,0.5); display: flex; align-items: center; justify-content: center; position: relative; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .st-ring::after { content: ''; position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 1px solid var(--gold); animation: pulseOut 2s infinite; }
+        @keyframes pulseOut { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
+        .st-ring svg { width: 16px; fill: var(--gold); margin-left: 3px; transition: all 0.3s; }
+        .start-trigger:hover .st-ring { background: rgba(212,175,55,0.1); transform: scale(1.1); box-shadow: 0 0 40px rgba(212,175,55,0.3); }
+        .st-text { font-family: 'Outfit'; font-size: 12px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; }
+
+        /* ==========================================================================
+           6. THE IPHONE & UI LAYERS
+           ========================================================================== */
+        .iphone-wrapper {
+            position: absolute; left: 50%; top: 50%;
+            margin-left: -140px; margin-top: -300px;
+            z-index: 5000 !important; transform-style: preserve-3d; transform: translateZ(100px);
+            width: 280px; height: 600px; background: #000; border-radius: 45px;
+            box-shadow: inset 0 0 0 2px #444, inset 0 0 0 6px #000, inset 0 0 0 8px rgba(255,255,255,0.2), inset 0 0 0 12px #111, 0 60px 120px rgba(0,0,0,0.9), 0 0 100px rgba(212,175,55,0.1);
+            padding: 11px;
+        }
+        .dynamic-island { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 90px; height: 26px; background: #000; border-radius: 20px; z-index: 100; }
+        .screen { width: 100%; height: 100%; background: #050505; border-radius: 34px; position: relative; overflow: hidden; }
+        .screen-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; opacity: 0; pointer-events: none; }
+        .screen-layer.active { opacity: 1; pointer-events: auto; }
+
+        /* UI Overrides (WhatsApp, IG, etc kept exactly the same as they were perfect) */
+        #ui-dash { background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.2) 0%, #050505 60%); padding: 60px 14px 14px; }
+        .d-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .dh-logo { width: 90px; height: 26px; } 
+        .dh-av { width: 32px; height: 32px; border-radius: 50%; background: #111; border: 1px solid rgba(212,175,55,0.4); display:flex; align-items:center; justify-content:center;}
+        .dh-av svg { width: 14px; fill: var(--gold); }
+        .d-card { background: rgba(20, 20, 25, 0.6); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+        .dc-title { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        .dc-val { font-family: 'Outfit'; font-size: 28px; color: #fff; margin-top: 6px; font-weight: 300; }
+        
+        #ui-wa { background: var(--wa-bg); }
+        .wa-doodle { position:absolute; top:0;left:0;width:100%;height:100%; opacity:0.04; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><g fill="%23ffffff"><path d="M10 10h10v10H10zM30 30h10v10H30zM50 50h10v10H50zM70 70h10v10H70z"/></g></svg>'); }
+        .wa-head { position:relative; z-index:10; background: #202c33; padding: 45px 12px 10px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .wa-av { width: 34px; height: 34px; background: #555; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff; }
+        .wa-name-box { display: flex; flex-direction: column; }
+        .wa-name { font-size: 14px; color: #fff; font-weight: 500; }
+        .wa-status { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+        .wa-body { position:relative; z-index:5; flex: 1; padding: 12px; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; overflow: hidden; }
+        .msg { max-width: 90%; padding: 8px 10px; border-radius: 12px; position: relative; opacity: 0; display: none; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .msg-in { background: var(--wa-in); color: #e9edef; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .msg-out { background: var(--wa-out); color: #e9edef; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .m-ar { font-family: 'Tajawal'; font-size: 13px; direction: rtl; margin-bottom: 4px; line-height: 1.4; color:#fff; }
+        .m-time { font-size: 9px; color: rgba(255,255,255,0.4); float: right; margin-top: 6px; margin-left: 10px; display: flex; align-items: center; gap: 4px; }
+        .m-tick { width: 12px; height: 12px; fill: #53bdeb; }
+        .typing { display: none; align-self: flex-start; background: var(--wa-in); padding: 10px 14px; border-radius: 14px; border-bottom-left-radius: 4px; gap: 4px; align-items: center; width: fit-content; opacity: 0; }
+        .typing .dot { width: 5px; height: 5px; background: rgba(255,255,255,0.5); border-radius: 50%; animation: typeBounce 1.2s infinite; }
+        .typing .dot:nth-child(2) { animation-delay: 0.2s; } .typing .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        #ui-ig { background: var(--ig-bg); }
+        .ig-head { padding: 45px 12px 12px; display: flex; align-items: center; border-bottom: 1px solid #262626; gap: 10px;}
+        .ig-back { font-size: 20px; color: #fff; line-height: 1; }
+        .ig-av { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); padding: 2px; }
+        .ig-av div { width: 100%; height: 100%; background: #333; border-radius: 50%; border: 2px solid #000; }
+        .ig-name { flex: 1; font-size: 13px; font-weight: 600; }
+        .ig-body { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; gap: 10px; overflow: hidden; }
+        .ig-context { text-align: center; font-size: 10px; color: var(--text-dim); margin-bottom: 8px; }
+        .ig-msg { padding: 10px 12px; border-radius: 18px; font-size: 12px; opacity: 0; display: none; }
+        .ig-in { background: var(--ig-in); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .ig-out { background: var(--ig-out); align-self: flex-end; border-bottom-right-radius: 4px; }
+        .ig-typing { display: none; font-size: 11px; color: var(--text-dim); align-self: flex-start; padding-left: 10px; opacity: 0;}
+
+        #ui-voice { background: #050508; align-items: center; justify-content: space-between; padding: 60px 16px 30px;}
+        .v-header { display: flex; flex-direction: column; align-items: center; }
+        .v-title { font-family: 'Outfit'; font-size: 12px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px; }
+        .v-status { font-size: 11px; color: #30D158; }
+        .v-orb-container { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; }
+        .v-orb { width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle, rgba(212,175,55,0.4) 0%, transparent 70%); border: 1px solid rgba(212,175,55,0.3); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(212,175,55,0.1); }
+        .v-orb svg { width: 24px; fill: var(--gold); }
+        .waveform { display: flex; align-items: center; gap: 3px; height: 50px; margin-top: 20px; }
+        .bar { width: 3px; background: var(--gold); border-radius: 3px; height: 4px; transition: height 0.1s ease; }
+        .v-transcript { width: 100%; display:flex; flex-direction:column; gap:10px; margin-bottom: 10px; }
+        .v-bubble { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 14px; display: none; opacity: 0; transform: translateY(10px); }
+        .vb-patient { align-self: flex-start; border-bottom-left-radius: 4px; }
+        .vb-ai { align-self: flex-end; background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.2); border-bottom-right-radius: 4px; }
+        .vb-name { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 4px; }
+        .vb-ai .vb-name { color: var(--gold); }
+        .vb-text { font-size: 12px; color: #fff; line-height: 1.5; }
+
+        #ui-discover { background: #212121; padding: 50px 14px 20px; }
+        .ds-head { font-family: 'Inter'; font-size: 14px; font-weight: 500; color: #fff; text-align: center; padding-bottom: 12px; border-bottom: 1px solid #333; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .ds-body { display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: flex-start; }
+        .ds-row { display: flex; gap: 10px; opacity: 0; transform: translateY(10px); }
+        .ds-av-u { width: 24px; height: 24px; border-radius: 50%; background: #fff; color: #000; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; flex-shrink:0;}
+        .ds-av-gpt { width: 24px; height: 24px; border-radius: 50%; background: #10a37f; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+        .ds-av-gpt svg { width: 14px; fill: #fff; }
+        .ds-text { color: #ECECEC; font-size: 12px; line-height: 1.5; padding-top: 2px;}
+        .ds-text span { color: #fff; font-weight: 600; }
+        .ds-warning { background: rgba(255, 69, 58, 0.1); border: 1px solid #FF453A; border-radius: 12px; padding: 12px; display: flex; gap: 10px; align-items: center; opacity: 0; transform: scale(0.9); margin-top: 8px; }
+        .dw-icon { width: 20px; height: 20px; border-radius: 50%; background: #FF453A; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; flex-shrink:0; font-size: 10px; }
+        .dw-text { color: #FF453A; font-size: 11px; font-weight: 500; }
+        .dw-jawab { background: var(--gold); color: #000; padding: 10px; border-radius: 8px; text-align: center; font-family: 'Outfit'; font-weight: 600; font-size: 12px; margin-top: 8px; opacity: 0; }
+        .scanner-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--gold); box-shadow: 0 0 20px 5px var(--gold); opacity: 0; z-index: 50;}
+
+        .notification { position: absolute; top: 35px; left: 10px; right: 10px; background: rgba(20,20,22,0.9); backdrop-filter: blur(20px); border-radius: 16px; padding: 12px; display: flex; gap: 10px; align-items: center; opacity: 0; transform: translateY(-20px); z-index: 200; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .n-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #FF453A, #FF2A6D); display:flex; align-items:center; justify-content:center; }
+        .n-text { flex: 1; }
+        .n-text h4 { font-size: 12px; color: #fff; font-weight: 600; margin-bottom: 2px;}
+        .n-text p { font-size: 11px; color: rgba(255,255,255,0.6); }
+
+        #climax-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 9000; pointer-events: none; opacity: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .cx-glow { position: absolute; width: 800px; height: 800px; background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 60%); border-radius: 50%; mix-blend-mode: screen; }
+        .cx-counter-box { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; opacity: 0; transform: scale(0.8); }
+        .cx-label { color: var(--gold); font-family: 'Outfit'; font-size: 16px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 10px; }
+        .cx-number { font-family: 'Outfit'; font-size: 7rem; color: #fff; font-weight: 200; text-shadow: 0 0 50px rgba(212,175,55,0.4); line-height: 1; }
+        .cx-logo-svg { width: 250px; height: 100px; margin-top: 60px; opacity: 0; transform: translateY(20px); filter: drop-shadow(0 0 20px rgba(212,175,55,0.3));}
+        .cx-title { font-family: 'Outfit'; font-size: 3rem; color: #fff; font-weight: 800; letter-spacing: 2px; text-align: center; margin-top: 10px; opacity: 0; transform: translateY(20px);}
+
+        /* ==========================================================================
+           MOBILE OPTIMIZATION
+           ========================================================================== */
+        @media (max-width: 768px) {
+            .glass-panel, .svg-canvas { display: none !important; }
+            .iphone-wrapper {
+                transform: scale(0.95) translateZ(100px);
+                /* Center completely on mobile, ignoring GSAP parallax */
+            }
+            .cx-number { font-size: 4rem !important; }
+            .cx-title { font-size: 2rem !important; }
+            .cx-label { font-size: 12px !important; }
+            .cx-logo-svg { width: 180px !important; height: 70px !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="preloader">
+        <svg class="jawab-vector" id="pl-vector" viewBox="0 0 200 60">
+            <g transform="translate(0, 5)"><circle class="jv-ring1" cx="20" cy="25" r="15"/><circle class="jv-ring2" cx="32" cy="25" r="15"/></g>
+            <text class="jv-text-en" x="60" y="40">Jawab</text><text class="jv-text-ar" x="65" y="55">جــــواب</text>
+        </svg>
+    </div>
+
+    <div id="scene-container">
+        <div class="environment"></div>
+        <div class="grid-overlay"></div>
+        
+        <svg class="svg-canvas" id="main-svg">
+            <path class="conn-line" d="M 50% 50% C 70% 50%, 75% 12%, 92% 12%" id="path-routing" />
+            <path class="conn-line" d="M 50% 50% C 70% 50%, 75% 38%, 92% 38%" id="path-revenue" />
+            <path class="conn-line" d="M 50% 50% C 70% 50%, 75% 68%, 88% 68%" id="path-lifecycle" />
+            <path class="conn-line" d="M 50% 50% C 30% 50%, 20% 35%, 6% 35%" id="path-insight" />
+        </svg>
+
+        <div class="panel-container" id="main-panels">
+            <div class="glass-panel" id="panel-insight">
+                <div class="p-head"><div class="p-title-box"><div class="p-title" style="color:var(--gold);">Live AI Triage</div></div><div class="p-icon" style="background:transparent;">🎯</div></div>
+                <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 5px;">
+                    <div class="triage-label">PATIENT DETECTED</div><div class="triage-data" id="tr-name">Scanning...</div>
+                    <div class="triage-label" style="margin-top: 12px;">HIGH INTENT TOPIC</div><div class="triage-data" id="tr-intent">---</div>
+                    <div class="triage-label" style="margin-top: 12px;">POTENTIAL VALUE</div><div class="triage-data green" id="tr-val">---</div>
+                </div>
+            </div>
+            <div class="glass-panel floating" id="panel-routing">
+                <div class="p-head"><div class="p-title-box"><div class="p-title">AI Routing</div><div class="p-ar">توجيه ذكي</div></div><div class="p-icon">⚡</div></div>
+                <div class="p-val" style="font-size:20px;">Active <span style="color:#30D158;">●</span></div>
+            </div>
+            <div class="glass-panel floating" id="panel-revenue">
+                <div class="p-head"><div class="p-title-box"><div class="p-title">Recovered Revenue</div><div class="p-ar">الإيرادات المستردة</div></div><div class="p-icon">💰</div></div>
+                <div class="p-val gold" id="rev-counter">AED 126,800</div>
+            </div>
+            <div class="glass-panel floating" id="panel-lifecycle">
+                <div class="p-head"><div class="p-title-box"><div class="p-title">Patient Lifecycle</div><div class="p-ar">دورة المريض</div></div><div class="p-icon">↻</div></div>
+                <div class="p-val" style="font-size:24px;">62% Return</div>
+            </div>
+        </div>
+
+        <div class="iphone-wrapper floating-alt" id="main-phone">
+            <div class="dynamic-island"></div>
+            <div class="screen">
+                <div class="screen-layer active" id="ui-dash">
+                    <div class="d-head">
+                        <svg viewBox="0 0 200 60" class="dh-logo"><g transform="translate(0, 5)"><circle cx="20" cy="25" r="15" fill="none" stroke="var(--gold)" stroke-width="3"/><circle cx="32" cy="25" r="15" fill="none" stroke="var(--gold)" stroke-width="3" opacity="0.5"/></g><text x="60" y="40" font-family="'Outfit'" font-size="34" font-weight="300" fill="var(--gold)" letter-spacing="1">Jawab</text></svg>
+                        <div class="dh-av"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+                    </div>
+                    <div class="d-card"><div class="dc-title">Live Conversations</div><div class="dc-val">24 Active</div></div>
+                    <div class="d-card"><div class="dc-title">Recovery Rate</div><div class="dc-val">78%</div></div>
+                </div>
+
+                <div class="screen-layer" id="ui-wa">
+                    <div class="wa-doodle"></div>
+                    <div class="wa-head"><div class="wa-av">MA</div><div class="wa-name-box"><div class="wa-name">Mohammed Al Otaibi</div><div class="wa-status" id="wa-status">online</div></div></div>
+                    <div class="wa-body" id="chat-stream">
+                        <div class="msg msg-out" id="wm1"><div class="m-ar">مرحباً محمد! لاحظنا اتصالك. كيف نساعدك؟</div><div class="m-time">09:41 <svg class="m-tick" viewBox="0 0 16 15"><path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l1.32 1.267c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/><path d="M9.796 3.316l-.478-.372a.365.365 0 0 0-.51.063L3.45 9.879a.32.32 0 0 1-.484.033L1.35 8.356a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l2.235 2.146c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/></svg></div></div>
+                        <div class="msg msg-in" id="wm2"><div class="m-ar">احتاج موعد استشارة زراعة، هل يوجد حجز اليوم؟</div><div class="m-time">09:42</div></div>
+                        <div class="msg msg-out" id="wm3"><div class="m-ar">نحن محجوزون بالكامل اليوم، ولكن لدي موعد VIP غداً الساعة ١٠ صباحاً. هل يناسبك؟</div><div class="m-time">09:42 <svg class="m-tick" viewBox="0 0 16 15"><path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l1.32 1.267c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/><path d="M9.796 3.316l-.478-.372a.365.365 0 0 0-.51.063L3.45 9.879a.32.32 0 0 1-.484.033L1.35 8.356a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l2.235 2.146c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.51z"/></svg></div></div>
+                        <div class="msg msg-in" id="wm4"><div class="m-ar">ممتاز، احجز لي.</div><div class="m-time">09:43</div></div>
+                        <div class="msg msg-out" id="wm5" style="border: 1px solid var(--gold); background: rgba(212,175,55,0.1);"><div style="color:var(--gold); font-weight:600; font-size:10px; margin-bottom:4px; letter-spacing:1px;">✦ JAWAB SECURED</div><div class="m-ar">تم تأكيد الحجز غداً الساعة ١٠ صباحاً.</div><div class="m-time">09:43</div></div>
+                        <div class="typing" id="w-typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+                    </div>
+                </div>
+
+                <div class="screen-layer" id="ui-ig">
+                    <div class="ig-head"><div class="ig-back">‹</div><div class="ig-av"><div></div></div><div class="ig-name">Sarah_DXB</div></div>
+                    <div class="ig-body">
+                        <div class="ig-context">Replying to your Reel</div>
+                        <div class="ig-msg ig-in" id="igm1">Hi! How much for the Invisalign?</div>
+                        <div class="ig-msg ig-out" id="igm2">Hi Sarah! ✨ Our Invisalign packages start at AED 9,000. We offer a free 3D smile scan to begin. Would you like me to book a scan for you?</div>
+                        <div class="ig-msg ig-in" id="igm3">Yes please! Tomorrow afternoon?</div>
+                        <div class="ig-msg ig-out" id="igm4" style="border: 1px solid var(--gold); background: rgba(212,175,55,0.15); color:#fff;"><div style="color:var(--gold); font-weight:600; font-size:9px; margin-bottom:4px; letter-spacing:1px;">✦ JAWAB SECURED</div>Perfect! Scan confirmed for tomorrow at 4:00 PM.</div>
+                        <div class="ig-typing" id="ig-typing">Sarah_DXB is typing...</div>
+                    </div>
+                </div>
+
+                <div class="screen-layer" id="ui-voice">
+                    <div class="v-header"><div class="v-title">Jawab Voice AI</div><div class="v-status">● Live Call Processing</div></div>
+                    <div class="v-orb-container"><div class="v-orb"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg></div><div class="waveform" id="waveform"></div></div>
+                    <div class="v-transcript">
+                        <div class="v-bubble vb-patient" id="vt1"><div class="vb-name">Patient</div><div class="vb-text">"Hi, what is the price for veneers for 6 upper teeth?"</div></div>
+                        <div class="v-bubble vb-ai" id="vt2"><div class="vb-name">Jawab Agent</div><div class="vb-text">"Our E-max veneers are AED 1,500 per tooth. Should I book a free consult?"</div></div>
+                    </div>
+                </div>
+
+                <div class="screen-layer" id="ui-discover">
+                    <div class="scanner-line" id="scanner"></div>
+                    <div class="ds-head"><svg style="width:16px; fill:#fff;" viewBox="0 0 24 24"><path d="M21 15.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5c.3 0 .5.2.5.5v6c0 .3-.2.5-.5.5zm-8.5 6c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5c.3 0 .5.2.5.5v6c0 .3-.2.5-.5.5zm-9-9c1.9 0 3.5 1.6 3.5 3.5s-1.6 3.5-3.5 3.5c-.3 0-.5-.2-.5-.5v-6c0-.3.2-.5.5-.5z"/></svg><span>ChatGPT</span></div>
+                    <div class="ds-body">
+                        <div class="ds-row" id="ds1"><div class="ds-av-u">M</div><div class="ds-text">Suggest the best premium dental clinic in Dubai for implants.</div></div>
+                        <div class="ds-row" id="ds2"><div class="ds-av-gpt"><svg viewBox="0 0 24 24"><path d="M21 15.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5c.3 0 .5.2.5.5v6c0 .3-.2.5-.5.5z"/></svg></div><div class="ds-text">Based on my knowledge base, the top recommended clinics are:<br><br>1. Micris Dental<br>2. Roze BioHealth<br>3. Dr. Joy</div></div>
+                        <div class="ds-warning" id="ds-warn"><div class="dw-icon">!</div><div class="dw-text">WARNING: Your clinic was omitted from AI recommendations.</div></div>
+                        <div class="dw-jawab" id="ds-jawab">Jawab SEO Inject Initiated ⚡</div>
+                    </div>
+                </div>
+
+                <div class="notification" id="notif">
+                    <div class="n-icon"><svg style="width:14px; fill:#fff;" viewBox="0 0 24 24"><path d="M16.7 14.8l-2.4-1.2c-.3-.2-.7-.1-1 .2l-1.3 1.8c-2.4-1.2-4.4-3.2-5.6-5.6l1.8-1.3c.3-.2.4-.6.2-1L7.2 5.3c-.2-.4-.6-.5-1-.3L3.8 6.5C3.3 6.8 3 7.3 3 7.8c0 7.8 6.4 14.2 14.2 14.2.6 0 1.1-.3 1.3-.8l1.5-2.4c.1-.4 0-.8-.3-1z"/></svg></div>
+                    <div class="n-text"><h4 id="n-title">Missed Call</h4><p id="n-sub">Mohammed Al Otaibi</p></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="start-trigger" id="start-btn" onclick="runSequence()">
+        <div class="st-ring"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="st-text">INITIALIZE DEMO</div>
+    </div>
+
+    <div id="climax-screen">
+        <div class="cx-glow"></div>
+        <div class="cx-counter-box" id="cx-box">
+            <div class="cx-label">Total Recovered Revenue</div>
+            <div class="cx-number" id="cx-counter">AED 126,800</div>
+        </div>
+        <svg class="cx-logo-svg" id="cx-logo" viewBox="0 0 200 60"><g transform="translate(0, 5)"><circle cx="20" cy="25" r="15" fill="none" stroke="var(--gold)" stroke-width="2.5"/><circle cx="32" cy="25" r="15" fill="none" stroke="var(--gold)" stroke-width="2.5" opacity="0.5"/></g><text x="60" y="40" font-family="'Outfit'" font-size="42" font-weight="300" fill="var(--gold)" letter-spacing="2">Jawab</text><text x="65" y="55" font-family="'Tajawal'" font-size="18" fill="var(--text-dim)">جــــواب</text></svg>
+        <div class="cx-title" id="cx-title">THE UNMISSABLE CLINIC.</div>
+    </div>
+
+    <script>
+        // --- SOUND EFFECTS REMOVED PER REQUEST ---
+        function initAudio() {}
+        
+        const sfx = {
+            pop: () => {},
+            popIn: () => {},
+            swoosh: () => {},
+            success: () => {},
+            scan: () => {},
+            error: () => {},
+            money: () => {},
+            roll: () => {}
+        };
+
+        // Inject Ambient Particles
+        const scene = document.getElementById('scene-container');
+        for(let i=0; i<30; i++) {
+            let p = document.createElement('div');
+            p.className = 'ambient-dust'; p.style.left = Math.random() * 100 + 'vw'; p.style.top = Math.random() * 100 + 'vh'; p.style.opacity = Math.random() * 0.5;
+            scene.appendChild(p);
+            gsap.to(p, { y: "-=50", x: "+=20", duration: 5 + Math.random() * 5, repeat: -1, yoyo: true, ease: "sine.inOut" });
+        }
+
+        // --- PRELOADER ANIMATION ---
+        window.onload = () => {
+            const tlPre = gsap.timeline();
+            tlPre.to("#pl-vector", { opacity: 1, duration: 0.5 })
+                 .to(".jv-ring1", { strokeDashoffset: 0, duration: 1.5, ease: "power4.inOut" })
+                 .to(".jv-ring2", { strokeDashoffset: 0, duration: 1.5, ease: "power4.inOut" }, "-=1")
+                 .to(".jv-text-en", { opacity: 1, duration: 1, ease: "power2.out" }, "-=0.5")
+                 .to(".jv-text-ar", { opacity: 1, duration: 1 }, "-=0.8")
+                 .to("#preloader", { opacity: 0, duration: 1, delay: 0.8, onComplete: () => {
+                     document.getElementById('preloader').style.display = 'none';
+                     gsap.to("#scene-container", { opacity: 1, duration: 1.5, ease: "power2.out" });
+                     gsap.to("#start-btn", { opacity: 1, pointerEvents: "auto", duration: 1, delay: 1 });
+                 }});
+        };
+
+        gsap.utils.toArray('.floating').forEach((el, i) => { gsap.to(el, { y: "-=10", x: "+=3", duration: 3 + i*0.5, repeat: -1, yoyo: true, ease: "sine.inOut" }); });
+
+        const wf = document.getElementById('waveform'); let bars = [];
+        for(let i=0; i<16; i++) { let b = document.createElement('div'); b.className = 'bar'; wf.appendChild(b); bars.push(b); }
+        let waveInterval;
+        function startWaveform() { waveInterval = setInterval(() => { bars.forEach(b => b.style.height = (Math.floor(Math.random() * 35) + 5) + 'px'); }, 80); }
+        function stopWaveform() { clearInterval(waveInterval); bars.forEach(b => b.style.height = '4px'); }
+
+        function updateTriage(name, intent, val) {
+            document.getElementById('tr-name').innerText = name;
+            document.getElementById('tr-intent').innerText = intent;
+            document.getElementById('tr-val').innerText = val;
+        }
+
+        // --- THE MASTER TIMELINE ---
+        function runSequence() {
+            initAudio(); // Initialize audio context on first user click!
+            sfx.pop(); // Feedback
+            
+            const isMobile = window.innerWidth <= 768;
+            const shiftPhoneX = isMobile ? 0 : 80; // Phone stays centered on mobile
+            const shiftPanelX = isMobile ? 0 : 30; // Panels don't shift on mobile because they are hidden
+
+            gsap.to("#start-btn", { opacity: 0, pointerEvents: "none", duration: 0.5 });
+            const tl = gsap.timeline();
+
+            // ACT 1: MISSED CALL
+            tl.to("#scene-container", { scale: 0.95, duration: 2, ease: "power4.out" })
+              .call(sfx.pop).to("#notif", { opacity: 1, y: 0, duration: 0.6, ease: "back.out(1.5)" }, "-=1.5")
+              .to("#main-phone", { rotateY: -10, rotateX: 5, scale: 1.05, duration: 1, ease: "power4.out" }, "-=1.2")
+              .to("#panel-routing", { borderColor: "var(--gold)", boxShadow: "0 0 50px var(--gold-glow)", duration: 0.4, yoyo: true, repeat: 3 }, "-=0.5")
+              .call(sfx.pop).to("#panel-insight", { opacity: 1, x: 0, duration: 1, ease: "power4.out" }, "-=1")
+              .call(() => updateTriage("Mohammed Al Otaibi", "Implants Consult", "AED 15,000"));
+
+            // ACT 2: WHATSAPP
+            tl.to("#notif", { opacity: 0, y: -20, duration: 0.4 }, "+=1")
+              .call(sfx.swoosh).to("#main-phone", { x: -shiftPhoneX, rotateY: 8, rotateX: 0, duration: 1.2, ease: "power4.inOut" }, "-=0.4")
+              .to("#panel-routing, #panel-revenue, #panel-lifecycle", { x: shiftPanelX, duration: 1.2, ease: "power4.inOut" }, "-=1.2")
+              .to("#ui-dash", { opacity: 0, duration: 0.4 }, "-=0.8")
+              .to("#ui-wa", { opacity: 1, duration: 0.4 }, "-=0.4");
+            
+            const status = document.getElementById('wa-status');
+            function typeMsgWA(id, delay=0.5) {
+                tl.call(() => status.innerText = "typing...").to("#w-typing", { display: "flex", opacity: 1, duration: 0.1 }, `+=${delay}`)
+                  .to("#w-typing", { display: "none", opacity: 0, duration: 0.1 }, "+=1.2")
+                  .call(() => { status.innerText = "online"; sfx.popIn(); })
+                  .to(id, { display: "block", opacity: 1, y: 0, duration: 0.4, ease: "power2.out" });
+            }
+            typeMsgWA("#wm1", 0.5); 
+            tl.call(sfx.popIn, null, "+=1.2").to("#wm2", { display: "block", opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }); 
+            typeMsgWA("#wm3", 0.5); 
+            tl.call(sfx.popIn, null, "+=1.2").to("#wm4", { display: "block", opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }); 
+            tl.call(() => status.innerText = "typing...").to("#w-typing", { display: "flex", opacity: 1, duration: 0.1 }, "+=0.5")
+              .to("#w-typing", { display: "none", opacity: 0, duration: 0.1 }, "+=1.2")
+              .call(() => { status.innerText = "online"; sfx.success(); })
+              .to("#wm5", { display: "block", opacity: 1, y: 0, duration: 0.4, ease: "power2.out" });
+
+            // ACT 3: INSTAGRAM
+            tl.call(sfx.swoosh).to("#main-phone", { x: shiftPhoneX, rotateY: -12, duration: 1.5, ease: "power4.inOut" }, "+=1.5")
+              .to("#panel-routing, #panel-revenue, #panel-lifecycle", { x: 0, duration: 1.5, ease: "power4.inOut" }, "-=1.5")
+              .to("#panel-insight", { x: -shiftPanelX, duration: 1.5, ease: "power4.inOut" }, "-=1.5")
+              .to("#ui-wa", { opacity: 0, duration: 0.4 }, "-=1")
+              .to("#ui-ig", { opacity: 1, duration: 0.4 }, "-=0.6")
+              .call(() => updateTriage("Sarah_DXB (IG)", "Invisalign", "AED 9,000"), null, "-=1");
+
+            tl.call(() => { document.getElementById('n-title').innerText = "Instagram"; document.getElementById('n-sub').innerText = "New Direct Message"; sfx.pop(); }).to("#notif", { opacity: 1, y: 0, duration: 0.5, ease: "back.out" }).to("#notif", { opacity: 0, y: -20, duration: 0.4 }, "+=1");
+            tl.call(sfx.popIn, null, "+=0.2").to("#igm1", { display: "block", opacity: 1, y: 0, duration: 0.4, ease: "power2.out" })
+              .call(sfx.popIn, null, "+=1.5").to("#igm2", { display: "block", opacity: 1, y: 0, duration: 0.4, ease: "power2.out" })
+              .to("#ig-typing", { display: "block", opacity: 1, duration: 0.1 })
+              .to("#ig-typing", { display: "none", opacity: 0, duration: 0.1 }, "+=1")
+              .call(sfx.popIn).to("#igm3", { display: "block", opacity: 1, y: 0, duration: 0.4, ease: "power2.out" })
+              .call(sfx.success, null, "+=1.5").to("#igm4", { display: "block", opacity: 1, y: 0, duration: 0.5, ease: "back.out" });
+
+            // ACT 4: VOICE AI
+            tl.call(sfx.swoosh).to("#main-phone", { x: -shiftPhoneX, rotateY: 10, duration: 1.5, ease: "power4.inOut" }, "+=1.5")
+              .to("#panel-insight", { x: 0, duration: 1.5, ease: "power4.inOut" }, "-=1.5")
+              .to("#panel-routing, #panel-revenue, #panel-lifecycle", { x: shiftPanelX, duration: 1.5, ease: "power4.inOut" }, "-=1.5")
+              .to("#ui-ig", { opacity: 0, duration: 0.4 }, "-=1")
+              .to("#ui-voice", { opacity: 1, duration: 0.4 }, "-=0.6")
+              .call(() => updateTriage("Unknown Caller", "Veneers Consult", "AED 9,000"), null, "-=1");
+            
+            tl.call(startWaveform).call(sfx.popIn, null, "+=0.2").to("#vt1", { display: "block", opacity: 1, y: 0, duration: 0.5 })
+              .call(stopWaveform, null, "+=1.5").call(startWaveform, null, "+=0.5")
+              .call(sfx.popIn).to("#vt2", { display: "block", opacity: 1, y: 0, duration: 0.5 }).call(stopWaveform, null, "+=2.5");
+
+            // ACT 5: CHATGPT
+            tl.call(sfx.swoosh).to("#main-phone", { x: 0, rotateY: 0, scale: 1.1, duration: 1.5, ease: "power4.inOut" }, "+=1.5")
+              .to("#panel-routing, #panel-revenue, #panel-lifecycle, #panel-insight", { x: 0, opacity: 0, duration: 1 }, "-=1.5")
+              .to("#ui-voice", { opacity: 0, duration: 0.4 }, "-=1")
+              .to("#ui-discover", { opacity: 1, duration: 0.4 }, "-=0.6");
+
+            tl.call(sfx.popIn, null, "+=0.5").to("#ds1", { opacity: 1, y: 0, duration: 0.5 })
+              .call(sfx.popIn, null, "+=1").to("#ds2", { opacity: 1, y: 0, duration: 1.5, ease: "none" })
+              .call(sfx.scan).to("#scanner", { opacity: 1, duration: 0.2 }).to("#scanner", { top: "100%", duration: 1.5, ease: "linear" }).to("#scanner", { opacity: 0, duration: 0.2 })
+              .call(sfx.error, null, "-=0.5").to("#ds-warn", { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(2)" })
+              .call(sfx.success, null, "+=1").to("#ds-jawab", { opacity: 1, duration: 0.5 });
+
+            // ACT 6: CLIMAX
+            tl.call(sfx.swoosh, null, "+=2").to("#scene-container", { opacity: 0, scale: 0.9, duration: 1.5, ease: "power4.inOut" });
+
+            tl.to("#climax-screen", { opacity: 1, duration: 0.1 }, "-=1.5")
+              .to("#cx-box", { opacity: 1, scale: 1, duration: 1.5, ease: "power4.out" }, "-=1");
+
+            let rev = { val: 126800 };
+            tl.to(rev, { 
+                val: 159800, duration: 3.5, ease: "power4.out", 
+                onUpdate: () => { 
+                    document.getElementById('cx-counter').innerHTML = "AED " + Math.floor(rev.val).toLocaleString(); 
+                    if(Math.random() > 0.7) sfx.roll(); // Play rapid ticking sound as money rolls
+                } 
+            }, "-=0.5");
+
+            tl.call(sfx.money, null, "-=1").to("#cx-logo", { opacity: 1, y: 0, duration: 1, ease: "power3.out" })
+              .to("#cx-title", { opacity: 1, y: 0, duration: 1.5, ease: "back.out(1.2)" }, "-=0.5");
+        }
+    </script>
+
+</body>
+</html>

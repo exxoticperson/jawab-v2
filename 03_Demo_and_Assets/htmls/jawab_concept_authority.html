@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jawab Reel Concept: The Authority</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;500;700&display=swap');
+        
+        :root {
+            --bg-color: #050505;
+            --jawab-neon: rgba(255, 255, 255, 0.9);
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color); color: #fff;
+            font-family: 'Inter', sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+        }
+
+        .phone-frame {
+            width: 400px; height: 711px;
+            background: radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
+            position: relative; overflow: hidden;
+        }
+
+        .scene {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; padding: 40px; box-sizing: border-box; text-align: center;
+        }
+
+        .chat-bubble {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px 20px; border-radius: 12px; margin-bottom: 10px;
+            width: 80%; text-align: left; opacity: 0; transform: translateY(10px);
+            font-weight: 300; font-size: 0.9rem;
+        }
+        .chat-bubble.ai { border-color: rgba(255,255,255,0.4); text-align: right; margin-left: auto; }
+
+        h1 { font-weight: 200; font-size: 2rem; letter-spacing: -1px; margin-bottom: 10px; }
+        .highlight { font-weight: 500; text-shadow: 0 0 15px rgba(255,255,255,0.3); }
+        .timestamp { font-size: 0.7rem; color: #888; margin-top: 5px; }
+
+        /* Animations */
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { to { opacity: 0; } }
+        
+        /* Scene 1 */
+        #scene1 { animation: fadeUp 1s forwards 0.5s, fadeOut 0.8s forwards 3s; }
+        
+        /* Scene 2 */
+        #scene2 { animation: fadeUp 1s forwards 3.5s, fadeOut 0.8s forwards 7s; }
+        #scene2 .b1 { animation: fadeUp 0.5s forwards 4s; }
+        #scene2 .b2 { animation: fadeUp 0.5s forwards 5s; }
+        #scene2 .b3 { animation: fadeUp 0.5s forwards 6s; }
+
+        /* Scene 3 */
+        #scene3 { animation: fadeUp 1s forwards 7.5s; }
+
+        /* Grid background */
+        .grid {
+            position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            transform: perspective(500px) rotateX(60deg) translateY(0);
+            animation: moveGrid 10s linear infinite; pointer-events: none; z-index: 0;
+        }
+        @keyframes moveGrid { to { transform: perspective(500px) rotateX(60deg) translateY(30px); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="phone-frame">
+        <div class="grid"></div>
+
+        <!-- The Hook -->
+        <div class="scene" id="scene1">
+            <h1>You don't have a lead problem.<br><br>You have a <span class="highlight">leak problem.</span></h1>
+        </div>
+
+        <!-- The Proof -->
+        <div class="scene" id="scene2" style="z-index: 10;">
+            <div class="chat-bubble b1">
+                "Hi, I tried calling earlier about Invisalign."
+                <div class="timestamp">Patient • 2:14 AM</div>
+            </div>
+            <div class="chat-bubble ai b2">
+                "Hello! We missed your call. I am Jawab, the clinic's AI assistant. Would you like to schedule a consultation for this week?"
+                <div class="timestamp">Jawab • 2:14 AM</div>
+            </div>
+            <div class="chat-bubble b3">
+                "Yes, Thursday morning works."
+                <div class="timestamp">Patient • 2:16 AM</div>
+            </div>
+        </div>
+
+        <!-- The CTA -->
+        <div class="scene" id="scene3">
+            <h1><span class="highlight">Jawab</span> works while you sleep.</h1>
+            <p style="font-weight: 200; font-size: 0.9rem; margin-top: 30px;">Link in bio.</p>
+        </div>
+    </div>
+
+</body>
+</html>

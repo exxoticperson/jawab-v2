@@ -1,0 +1,24 @@
+{
+  "name": "jawab-remotion-reels",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "still": "remotion still src/index.ts SilentLeakA --frame=45 out/silent-leak-a-frame45.png",
+    "render:silent": "remotion render src/index.ts SilentLeakA out/jawab-silent-leak-a.mp4 --codec=h264 --pixel-format=yuv420p --audio-codec=aac --fps=30",
+    "render:fastest": "remotion render src/index.ts FastestClinicWins out/jawab-fastest-clinic-wins.mp4 --codec=h264 --pixel-format=yuv420p --audio-codec=aac --fps=30",
+    "render:future": "remotion render src/index.ts FutureStandard out/jawab-future-standard.mp4 --codec=h264 --pixel-format=yuv420p --audio-codec=aac --fps=30",
+    "render:launch": "remotion render src/index.ts JawabLaunchFilm out/jawab-launch-film.mp4 --codec=h264 --pixel-format=yuv420p --audio-codec=aac --fps=30",
+    "render:all": "npm run render:silent && npm run render:fastest && npm run render:future"
+  },
+  "dependencies": {
+    "@remotion/cli": "latest",
+    "remotion": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@types/react": "latest",
+    "typescript": "latest"
+  }
+}

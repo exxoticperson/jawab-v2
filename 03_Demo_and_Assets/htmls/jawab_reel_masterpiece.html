@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jawab Reel | The Masterpiece</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;800&family=Outfit:wght@200;300;400;600;800&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        :root {
+            --bg-deep: #020202;
+            --gold: #D4AF37;
+            --gold-light: #FCE68D;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --red-alert: #FF3B30;
+            --green-success: #30D158;
+            --text-main: #FFFFFF;
+            --text-dim: #86868B;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body, html {
+            width: 100%; height: 100%; background: #000;
+            font-family: 'Inter', sans-serif; overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* 9:16 Canvas */
+        #reel-canvas {
+            width: 400px; height: 711px;
+            background: var(--bg-deep); position: relative;
+            overflow: hidden; box-shadow: 0 0 100px rgba(212,175,55,0.1);
+        }
+
+        /* Global Elements */
+        .ambient-dust { position: absolute; width: 2px; height: 2px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 10px var(--gold); pointer-events: none; z-index: 1; opacity: 0; }
+        
+        .grid-bg {
+            position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px; transform: perspective(800px) rotateX(60deg) translateY(0);
+            z-index: 0; opacity: 0;
+        }
+
+        /* Scene 1: The Hook */
+        #scene-hook { position: absolute; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 30px; }
+        .h-text { font-size: 2.2rem; font-weight: 200; line-height: 1.2; letter-spacing: -1px; opacity: 0; transform: translateY(20px); }
+        .h-text span { font-weight: 800; text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+        
+        /* Scene 2: Agitation (The Bleed) */
+        #scene-bleed { position: absolute; width: 100%; height: 100%; z-index: 20; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; }
+        .missed-call-flood { position: absolute; width: 100%; height: 100%; }
+        .mc-item { position: absolute; color: var(--red-alert); font-family: 'Outfit'; font-size: 14px; font-weight: 600; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,59,48,0.5); opacity: 0; }
+        .bleed-counter { font-family: 'Outfit'; font-size: 4rem; font-weight: 800; color: var(--red-alert); z-index: 21; text-shadow: 0 0 40px rgba(255,59,48,0.8); }
+        .bleed-label { font-size: 1rem; font-weight: 600; color: #fff; letter-spacing: 4px; text-transform: uppercase; margin-top: 10px; z-index: 21; }
+
+        /* Scene 3: The Reveal */
+        #scene-reveal { position: absolute; width: 100%; height: 100%; z-index: 30; display: flex; flex-direction: column; justify-content: center; align-items: center; background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%); opacity: 0; }
+        .jawab-svg-logo { width: 280px; filter: drop-shadow(0 0 30px var(--gold-glow)); transform: scale(0.8); opacity: 0; }
+        .reveal-text { margin-top: 40px; font-size: 1.2rem; font-weight: 300; letter-spacing: 2px; color: #fff; opacity: 0; }
+        .reveal-text span { color: var(--gold); font-weight: 600; }
+
+        /* Scene 4: The Action (Glassmorphic Phone) */
+        #scene-action { position: absolute; width: 100%; height: 100%; z-index: 40; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; opacity: 0; padding-bottom: 20px;}
+        .glass-phone { 
+            width: 320px; height: 500px; background: rgba(20,20,22,0.6); backdrop-filter: blur(30px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 40px 40px 0 0;
+            box-shadow: 0 -20px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.2);
+            transform: translateY(100%); display: flex; flex-direction: column; padding: 20px;
+        }
+        .phone-notch { width: 80px; height: 20px; background: #000; border-radius: 10px; margin: 0 auto 20px; }
+        
+        .chat-ui { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+        .c-bubble { padding: 12px 16px; border-radius: 16px; font-size: 13px; max-width: 85%; opacity: 0; transform: translateY(10px); }
+        .c-patient { background: #262626; color: #fff; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .c-ai { background: rgba(212,175,55,0.15); border: 1px solid var(--gold); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 0 20px rgba(212,175,55,0.1); }
+        .c-ai-header { font-size: 9px; color: var(--gold); font-weight: 800; letter-spacing: 1px; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+        
+        .live-revenue { position: absolute; top: 100px; text-align: center; width: 100%; z-index: 45; opacity: 0; transform: translateY(-20px); }
+        .lr-label { font-size: 11px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; font-weight: 600; }
+        .lr-number { font-family: 'Outfit'; font-size: 3rem; font-weight: 300; color: #fff; text-shadow: 0 0 30px var(--gold-glow); margin-top: 5px; }
+
+        /* Scene 5: Climax & CTA */
+        #scene-cta { position: absolute; width: 100%; height: 100%; z-index: 50; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg-deep); opacity: 0; text-align: center; padding: 40px; }
+        .cta-title { font-size: 2.8rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px; transform: scale(0.9); opacity: 0; }
+        .cta-sub { font-size: 1.1rem; color: var(--text-dim); margin-bottom: 40px; opacity: 0; }
+        .save-icon { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #fff; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; animation: pulse 2s infinite; opacity: 0; }
+        .save-icon svg { width: 24px; fill: none; stroke: #fff; stroke-width: 2; }
+        .save-text { font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0; }
+
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); } 70% { box-shadow: 0 0 0 20px rgba(255,255,255,0); } 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); } }
+
+        /* Play Button Overlay */
+        #play-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-direction: column; }
+        .play-btn { width: 80px; height: 80px; border-radius: 50%; background: var(--gold); display: flex; justify-content: center; align-items: center; margin-bottom: 20px; transition: transform 0.3s; }
+        .play-btn:hover { transform: scale(1.1); box-shadow: 0 0 40px var(--gold-glow); }
+        .play-btn svg { width: 30px; fill: #000; margin-left: 5px; }
+
+    </style>
+</head>
+<body>
+
+    <div id="reel-canvas">
+        <div class="grid-bg" id="grid"></div>
+        
+        <!-- Ambient Particles Container -->
+        <div id="particles"></div>
+
+        <!-- SCENE 1: HOOK -->
+        <div id="scene-hook">
+            <div class="h-text" id="h1">Top clinics in Dubai<br>share <span style="color: var(--gold);">one secret.</span></div>
+        </div>
+
+        <!-- SCENE 2: BLEED -->
+        <div id="scene-bleed">
+            <div class="missed-call-flood" id="mc-flood"></div>
+            <div class="bleed-counter" id="bleed-num">-AED 0</div>
+            <div class="bleed-label">Bleeding Monthly</div>
+        </div>
+
+        <!-- SCENE 3: REVEAL -->
+        <div id="scene-reveal">
+            <svg class="jawab-svg-logo" id="main-logo" viewBox="0 0 200 60">
+                <g transform="translate(0, 5)">
+                    <circle cx="20" cy="25" r="15" fill="none" stroke="#D4AF37" stroke-width="3"/>
+                    <circle cx="32" cy="25" r="15" fill="none" stroke="#D4AF37" stroke-width="3" opacity="0.5"/>
+                </g>
+                <text x="60" y="40" font-family="'Outfit'" font-size="44" font-weight="800" fill="#D4AF37" letter-spacing="1">Jawab</text>
+                <text x="65" y="55" font-family="'Tajawal'" font-size="16" fill="#86868B">جــــواب</text>
+            </svg>
+            <div class="reveal-text" id="rev-text">The <span>AI</span> Patient Engine.</div>
+        </div>
+
+        <!-- SCENE 4: ACTION (UI DEMO) -->
+        <div class="live-revenue" id="live-rev">
+            <div class="lr-label">Recovered Revenue</div>
+            <div class="lr-number" id="lr-num">AED 0</div>
+        </div>
+        <div id="scene-action">
+            <div class="glass-phone" id="g-phone">
+                <div class="phone-notch"></div>
+                <div class="chat-ui">
+                    <div class="c-bubble c-patient" id="c1">I tried calling earlier. Do you do implants?</div>
+                    <div class="c-bubble c-ai" id="c2">
+                        <div class="c-ai-header">✦ JAWAB AI</div>
+                        Yes, we have Dubai's leading implant specialists. Would you like to book a free 3D scan tomorrow?
+                    </div>
+                    <div class="c-bubble c-patient" id="c3">Yes, 10 AM works perfectly.</div>
+                    <div class="c-bubble c-ai" id="c4" style="background: var(--green-success); border:none; color:#000; box-shadow: 0 0 30px rgba(48,209,88,0.4);">
+                        <div class="c-ai-header" style="color:#000;">✓ SECURED</div>
+                        Confirmed. <b>AED 15,000</b> potential value locked.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCENE 5: CTA -->
+        <div id="scene-cta">
+            <div class="cta-title" id="cta-t">Stop Bleeding.<br><span style="color:var(--gold);">Start Scaling.</span></div>
+            <div class="cta-sub" id="cta-s">Install Jawab in 10 minutes.</div>
+            <div class="save-icon" id="cta-icon"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+            <div class="save-text" id="cta-text">Save & Link In Bio</div>
+        </div>
+
+        <div id="play-overlay" onclick="startReel()">
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            <div style="color:var(--gold); font-family:'Outfit'; letter-spacing:4px; font-size:12px; margin-top:20px;">PLAY MASTERPIECE</div>
+        </div>
+    </div>
+
+    <script>
+        // Generate Particles
+        const pCont = document.getElementById('particles');
+        for(let i=0; i<40; i++) {
+            let p = document.createElement('div');
+            p.className = 'ambient-dust';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            pCont.appendChild(p);
+        }
+
+        // Generate Missed Call Flood
+        const mcFlood = document.getElementById('mc-flood');
+        for(let i=0; i<30; i++) {
+            let item = document.createElement('div');
+            item.className = 'mc-item';
+            item.innerText = `MISSED CALL 05${Math.floor(Math.random()*90000000+10000000)}`;
+            item.style.left = (Math.random() * 80 + 10) + '%';
+            item.style.top = (Math.random() * 80 + 10) + '%';
+            item.style.transform = `rotate(${Math.random() * 40 - 20}deg)`;
+            mcFlood.appendChild(item);
+        }
+
+        function startReel() {
+            document.getElementById('play-overlay').style.display = 'none';
+            const tl = gsap.timeline();
+
+            // SCENE 1: THE HOOK (0s - 3s)
+            gsap.to(".ambient-dust", { opacity: Math.random()*0.6+0.2, duration: 1, stagger: 0.1, y: "-=50", repeat: -1, yoyo: true });
+            tl.to("#grid", { opacity: 0.4, duration: 2, ease: "power2.inOut" })
+              .to("#h1", { opacity: 1, y: 0, duration: 1.5, ease: "power4.out" })
+              .to("#h1", { scale: 1.1, duration: 3, ease: "linear" }, "-=1.5")
+              .to("#scene-hook", { opacity: 0, scale: 1.5, duration: 0.5, ease: "power4.in" }, "+=1.5");
+
+            // SCENE 2: THE BLEED (3s - 7s)
+            tl.to("#scene-bleed", { opacity: 1, duration: 0.1 });
+            let mcItems = document.querySelectorAll('.mc-item');
+            tl.to(mcItems, { opacity: 0.8, scale: 1.2, duration: 0.1, stagger: 0.05, ease: "rough" }, "-=0.1");
+            
+            let bleed = { val: 0 };
+            tl.to(bleed, { 
+                val: 84500, duration: 3.5, ease: "power4.in",
+                onUpdate: () => document.getElementById('bleed-num').innerText = "-AED " + Math.floor(bleed.val).toLocaleString()
+            }, "-=1.5");
+            
+            tl.to("#scene-bleed", { opacity: 0, filter: "blur(20px)", duration: 0.5, ease: "power4.in" }, "+=0.5");
+
+            // SCENE 3: THE REVEAL (7s - 11s)
+            tl.to("#scene-reveal", { opacity: 1, duration: 0.5 })
+              .to("#main-logo", { opacity: 1, scale: 1.2, duration: 2, ease: "elastic.out(1, 0.5)" }, "-=0.2")
+              .to("#rev-text", { opacity: 1, y: -20, duration: 1, ease: "power2.out" }, "-=1.5")
+              .to("#scene-reveal", { opacity: 0, y: -50, duration: 0.8, ease: "power4.in" }, "+=2");
+
+            // SCENE 4: THE ACTION (11s - 20s)
+            tl.to("#scene-action", { opacity: 1, duration: 0.1 })
+              .to("#live-rev", { opacity: 1, y: 0, duration: 1, ease: "power4.out" })
+              .to("#g-phone", { y: "0%", duration: 1.2, ease: "power4.out" }, "-=0.8")
+              
+              // Chat sequence
+              .to("#c1", { opacity: 1, y: 0, duration: 0.5, ease: "back.out" }, "+=0.5")
+              .to("#c2", { opacity: 1, y: 0, duration: 0.5, ease: "back.out" }, "+=1")
+              .to("#c3", { opacity: 1, y: 0, duration: 0.5, ease: "back.out" }, "+=1")
+              .to("#c4", { opacity: 1, y: 0, scale: 1.05, duration: 0.6, ease: "elastic.out(1, 0.5)" }, "+=1");
+
+            let rev = { val: 0 };
+            tl.to(rev, {
+                val: 15000, duration: 2, ease: "power4.out",
+                onUpdate: () => document.getElementById('lr-num').innerText = "AED " + Math.floor(rev.val).toLocaleString()
+            }, "-=0.5");
+
+            tl.to("#c4", { scale: 1, duration: 0.2 })
+              .to("#scene-action", { opacity: 0, scale: 0.8, duration: 0.8, ease: "power4.in" }, "+=2")
+              .to("#live-rev", { opacity: 0, y: -50, duration: 0.5 }, "-=0.8");
+
+            // SCENE 5: THE CTA (20s - 25s)
+            tl.to("#scene-cta", { opacity: 1, duration: 0.5 })
+              .to("#cta-t", { opacity: 1, scale: 1, duration: 1, ease: "back.out(1.5)" })
+              .to("#cta-s", { opacity: 1, duration: 1 }, "-=0.5")
+              .to("#cta-icon, #cta-text", { opacity: 1, y: -10, duration: 1, stagger: 0.2 }, "-=0.5");
+        }
+    </script>
+</body>
+</html>

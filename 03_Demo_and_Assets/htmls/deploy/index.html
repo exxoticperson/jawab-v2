@@ -1,0 +1,2335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jawab | Clinic Revenue Recovery</title>
+  <meta name="description" content="Jawab catches missed calls, delayed WhatsApp replies, Instagram inquiries, and post-consult drop-offs before premium clinic patients disappear.">
+  <meta name="theme-color" content="#050505">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #050505;
+      --obsidian: #090806;
+      --ink: #11100d;
+      --panel: rgba(18, 17, 13, 0.78);
+      --panel-soft: rgba(255, 255, 255, 0.045);
+      --cream: #f7efe1;
+      --sand: #d9c8aa;
+      --muted: #9f9484;
+      --dim: #655f56;
+      --gold: #d4af37;
+      --gold-2: #f1cf78;
+      --amber: #ff8a1f;
+      --green: #25d366;
+      --red: #ff453a;
+      --blue: #7ab7ff;
+      --line: rgba(255, 255, 255, 0.11);
+      --line-gold: rgba(212, 175, 55, 0.35);
+      --shadow: 0 34px 100px rgba(0, 0, 0, 0.62);
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --wide: min(1200px, calc(100vw - 40px));
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      background: var(--black);
+      color: var(--cream);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-family: "Manrope", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 14% 7%, rgba(212, 175, 55, 0.18), transparent 24vw),
+        radial-gradient(circle at 86% 16%, rgba(255, 138, 31, 0.13), transparent 26vw),
+        linear-gradient(180deg, #050505 0%, #080705 47%, #050505 100%);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      pointer-events: none;
+      opacity: 0.34;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: radial-gradient(circle at 50% 10%, black 0%, transparent 70%);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.88), transparent 18%, transparent 82%, rgba(0, 0, 0, 0.88)),
+        radial-gradient(circle at 50% 0%, transparent, rgba(0, 0, 0, 0.72) 68%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+    img { display: block; max-width: 100%; }
+    ::selection { background: rgba(212, 175, 55, 0.35); color: white; }
+
+    .loader {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at center, rgba(212, 175, 55, 0.12), transparent 33%),
+        #030303;
+      transition: opacity 0.8s var(--ease), visibility 0.8s var(--ease);
+    }
+
+    .loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-inner {
+      width: min(440px, 84vw);
+      text-align: center;
+    }
+
+    .loader-mark {
+      width: 86px;
+      height: 86px;
+      margin: 0 auto 26px;
+      border: 1px solid rgba(212, 175, 55, 0.32);
+      border-radius: 28px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.035);
+      box-shadow: 0 0 60px rgba(212, 175, 55, 0.16);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .loader-mark::after {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background: linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.28), transparent 64%);
+      animation: sweep 1.7s infinite;
+      transform: translateX(-120%);
+    }
+
+    .loader-mark img {
+      width: 58px;
+      filter: drop-shadow(0 0 16px rgba(212, 175, 55, 0.38));
+    }
+
+    .loader-line {
+      height: 2px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .loader-line span {
+      display: block;
+      width: 42%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, transparent, var(--gold-2), transparent);
+      animation: scan 1.25s infinite var(--ease);
+    }
+
+    .loader p {
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    #signal-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .progress {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 900;
+      height: 2px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--amber), var(--gold-2));
+      box-shadow: 0 0 24px rgba(212, 175, 55, 0.7);
+    }
+
+    .nav {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      z-index: 800;
+      width: min(1160px, calc(100vw - 32px));
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      background: rgba(5, 5, 5, 0.62);
+      backdrop-filter: blur(22px);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 140px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, rgba(212, 175, 55, 0.18), rgba(255, 255, 255, 0.035));
+      border: 1px solid rgba(212, 175, 55, 0.28);
+    }
+
+    .brand-logo img { width: 26px; }
+
+    .brand-name {
+      display: grid;
+      gap: 1px;
+      line-height: 1;
+      font-family: "Space Grotesk", sans-serif;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-name span:last-child {
+      font-family: "IBM Plex Sans Arabic", sans-serif;
+      color: var(--gold-2);
+      font-size: 13px;
+      letter-spacing: 0;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .nav-links a {
+      padding: 9px 12px;
+      color: rgba(247, 239, 225, 0.72);
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 13px;
+      transition: 0.35s var(--ease);
+    }
+
+    .nav-links a:hover {
+      color: white;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 46px;
+      padding: 0 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      color: var(--cream);
+      background: rgba(255, 255, 255, 0.045);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      transition: transform 0.35s var(--ease), border-color 0.35s var(--ease), background 0.35s var(--ease), box-shadow 0.35s var(--ease);
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(212, 175, 55, 0.42);
+      background: rgba(255, 255, 255, 0.075);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.25);
+    }
+
+    .btn.primary {
+      color: #090806;
+      border-color: rgba(241, 207, 120, 0.72);
+      background: linear-gradient(135deg, #f8e1a0, #d4af37 55%, #b87722);
+      box-shadow: 0 20px 60px rgba(212, 175, 55, 0.22);
+    }
+
+    .btn.whatsapp {
+      color: #06130a;
+      border-color: rgba(37, 211, 102, 0.7);
+      background: linear-gradient(135deg, #7dffa8, #25d366);
+      box-shadow: 0 18px 50px rgba(37, 211, 102, 0.18);
+    }
+
+    .section {
+      width: var(--wide);
+      margin: 0 auto;
+      padding: 108px 0;
+      position: relative;
+    }
+
+    .hero {
+      min-height: 100vh;
+      width: var(--wide);
+      margin: 0 auto;
+      padding: 148px 0 84px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.03fr) minmax(380px, 0.97fr);
+      gap: 58px;
+      align-items: center;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 44%;
+      top: 18%;
+      width: 50vw;
+      height: 50vw;
+      max-width: 640px;
+      max-height: 640px;
+      z-index: -1;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.14), transparent 65%);
+      filter: blur(10px);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+    }
+
+    .reveal.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 24px;
+      font-family: "Instrument Serif", serif;
+      font-size: clamp(58px, 8.2vw, 118px);
+      line-height: 0.92;
+      letter-spacing: -0.055em;
+      max-width: 780px;
+    }
+
+    .hero h1 span {
+      color: var(--gold-2);
+      font-style: italic;
+    }
+
+    .hero-copy {
+      max-width: 650px;
+      color: var(--sand);
+      font-size: clamp(18px, 1.6vw, 22px);
+      line-height: 1.62;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 13px;
+      margin: 34px 0 30px;
+    }
+
+    .proof-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 650px;
+    }
+
+    .proof {
+      padding: 16px 15px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.036);
+    }
+
+    .proof strong {
+      display: block;
+      color: var(--gold-2);
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 24px;
+      line-height: 1;
+      margin-bottom: 7px;
+    }
+
+    .proof span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .system-stage {
+      position: relative;
+      min-height: 620px;
+    }
+
+    .orbit {
+      position: absolute;
+      inset: 20px;
+      border: 1px solid rgba(212, 175, 55, 0.13);
+      border-radius: 42% 58% 53% 47% / 51% 38% 62% 49%;
+      animation: rotateSlow 24s linear infinite;
+      opacity: 0.75;
+    }
+
+    .orbit.two {
+      inset: 80px 12px 70px 50px;
+      border-color: rgba(255, 255, 255, 0.08);
+      animation-duration: 32s;
+      animation-direction: reverse;
+    }
+
+    .command-center {
+      position: relative;
+      z-index: 2;
+      min-height: 610px;
+      padding: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 38px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.03)),
+        rgba(5, 5, 5, 0.56);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(28px);
+      overflow: hidden;
+    }
+
+    .command-center::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 28% 0%, rgba(212, 175, 55, 0.17), transparent 38%),
+        linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.06) 48%, transparent 68%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .cc-top {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 14px 20px;
+      align-items: flex-start;
+    }
+
+    .cc-title {
+      display: grid;
+      gap: 8px;
+    }
+
+    .cc-title strong {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .cc-title span,
+    .cc-status span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .cc-status {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 11px;
+      border: 1px solid rgba(37, 211, 102, 0.22);
+      border-radius: 999px;
+      color: var(--green);
+      background: rgba(37, 211, 102, 0.07);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 99px;
+      background: var(--green);
+      box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.52);
+      animation: pulse 1.5s infinite;
+    }
+
+    .cc-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 0.78fr 1fr;
+      gap: 14px;
+    }
+
+    .metric-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .metric-card,
+    .inbox,
+    .handoff,
+    .mini-report,
+    .scanner-panel,
+    .path-node,
+    .offer-card,
+    .timeline-step,
+    .faq-item {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(11, 10, 8, 0.72);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(18px);
+    }
+
+    .metric-card {
+      padding: 16px;
+      border-radius: 24px;
+      min-height: 122px;
+    }
+
+    .metric-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 11px;
+    }
+
+    .metric-card strong {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 36px;
+      letter-spacing: -0.06em;
+    }
+
+    .metric-card small {
+      margin-left: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .spark {
+      width: 100%;
+      height: 38px;
+      margin-top: 12px;
+    }
+
+    .spark path {
+      fill: none;
+      stroke: url(#sparkGradient);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-dasharray: 180;
+      stroke-dashoffset: 180;
+      animation: draw 2.4s var(--ease) forwards infinite;
+    }
+
+    .inbox {
+      border-radius: 28px;
+      padding: 16px;
+      min-height: 414px;
+    }
+
+    .inbox-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .inbox-tabs span {
+      padding: 8px 11px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .inbox-tabs span:first-child {
+      color: #11100d;
+      background: var(--gold-2);
+    }
+
+    .message {
+      position: relative;
+      display: grid;
+      grid-template-columns: 38px 1fr auto;
+      gap: 11px;
+      align-items: center;
+      padding: 13px 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      color: var(--cream);
+      background: linear-gradient(145deg, rgba(212, 175, 55, 0.2), rgba(255, 255, 255, 0.06));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-weight: 900;
+    }
+
+    .message strong {
+      display: block;
+      color: var(--cream);
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+
+    .message p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .message em {
+      color: var(--gold-2);
+      font-style: normal;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .handoff {
+      position: absolute;
+      right: 18px;
+      bottom: 58px;
+      z-index: 4;
+      width: 290px;
+      padding: 17px;
+      border-radius: 26px;
+      background: rgba(8, 8, 7, 0.88);
+      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.48);
+    }
+
+    .handoff::before {
+      content: "";
+      position: absolute;
+      top: 19px;
+      left: -64px;
+      width: 64px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.85));
+    }
+
+    .handoff span,
+    .mini-report span {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .handoff p {
+      margin: 0;
+      color: var(--sand);
+      font-size: 13px;
+      line-height: 1.58;
+    }
+
+    .mini-report {
+      position: absolute;
+      left: 18px;
+      bottom: 22px;
+      z-index: 4;
+      width: 235px;
+      padding: 16px;
+      border-radius: 24px;
+      background: rgba(8, 8, 7, 0.87);
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.5);
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin: 9px 0;
+    }
+
+    .bar {
+      position: relative;
+      height: 7px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.09);
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      width: var(--w);
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--gold), var(--amber));
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(280px, 0.55fr);
+      align-items: end;
+      gap: 42px;
+      margin-bottom: 46px;
+    }
+
+    .section-kicker {
+      margin-bottom: 16px;
+      color: var(--gold-2);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin-bottom: 0;
+      font-family: "Instrument Serif", serif;
+      font-size: clamp(42px, 6vw, 82px);
+      line-height: 0.96;
+      letter-spacing: -0.046em;
+      max-width: 830px;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .leak-path {
+      position: relative;
+      min-height: 560px;
+      padding: 42px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 42px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 18% 12%, rgba(255, 69, 58, 0.13), transparent 28%),
+        radial-gradient(circle at 83% 78%, rgba(37, 211, 102, 0.1), transparent 32%),
+        rgba(255, 255, 255, 0.03);
+      box-shadow: var(--shadow);
+    }
+
+    .path-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .path-svg path {
+      fill: none;
+      stroke: rgba(212, 175, 55, 0.28);
+      stroke-width: 2;
+      stroke-dasharray: 8 9;
+    }
+
+    .signal-runner {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--gold-2);
+      box-shadow: 0 0 26px rgba(212, 175, 55, 0.8);
+      offset-path: path("M 80 370 C 200 110, 380 120, 520 280 S 820 550, 1080 180");
+      animation: runner 7s infinite var(--ease);
+    }
+
+    .path-nodes {
+      position: relative;
+      z-index: 2;
+      height: 475px;
+    }
+
+    .path-node {
+      position: absolute;
+      width: 230px;
+      padding: 18px;
+      border-radius: 26px;
+      transition: 0.45s var(--ease);
+    }
+
+    .path-node:hover {
+      transform: translateY(-6px);
+      border-color: rgba(212, 175, 55, 0.35);
+      background: rgba(15, 14, 11, 0.86);
+    }
+
+    .path-node:nth-child(1) { left: 0; bottom: 35px; }
+    .path-node:nth-child(2) { left: 19%; top: 0; }
+    .path-node:nth-child(3) { left: 40%; top: 178px; }
+    .path-node:nth-child(4) { right: 15%; bottom: 0; }
+    .path-node:nth-child(5) { right: 0; top: 42px; }
+
+    .node-index {
+      display: inline-grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      margin-bottom: 18px;
+      border-radius: 13px;
+      color: var(--red);
+      background: rgba(255, 69, 58, 0.1);
+      border: 1px solid rgba(255, 69, 58, 0.28);
+      font-weight: 900;
+    }
+
+    .path-node h3 {
+      margin: 0 0 8px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .path-node p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.52;
+    }
+
+    .scanner-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(390px, 1.1fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .scanner-panel {
+      border-radius: 34px;
+      padding: 28px;
+      min-height: 500px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.064), rgba(255, 255, 255, 0.026)),
+        rgba(5, 5, 5, 0.5);
+    }
+
+    .scanner-panel h3 {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 28px;
+      letter-spacing: -0.05em;
+      margin-bottom: 12px;
+    }
+
+    .scanner-panel > p {
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .scanner-control {
+      display: grid;
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .field label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      color: var(--sand);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--gold);
+    }
+
+    .risk-readout {
+      display: grid;
+      place-items: center;
+      min-height: 320px;
+      margin-top: 22px;
+      border: 1px solid rgba(212, 175, 55, 0.18);
+      border-radius: 32px;
+      background:
+        conic-gradient(from 180deg, rgba(255, 69, 58, 0.17), rgba(212, 175, 55, 0.18), rgba(37, 211, 102, 0.14), rgba(255, 69, 58, 0.17)),
+        rgba(255, 255, 255, 0.035);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .risk-readout::before {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border-radius: 24px;
+      background: rgba(5, 5, 5, 0.78);
+      backdrop-filter: blur(24px);
+    }
+
+    .risk-inner {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .risk-inner span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .risk-value {
+      margin: 12px 0 4px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(58px, 7vw, 98px);
+      letter-spacing: -0.08em;
+      color: var(--gold-2);
+    }
+
+    .risk-inner p {
+      margin: 0 auto;
+      max-width: 290px;
+      color: var(--sand);
+      line-height: 1.55;
+    }
+
+    .matrix {
+      display: grid;
+      gap: 14px;
+    }
+
+    .matrix-row {
+      display: grid;
+      grid-template-columns: 130px 1fr auto;
+      align-items: center;
+      gap: 13px;
+      padding: 15px;
+      border-radius: 21px;
+      border: 1px solid rgba(255, 255, 255, 0.085);
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .matrix-row strong {
+      font-size: 13px;
+    }
+
+    .matrix-track {
+      height: 9px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .matrix-fill {
+      height: 100%;
+      width: var(--score);
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--red), var(--amber), var(--green));
+    }
+
+    .matrix-row span {
+      color: var(--gold-2);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .product-tabs {
+      display: grid;
+      grid-template-columns: 0.78fr 1.22fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .tab-list {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .tab-btn {
+      width: 100%;
+      min-height: 92px;
+      padding: 20px;
+      text-align: left;
+      color: var(--cream);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.035);
+      cursor: pointer;
+      transition: 0.35s var(--ease);
+    }
+
+    .tab-btn strong {
+      display: block;
+      margin-bottom: 6px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 17px;
+    }
+
+    .tab-btn span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .tab-btn.active,
+    .tab-btn:hover {
+      transform: translateX(7px);
+      border-color: rgba(212, 175, 55, 0.36);
+      background: rgba(212, 175, 55, 0.085);
+    }
+
+    .product-stage {
+      position: relative;
+      min-height: 520px;
+      border-radius: 38px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(212, 175, 55, 0.16), transparent 34%),
+        rgba(255, 255, 255, 0.035);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .tab-panel {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 0.92fr;
+      gap: 22px;
+      padding: 34px;
+      opacity: 0;
+      transform: translateY(18px);
+      pointer-events: none;
+      transition: 0.48s var(--ease);
+    }
+
+    .tab-panel.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .script-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 30px;
+      background: rgba(6, 6, 5, 0.72);
+    }
+
+    .script-card h3 {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 32px;
+      letter-spacing: -0.055em;
+      margin-bottom: 14px;
+    }
+
+    .script-card p {
+      color: var(--sand);
+      line-height: 1.65;
+      margin-bottom: 22px;
+    }
+
+    .arabic-line {
+      direction: rtl;
+      padding: 18px;
+      border-radius: 21px;
+      color: var(--cream);
+      font-family: "IBM Plex Sans Arabic", sans-serif;
+      font-size: 18px;
+      line-height: 1.7;
+      background: rgba(212, 175, 55, 0.09);
+      border: 1px solid rgba(212, 175, 55, 0.16);
+    }
+
+    .routing-card {
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      padding: 28px;
+    }
+
+    .route-step {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(255, 255, 255, 0.075);
+    }
+
+    .route-step i {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      color: #070705;
+      background: var(--gold-2);
+      font-style: normal;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .route-step strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .route-step span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .report-shell {
+      border-radius: 42px;
+      padding: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      background:
+        linear-gradient(135deg, rgba(212, 175, 55, 0.08), transparent 28%),
+        rgba(255, 255, 255, 0.035);
+      box-shadow: var(--shadow);
+    }
+
+    .report-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+      padding: 10px 8px 24px;
+    }
+
+    .report-top h3 {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 30px;
+      letter-spacing: -0.05em;
+      margin: 0;
+    }
+
+    .report-top span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .report-stat {
+      min-height: 132px;
+      padding: 18px;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: rgba(8, 8, 7, 0.64);
+    }
+
+    .report-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      margin-bottom: 14px;
+    }
+
+    .report-stat strong {
+      display: block;
+      color: var(--gold-2);
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 34px;
+      letter-spacing: -0.07em;
+    }
+
+    .recommendation {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: center;
+      padding: 22px;
+      border-radius: 28px;
+      border: 1px solid rgba(37, 211, 102, 0.18);
+      background: rgba(37, 211, 102, 0.06);
+    }
+
+    .recommendation p {
+      margin: 0;
+      color: var(--sand);
+      line-height: 1.55;
+    }
+
+    .recommendation strong {
+      color: var(--green);
+    }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .compare-card {
+      min-height: 430px;
+      padding: 28px;
+      border-radius: 34px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.035);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .compare-card:first-child {
+      background:
+        radial-gradient(circle at 80% 10%, rgba(255, 69, 58, 0.14), transparent 36%),
+        rgba(255, 255, 255, 0.035);
+    }
+
+    .compare-card:last-child {
+      background:
+        radial-gradient(circle at 18% 4%, rgba(37, 211, 102, 0.14), transparent 36%),
+        rgba(255, 255, 255, 0.035);
+    }
+
+    .compare-card h3 {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 28px;
+      letter-spacing: -0.05em;
+      margin-bottom: 18px;
+    }
+
+    .compare-list {
+      display: grid;
+      gap: 13px;
+      margin-top: 28px;
+    }
+
+    .compare-row {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 13px;
+      border-radius: 18px;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .compare-row i {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      font-style: normal;
+      font-weight: 900;
+    }
+
+    .bad i { color: var(--red); background: rgba(255, 69, 58, 0.1); }
+    .good i { color: var(--green); background: rgba(37, 211, 102, 0.1); }
+
+    .compare-row span {
+      color: var(--sand);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+    }
+
+    .timeline-step {
+      min-height: 250px;
+      padding: 20px;
+      border-radius: 26px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .timeline-step::after {
+      content: "";
+      position: absolute;
+      inset: auto -40px -70px auto;
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      background: rgba(212, 175, 55, 0.1);
+      filter: blur(1px);
+    }
+
+    .timeline-step span {
+      display: block;
+      color: var(--gold-2);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 62px;
+    }
+
+    .timeline-step h3 {
+      font-family: "Space Grotesk", sans-serif;
+      margin-bottom: 10px;
+      letter-spacing: -0.04em;
+    }
+
+    .timeline-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .offers {
+      display: grid;
+      grid-template-columns: 0.8fr 1fr 1fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .offer-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 530px;
+      padding: 28px;
+      border-radius: 34px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .offer-card.featured {
+      border-color: rgba(212, 175, 55, 0.35);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.18), transparent 36%),
+        rgba(13, 12, 9, 0.82);
+      box-shadow: 0 34px 100px rgba(212, 175, 55, 0.12), var(--shadow);
+    }
+
+    .offer-card h3 {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 24px;
+      letter-spacing: -0.045em;
+      margin-bottom: 15px;
+    }
+
+    .price {
+      margin: 0 0 22px;
+      color: var(--gold-2);
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 38px;
+      line-height: 1;
+      letter-spacing: -0.07em;
+    }
+
+    .price small {
+      display: block;
+      margin-top: 9px;
+      color: var(--muted);
+      font-family: "Manrope", sans-serif;
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 0;
+    }
+
+    .offer-card ul {
+      display: grid;
+      gap: 13px;
+      padding: 0;
+      margin: 0 0 26px;
+      list-style: none;
+    }
+
+    .offer-card li {
+      display: grid;
+      grid-template-columns: 20px 1fr;
+      gap: 10px;
+      color: var(--sand);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .offer-card li::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      margin-top: 7px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 18px rgba(212, 175, 55, 0.45);
+    }
+
+    .offer-card .btn { margin-top: auto; width: 100%; }
+
+    .guarantee {
+      margin-top: 16px;
+      padding: 26px;
+      border: 1px solid rgba(37, 211, 102, 0.2);
+      border-radius: 32px;
+      background:
+        linear-gradient(135deg, rgba(37, 211, 102, 0.12), transparent 40%),
+        rgba(255, 255, 255, 0.035);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .guarantee-mark {
+      width: 70px;
+      height: 70px;
+      display: grid;
+      place-items: center;
+      border-radius: 24px;
+      color: var(--green);
+      font-size: 30px;
+      background: rgba(37, 211, 102, 0.09);
+      border: 1px solid rgba(37, 211, 102, 0.22);
+    }
+
+    .guarantee p {
+      margin: 0;
+      color: var(--sand);
+      line-height: 1.55;
+    }
+
+    .guarantee strong {
+      color: var(--green);
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(360px, 1.2fr);
+      gap: 34px;
+    }
+
+    .privacy-card {
+      min-height: 420px;
+      padding: 30px;
+      border-radius: 36px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(122, 183, 255, 0.13), transparent 35%),
+        rgba(255, 255, 255, 0.035);
+      position: sticky;
+      top: 110px;
+    }
+
+    .privacy-card h3 {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 30px;
+      letter-spacing: -0.05em;
+    }
+
+    .privacy-card p {
+      color: var(--sand);
+      line-height: 1.65;
+    }
+
+    .data-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 26px;
+    }
+
+    .data-pills span {
+      padding: 9px 11px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(255, 255, 255, 0.075);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .faq-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .faq-item {
+      border-radius: 24px;
+      overflow: hidden;
+    }
+
+    .faq-q {
+      width: 100%;
+      padding: 21px;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      color: var(--cream);
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      text-align: left;
+      font-weight: 900;
+    }
+
+    .faq-q span {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      color: var(--gold-2);
+      background: rgba(212, 175, 55, 0.08);
+      flex: 0 0 auto;
+      transition: 0.35s var(--ease);
+    }
+
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s var(--ease);
+    }
+
+    .faq-a p {
+      margin: 0;
+      padding: 0 21px 21px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .faq-item.open .faq-a { max-height: 220px; }
+    .faq-item.open .faq-q span { transform: rotate(45deg); }
+
+    .final-cta {
+      width: var(--wide);
+      margin: 0 auto 42px;
+      padding: 52px;
+      border-radius: 44px;
+      border: 1px solid rgba(212, 175, 55, 0.26);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(212, 175, 55, 0.18), transparent 33%),
+        radial-gradient(circle at 86% 92%, rgba(37, 211, 102, 0.11), transparent 26%),
+        rgba(255, 255, 255, 0.04);
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .final-cta h2 {
+      max-width: 730px;
+      margin-bottom: 18px;
+    }
+
+    .final-cta p {
+      max-width: 650px;
+      margin: 0;
+      color: var(--sand);
+      font-size: 17px;
+      line-height: 1.65;
+    }
+
+    .footer {
+      width: var(--wide);
+      margin: 0 auto;
+      padding: 26px 0 44px;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      color: var(--dim);
+      font-size: 13px;
+    }
+
+    .footer a { color: var(--muted); }
+
+    .mobile-cta {
+      display: none;
+      position: fixed;
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+      z-index: 850;
+      gap: 10px;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      background: rgba(5, 5, 5, 0.76);
+      backdrop-filter: blur(20px);
+    }
+
+    .mobile-cta .btn {
+      flex: 1;
+      min-height: 48px;
+      padding: 0 10px;
+      font-size: 13px;
+    }
+
+    @keyframes sweep {
+      to { transform: translateX(120%); }
+    }
+
+    @keyframes scan {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(260%); }
+    }
+
+    @keyframes rotateSlow {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      70% { box-shadow: 0 0 0 13px rgba(37, 211, 102, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+    }
+
+    @keyframes draw {
+      40%, 100% { stroke-dashoffset: 0; }
+    }
+
+    @keyframes runner {
+      0% { offset-distance: 0%; opacity: 0; }
+      9% { opacity: 1; }
+      88% { opacity: 1; }
+      100% { offset-distance: 100%; opacity: 0; }
+    }
+
+    @media (max-width: 1020px) {
+      .nav-links { display: none; }
+      .hero,
+      .section-head,
+      .scanner-grid,
+      .product-tabs,
+      .faq-grid,
+      .final-cta {
+        grid-template-columns: 1fr;
+      }
+      .hero { padding-top: 132px; }
+      .system-stage { min-height: 580px; }
+      .handoff,
+      .mini-report { position: relative; left: auto; right: auto; bottom: auto; width: auto; margin-top: 14px; }
+      .handoff::before { display: none; }
+      .cc-grid { grid-template-columns: 1fr; }
+      .metric-stack { grid-template-columns: repeat(3, 1fr); }
+      .path-nodes { height: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 13px; }
+      .path-node { position: relative; inset: auto !important; width: auto; }
+      .signal-runner,
+      .path-svg { display: none; }
+      .report-grid,
+      .timeline,
+      .offers { grid-template-columns: repeat(2, 1fr); }
+      .tab-panel { position: relative; display: none; grid-template-columns: 1fr; }
+      .tab-panel.active { display: grid; }
+      .product-stage { min-height: auto; }
+    }
+
+    @media (max-width: 720px) {
+      :root { --wide: min(100vw - 28px, 1200px); }
+      .nav {
+        top: 10px;
+        width: calc(100vw - 20px);
+        border-radius: 20px;
+      }
+      .brand-name { display: none; }
+      .nav-actions .btn:not(.primary) { display: none; }
+      .nav-actions .btn.primary { min-height: 42px; padding: 0 13px; font-size: 12px; }
+      .section { padding: 76px 0; }
+      .hero {
+        min-height: auto;
+        padding: 112px 0 54px;
+        gap: 38px;
+      }
+      h1 { font-size: clamp(54px, 16vw, 80px); }
+      h2 { font-size: clamp(40px, 13vw, 62px); }
+      .hero-copy { font-size: 17px; }
+      .hero-actions,
+      .proof-strip,
+      .report-grid,
+      .timeline,
+      .offers,
+      .comparison,
+      .path-nodes,
+      .metric-stack,
+      .guarantee,
+      .final-cta {
+        grid-template-columns: 1fr;
+      }
+      .hero-actions .btn { width: 100%; }
+      .system-stage,
+      .command-center { min-height: auto; }
+      .orbit { display: none; }
+      .command-center { border-radius: 30px; padding: 12px; }
+      .cc-top { flex-direction: column; }
+      .inbox { min-height: auto; }
+      .message { grid-template-columns: 34px 1fr; }
+      .message em { grid-column: 2; }
+      .leak-path,
+      .scanner-panel,
+      .report-shell,
+      .compare-card,
+      .final-cta {
+        border-radius: 30px;
+        padding: 22px;
+      }
+      .matrix-row { grid-template-columns: 1fr; }
+      .tab-btn:hover,
+      .tab-btn.active { transform: translateY(-2px); }
+      .tab-panel { padding: 18px; }
+      .report-top,
+      .recommendation,
+      .footer {
+        flex-direction: column;
+        display: flex;
+        align-items: flex-start;
+      }
+      .offer-card { min-height: auto; }
+      .privacy-card { position: relative; top: auto; min-height: auto; }
+      .mobile-cta { display: flex; }
+      body { padding-bottom: 82px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader-inner">
+      <div class="loader-mark"><img src="./assets/jawab-logo-mark.png" alt=""></div>
+      <div class="loader-line"><span></span></div>
+      <p>Scanning patient revenue path</p>
+    </div>
+  </div>
+
+  <div class="progress" id="progress"></div>
+  <canvas id="signal-canvas" aria-hidden="true"></canvas>
+
+  <header class="nav">
+    <a class="brand" href="#top" aria-label="Jawab home">
+      <span class="brand-logo"><img src="./assets/jawab-logo-mark.png" alt=""></span>
+      <span class="brand-name"><span>Jawab</span><span>جواب</span></span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="#leaks">Leaks</a>
+      <a href="#scanner">Score</a>
+      <a href="#recover">System</a>
+      <a href="#report">Report</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn" href="./demo.html">Watch demo</a>
+      <a class="btn primary" href="https://wa.me/971506058562?text=AUDIT%20-%20I%20want%20a%20free%20Jawab%20clinic%20leak%20check">Get free audit</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="reveal">
+        <h1>Stop losing premium patients <span>between interest and booking.</span></h1>
+        <p class="hero-copy">Jawab catches missed calls, delayed WhatsApp replies, Instagram inquiries, and post-consult drop-offs before they become someone else's revenue.</p>
+        <div class="hero-actions">
+          <a class="btn whatsapp" href="https://wa.me/971506058562?text=AUDIT%20-%20I%20want%20a%20free%20Jawab%20clinic%20leak%20check">WhatsApp AUDIT</a>
+          <a class="btn" href="./calculator.html">Estimate the leak</a>
+          <a class="btn" href="mailto:jawabsystems@gmail.com?subject=Jawab%20Audit%20Request">Email Jawab</a>
+        </div>
+        <div class="proof-strip">
+          <div class="proof"><strong>72h</strong><span>from approval to first recovery workflow live</span></div>
+          <div class="proof"><strong>14d</strong><span>guarantee to surface missed patient opportunities</span></div>
+          <div class="proof"><strong>AR/EN</strong><span>bilingual routing built for Gulf clinics</span></div>
+        </div>
+      </div>
+
+      <div class="system-stage reveal">
+        <div class="orbit"></div>
+        <div class="orbit two"></div>
+        <div class="command-center">
+          <div class="cc-top">
+            <div class="cc-title">
+              <strong>Recovery Command Center</strong>
+              <span>Live patient opportunities, routed before they cool down.</span>
+            </div>
+            <div class="cc-status"><i class="pulse-dot"></i> Live</div>
+          </div>
+          <div class="cc-grid">
+            <div class="metric-stack">
+              <div class="metric-card">
+                <span>Recovered conversations</span>
+                <strong data-count="24">0</strong>
+                <svg class="spark" viewBox="0 0 180 44" aria-hidden="true">
+                  <defs><linearGradient id="sparkGradient" x1="0" x2="1"><stop stop-color="#d4af37"/><stop offset="1" stop-color="#ff8a1f"/></linearGradient></defs>
+                  <path d="M3 36 C22 20, 34 38, 49 25 S75 20, 91 26 119 35, 135 15 160 24, 177 6"/>
+                </svg>
+              </div>
+              <div class="metric-card">
+                <span>Average response time</span>
+                <strong data-count="18">0</strong>
+                <small>seconds</small>
+                <svg class="spark" viewBox="0 0 180 44" aria-hidden="true"><path d="M3 25 C24 28, 32 24, 47 23 S74 12, 93 18 118 31, 135 23 158 18, 177 20"/></svg>
+              </div>
+              <div class="metric-card">
+                <span>At-risk value spotted</span>
+                <strong>AED <b data-count="126">0</b>k</strong>
+                <svg class="spark" viewBox="0 0 180 44" aria-hidden="true"><path d="M3 38 C28 34, 36 31, 51 28 S77 21, 95 18 119 16, 136 12 158 9, 177 5"/></svg>
+              </div>
+            </div>
+            <div class="inbox">
+              <div class="inbox-tabs"><span>New</span><span>Active</span><span>Routed</span></div>
+              <div class="message">
+                <div class="avatar">M</div>
+                <div><strong>Mariam Khaled</strong><p>Missed call. Asking for same-week veneers consultation.</p></div>
+                <em>2m</em>
+              </div>
+              <div class="message">
+                <div class="avatar">A</div>
+                <div><strong>Ahmed Hassan</strong><p>WhatsApp delayed 3h. Implant pricing question.</p></div>
+                <em>4m</em>
+              </div>
+              <div class="message">
+                <div class="avatar">S</div>
+                <div><strong>Sara Ali</strong><p>Instagram DM. Asked if Arabic consult is available.</p></div>
+                <em>7m</em>
+              </div>
+              <div class="message">
+                <div class="avatar">F</div>
+                <div><strong>Fatima Mohammed</strong><p>Post-consult quote sent. No booking follow-up yet.</p></div>
+                <em>12m</em>
+              </div>
+            </div>
+          </div>
+          <div class="handoff">
+            <span>Staff handoff</span>
+            <p><strong>Patient:</strong> Mohammed | <strong>Service:</strong> Veneers | <strong>Urgency:</strong> This week | <strong>Language:</strong> Arabic | <strong>Next:</strong> Call before 6 PM</p>
+          </div>
+          <div class="mini-report">
+            <span>This week</span>
+            <div class="bar-row"><span>Detected</span><strong>31</strong></div><div class="bar"><i style="--w: 82%"></i></div>
+            <div class="bar-row"><span>Recovered</span><strong>19</strong></div><div class="bar"><i style="--w: 64%"></i></div>
+            <div class="bar-row"><span>Booked</span><strong>7</strong></div><div class="bar"><i style="--w: 38%"></i></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="leaks">
+      <div class="section-head reveal">
+        <div>
+          <div class="section-kicker">Patient path leakage</div>
+          <h2>The clinic does not lose the patient all at once. It loses them in small delays.</h2>
+        </div>
+        <p>Jawab maps the public patient path and scores the moments where premium demand disappears before your team can turn it into treatment.</p>
+      </div>
+      <div class="leak-path reveal">
+        <svg class="path-svg" viewBox="0 0 1160 560" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 80 370 C 200 110, 380 120, 520 280 S 820 550, 1080 180"/>
+        </svg>
+        <div class="signal-runner"></div>
+        <div class="path-nodes">
+          <article class="path-node"><span class="node-index">1</span><h3>Missed call</h3><p>Patient calls during procedures or lunch. No answer, no callback, next clinic wins.</p></article>
+          <article class="path-node"><span class="node-index">2</span><h3>Slow WhatsApp</h3><p>The intent is hot for minutes, not hours. A late reply makes the clinic look unavailable.</p></article>
+          <article class="path-node"><span class="node-index">3</span><h3>Lost DM</h3><p>Instagram inquiries sit between staff attention and marketing noise.</p></article>
+          <article class="path-node"><span class="node-index">4</span><h3>Consult drop</h3><p>High-value treatment plans need structured follow-up, not hope.</p></article>
+          <article class="path-node"><span class="node-index">5</span><h3>After-hours</h3><p>Evening and weekend inquiries die silently unless the clinic has a recovery layer.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="scanner">
+      <div class="section-head reveal">
+        <div>
+          <div class="section-kicker">Leak score</div>
+          <h2>Run the clinic like a revenue system, not a pile of messages.</h2>
+        </div>
+        <p>Use the audit to turn vague anxiety into a simple score: where the money leaks, how urgent it is, and what to fix first.</p>
+      </div>
+      <div class="scanner-grid reveal">
+        <div class="scanner-panel">
+          <h3>Interactive leak estimate</h3>
+          <p>Move the clinic variables. This is not promised revenue; it is a clean way to show potential at-risk patient value.</p>
+          <div class="scanner-control">
+            <div class="field">
+              <label>Missed inquiries per week <span id="missedOut">5</span></label>
+              <input id="missed" type="range" min="1" max="15" value="5">
+            </div>
+            <div class="field">
+              <label>Average treatment value <span id="valueOut">AED 9,000</span></label>
+              <input id="value" type="range" min="2500" max="25000" step="500" value="9000">
+            </div>
+            <div class="field">
+              <label>Conservative recovery rate <span id="rateOut">18%</span></label>
+              <input id="rate" type="range" min="8" max="35" value="18">
+            </div>
+          </div>
+          <div class="risk-readout">
+            <div class="risk-inner">
+              <span>Monthly recovery opportunity</span>
+              <div class="risk-value" id="opportunity">AED 16k</div>
+              <p>Useful enough to price the sprint without making fake guarantees.</p>
+            </div>
+          </div>
+        </div>
+        <div class="scanner-panel">
+          <h3>Jawab Revenue Leak Score / 100</h3>
+          <p>The scorecard focuses outreach. We audit only the clinics where the public path clearly shows leaks and high-value intent.</p>
+          <div class="matrix">
+            <div class="matrix-row"><strong>Response speed</strong><div class="matrix-track"><div class="matrix-fill" style="--score: 78%"></div></div><span>15 pts</span></div>
+            <div class="matrix-row"><strong>WhatsApp clarity</strong><div class="matrix-track"><div class="matrix-fill" style="--score: 65%"></div></div><span>15 pts</span></div>
+            <div class="matrix-row"><strong>Missed-call recovery</strong><div class="matrix-track"><div class="matrix-fill" style="--score: 88%"></div></div><span>15 pts</span></div>
+            <div class="matrix-row"><strong>Booking CTA</strong><div class="matrix-track"><div class="matrix-fill" style="--score: 52%"></div></div><span>10 pts</span></div>
+            <div class="matrix-row"><strong>Review trust</strong><div class="matrix-track"><div class="matrix-fill" style="--score: 71%"></div></div><span>10 pts</span></div>
+            <div class="matrix-row"><strong>Arabic readiness</strong><div class="matrix-track"><div class="matrix-fill" style="--score: 59%"></div></div><span>10 pts</span></div>
+            <div class="matrix-row"><strong>AI/search visibility</strong><div class="matrix-track"><div class="matrix-fill" style="--score: 46%"></div></div><span>10 pts</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="recover">
+      <div class="section-head reveal">
+        <div>
+          <div class="section-kicker">Recovery system</div>
+          <h2>Not a chatbot. A recovery layer that keeps humans in control.</h2>
+        </div>
+        <p>Patients get fast bilingual follow-up. Staff gets clean summaries. Owners get weekly visibility.</p>
+      </div>
+      <div class="product-tabs reveal">
+        <div class="tab-list" role="tablist" aria-label="Recovery scenarios">
+          <button class="tab-btn active" data-tab="missed" type="button"><strong>Missed call recovery</strong><span>Catch patients who call and disappear.</span></button>
+          <button class="tab-btn" data-tab="whatsapp" type="button"><strong>Slow WhatsApp rescue</strong><span>Re-engage high-intent inquiries before they go cold.</span></button>
+          <button class="tab-btn" data-tab="dm" type="button"><strong>Instagram DM routing</strong><span>Turn social intent into staff action.</span></button>
+          <button class="tab-btn" data-tab="consult" type="button"><strong>Treatment plan rescue</strong><span>Follow up after quotes without sounding desperate.</span></button>
+        </div>
+        <div class="product-stage">
+          <article class="tab-panel active" data-panel="missed">
+            <div class="script-card">
+              <div>
+                <h3>The patient called. Jawab answers the silence.</h3>
+                <p>When a call is missed, the patient receives a clinic-approved WhatsApp follow-up and staff gets a callback task.</p>
+              </div>
+              <div class="arabic-line">أهلاً، حاولنا مساعدتك بخصوص موعدك. ما الخدمة التي ترغب بها، ومتى يناسبك أن يتواصل معك الفريق؟</div>
+            </div>
+            <div class="routing-card">
+              <div class="route-step"><i>1</i><div><strong>Detect</strong><span>Missed call or unanswered inquiry appears in the recovery queue.</span></div></div>
+              <div class="route-step"><i>2</i><div><strong>Recover</strong><span>Patient receives warm bilingual follow-up with no medical advice.</span></div></div>
+              <div class="route-step"><i>3</i><div><strong>Route</strong><span>Staff gets service interest, urgency, language, and next action.</span></div></div>
+            </div>
+          </article>
+          <article class="tab-panel" data-panel="whatsapp">
+            <div class="script-card">
+              <div>
+                <h3>Delayed replies become booked conversations.</h3>
+                <p>Jawab flags slow response windows and triggers a clinic-approved recovery path before the patient compares other providers.</p>
+              </div>
+              <div class="arabic-line">شكراً لتواصلك. نقدر انتظارك، هل تفضل موعد استشارة هذا الأسبوع أم مكالمة سريعة من الفريق؟</div>
+            </div>
+            <div class="routing-card">
+              <div class="route-step"><i>1</i><div><strong>Spot delay</strong><span>WhatsApp inquiry sits too long without a meaningful next step.</span></div></div>
+              <div class="route-step"><i>2</i><div><strong>Qualify</strong><span>Service, urgency, language, and booking preference are captured.</span></div></div>
+              <div class="route-step"><i>3</i><div><strong>Escalate</strong><span>Staff sees exactly who needs a human touch now.</span></div></div>
+            </div>
+          </article>
+          <article class="tab-panel" data-panel="dm">
+            <div class="script-card">
+              <div>
+                <h3>Social curiosity gets converted into clinic intent.</h3>
+                <p>Instagram DMs are treated as patient opportunities, not random inbox noise.</p>
+              </div>
+              <div class="arabic-line">يسعدنا مساعدتك. هل ترغب بمعرفة الخطوة التالية للحجز أو تفضل أن يتواصل معك منسق المرضى؟</div>
+            </div>
+            <div class="routing-card">
+              <div class="route-step"><i>1</i><div><strong>Capture</strong><span>Inquiry source and topic are logged without touching clinical records.</span></div></div>
+              <div class="route-step"><i>2</i><div><strong>Clarify</strong><span>The patient gets one clean question instead of a generic bot flow.</span></div></div>
+              <div class="route-step"><i>3</i><div><strong>Move channel</strong><span>High-intent DMs can be handed to WhatsApp or staff.</span></div></div>
+            </div>
+          </article>
+          <article class="tab-panel" data-panel="consult">
+            <div class="script-card">
+              <div>
+                <h3>The quote is not the close. The follow-up is.</h3>
+                <p>Premium treatment plans often need reassurance, timing, finance clarity, or a human callback to book.</p>
+              </div>
+              <div class="arabic-line">نحب نطمئن عليك بعد الاستشارة. هل لديك أي سؤال عن الخطة أو تفضل أن يتواصل معك الفريق لتأكيد الخطوة التالية؟</div>
+            </div>
+            <div class="routing-card">
+              <div class="route-step"><i>1</i><div><strong>Track</strong><span>Consult completed, plan sent, no booking decision yet.</span></div></div>
+              <div class="route-step"><i>2</i><div><strong>Nudge</strong><span>Follow-up is polite, specific, and clinic-approved.</span></div></div>
+              <div class="route-step"><i>3</i><div><strong>Report</strong><span>Owner sees which objections block high-ticket treatment.</span></div></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="report">
+      <div class="section-head reveal">
+        <div>
+          <div class="section-kicker">Owner intelligence</div>
+          <h2>The weekly report is the retention engine.</h2>
+        </div>
+        <p>Jawab should feel hard to cancel because it shows the owner what they could not see before: where revenue was leaking and what to fix next.</p>
+      </div>
+      <div class="report-shell reveal">
+        <div class="report-top">
+          <div>
+            <h3>Weekly Jawab Intelligence Report</h3>
+            <span>May 11-17, 2026 | Premium Dental Clinic</span>
+          </div>
+          <a class="btn" href="./deck.html">Open pitch deck</a>
+        </div>
+        <div class="report-grid">
+          <div class="report-stat"><span>Patient opportunities detected</span><strong>31</strong></div>
+          <div class="report-stat"><span>Recovered conversations</span><strong>19</strong></div>
+          <div class="report-stat"><span>Qualified leads routed</span><strong>11</strong></div>
+          <div class="report-stat"><span>Consult bookings</span><strong>7</strong></div>
+        </div>
+        <div class="recommendation">
+          <p><strong>One action:</strong> add staff coverage from 1-3 PM. Forty percent of missed inquiries happened during lunch, mostly implant and veneer patients.</p>
+          <a class="btn primary" href="https://wa.me/971506058562?text=I%20want%20to%20see%20the%20Jawab%20weekly%20report%20template">See report template</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="comparison reveal">
+        <article class="compare-card">
+          <h3>What clinics usually do</h3>
+          <div class="compare-list">
+            <div class="compare-row bad"><i>×</i><span>Buy more ads before fixing the patient path already leaking.</span></div>
+            <div class="compare-row bad"><i>×</i><span>Assume front desk remembers every missed call and consult follow-up.</span></div>
+            <div class="compare-row bad"><i>×</i><span>Look at total leads but never inspect where patients disappear.</span></div>
+            <div class="compare-row bad"><i>×</i><span>Let owners hear about problems only when revenue already dropped.</span></div>
+          </div>
+        </article>
+        <article class="compare-card">
+          <h3>What Jawab changes</h3>
+          <div class="compare-list">
+            <div class="compare-row good"><i>✓</i><span>Recover demand before buying more demand.</span></div>
+            <div class="compare-row good"><i>✓</i><span>Give patients fast Arabic-English follow-up without medical advice.</span></div>
+            <div class="compare-row good"><i>✓</i><span>Route staff only the important next action, not raw inbox chaos.</span></div>
+            <div class="compare-row good"><i>✓</i><span>Give owners a weekly decision rule for revenue leakage.</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="onboarding">
+      <div class="section-head reveal">
+        <div>
+          <div class="section-kicker">Quick onboarding</div>
+          <h2>From yes to live in 72 hours.</h2>
+        </div>
+        <p>No complex clinic software replacement. Jawab starts as a recovery layer beside your existing WhatsApp, calls, booking path, and staff process.</p>
+      </div>
+      <div class="timeline reveal">
+        <article class="timeline-step"><span>Day 0</span><h3>Approve</h3><p>Payment, agreement, privacy terms, and setup checklist.</p></article>
+        <article class="timeline-step"><span>Day 1</span><h3>Map</h3><p>Services, staff handoff, hours, languages, and approved wording.</p></article>
+        <article class="timeline-step"><span>Day 2</span><h3>Build</h3><p>Recovery scripts, tracking sheet, routing logic, and staff summary.</p></article>
+        <article class="timeline-step"><span>Day 3</span><h3>Launch</h3><p>Limited workflow goes live with human oversight and testing.</p></article>
+        <article class="timeline-step"><span>Day 7</span><h3>Report</h3><p>First mini intelligence report and bottleneck recommendation.</p></article>
+        <article class="timeline-step"><span>Day 14</span><h3>Checkpoint</h3><p>Guarantee review: did Jawab surface missed opportunities?</p></article>
+      </div>
+    </section>
+
+    <section class="section" id="pricing">
+      <div class="section-head reveal">
+        <div>
+          <div class="section-kicker">Founding clinic offer</div>
+          <h2>Simple enough to buy. Strong enough to retain.</h2>
+        </div>
+        <p>Start with Recover. Expand into Visible when the clinic is ready to own search, reviews, AI answers, and treatment-page conversion.</p>
+      </div>
+      <div class="offers reveal">
+        <article class="offer-card">
+          <h3>Jawab Audit</h3>
+          <p class="price">Free<small>Public patient path leak check.</small></p>
+          <ul>
+            <li>3-5 specific revenue leak findings</li>
+            <li>Google, website, WhatsApp, and review scan</li>
+            <li>One-page findings summary</li>
+            <li>15-minute walkthrough</li>
+          </ul>
+          <a class="btn" href="https://wa.me/971506058562?text=AUDIT%20-%20I%20want%20a%20free%20Jawab%20clinic%20leak%20check">Request audit</a>
+        </article>
+        <article class="offer-card featured">
+          <h3>Jawab Recover</h3>
+          <p class="price">AED 5,000<small>Setup includes first 30 days. AED 1,500/month after. Founding floor AED 3,500 when needed.</small></p>
+          <ul>
+            <li>Missed call and delayed WhatsApp recovery</li>
+            <li>Arabic-English qualification scripts</li>
+            <li>Staff handoff summaries</li>
+            <li>Post-consult follow-up flow</li>
+            <li>Weekly Intelligence Report</li>
+            <li>14-day opportunity guarantee</li>
+          </ul>
+          <a class="btn primary" href="https://wa.me/971506058562?text=I%20want%20Jawab%20Recover%20for%20my%20clinic">Start Recover</a>
+        </article>
+        <article class="offer-card">
+          <h3>Recover + Visible</h3>
+          <p class="price">AED 12,000<small>Setup plus AED 3,500/month for recovery and visibility tracking.</small></p>
+          <ul>
+            <li>Everything in Recover</li>
+            <li>AI/search visibility testing</li>
+            <li>Google Business and review friction audit</li>
+            <li>Treatment page recommendations</li>
+            <li>Monthly visibility scorecard</li>
+          </ul>
+          <a class="btn" href="mailto:jawabsystems@gmail.com?subject=Jawab%20Recover%20%2B%20Visible">Ask about bundle</a>
+        </article>
+      </div>
+      <div class="guarantee reveal">
+        <div class="guarantee-mark">✓</div>
+        <p><strong>14-day guarantee:</strong> if Jawab does not surface at least 5 missed patient opportunities in the first 14 days, you pay nothing. We install, monitor, and report. If the leaks are not there, you owe nothing.</p>
+        <a class="btn whatsapp" href="https://wa.me/971506058562?text=Tell%20me%20about%20the%2014-day%20Jawab%20guarantee">Ask about guarantee</a>
+      </div>
+    </section>
+
+    <section class="section" id="privacy">
+      <div class="faq-grid reveal">
+        <aside class="privacy-card">
+          <div class="section-kicker">Privacy-first</div>
+          <h3>Jawab does not diagnose, prescribe, or replace clinical judgment.</h3>
+          <p>We only handle operational routing data. The clinic owns the patient relationship and data. Case studies never expose patient details without written approval.</p>
+          <div class="data-pills">
+            <span>Name</span><span>Contact</span><span>Language</span><span>Service interest</span><span>Urgency</span><span>Callback time</span><span>Source</span><span>Next action</span>
+          </div>
+        </aside>
+        <div class="faq-list">
+          <div class="faq-item open">
+            <button class="faq-q" type="button">Is Jawab a chatbot?<span>+</span></button>
+            <div class="faq-a"><p>No. Jawab is a revenue recovery layer. It uses approved messages and routing rules to catch patient opportunities and hand them back to staff.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button">Do you replace the receptionist?<span>+</span></button>
+            <div class="faq-a"><p>No. Your team stays in control. Jawab catches overflow, delayed replies, and follow-up gaps so staff can act faster.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button">Can it handle Arabic properly?<span>+</span></button>
+            <div class="faq-a"><p>Yes. The workflow is Arabic-English by design, and patient-facing wording is approved by the clinic before anything goes live.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button">Do you need access to clinical records?<span>+</span></button>
+            <div class="faq-a"><p>No. Jawab avoids clinical records. It uses minimum operational data needed to qualify, route, and follow up.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button">What if we already have software?<span>+</span></button>
+            <div class="faq-a"><p>Great. Jawab sits beside your existing workflow and focuses on the gaps between patient intent and booked treatment.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta reveal">
+      <div>
+        <h2>Want the 60-second leak check for your clinic?</h2>
+        <p>Send AUDIT on WhatsApp. Jawab will review the public patient path and return specific leaks before any paid offer.</p>
+      </div>
+      <div class="hero-actions">
+        <a class="btn whatsapp" href="https://wa.me/971506058562?text=AUDIT%20-%20I%20want%20a%20free%20Jawab%20clinic%20leak%20check">WhatsApp AUDIT</a>
+        <a class="btn" href="https://instagram.com/getjawab">Instagram @getjawab</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Jawab Systems | Clinic revenue recovery for premium Arabic-English clinics.</span>
+    <span><a href="mailto:jawabsystems@gmail.com">jawabsystems@gmail.com</a> | <a href="https://wa.me/971506058562">+971 50 605 8562</a></span>
+  </footer>
+
+  <div class="mobile-cta">
+    <a class="btn" href="./demo.html">Demo</a>
+    <a class="btn primary" href="https://wa.me/971506058562?text=AUDIT%20-%20I%20want%20a%20free%20Jawab%20clinic%20leak%20check">Free audit</a>
+  </div>
+
+  <script>
+    const loader = document.getElementById("loader");
+    window.addEventListener("load", () => {
+      setTimeout(() => loader.classList.add("hidden"), 560);
+    });
+
+    const progress = document.getElementById("progress");
+    const setProgress = () => {
+      const scrollable = document.documentElement.scrollHeight - innerHeight;
+      const pct = scrollable > 0 ? (scrollY / scrollable) * 100 : 0;
+      progress.style.width = `${pct}%`;
+    };
+    addEventListener("scroll", setProgress, { passive: true });
+    setProgress();
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.14 });
+    document.querySelectorAll(".reveal").forEach((el) => revealObserver.observe(el));
+
+    const countObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = Number(el.dataset.count || 0);
+        const start = performance.now();
+        const run = (time) => {
+          const t = Math.min(1, (time - start) / 1200);
+          const eased = 1 - Math.pow(1 - t, 3);
+          el.textContent = Math.round(target * eased);
+          if (t < 1) requestAnimationFrame(run);
+        };
+        requestAnimationFrame(run);
+        countObserver.unobserve(el);
+      });
+    }, { threshold: 0.8 });
+    document.querySelectorAll("[data-count]").forEach((el) => countObserver.observe(el));
+
+    const missed = document.getElementById("missed");
+    const value = document.getElementById("value");
+    const rate = document.getElementById("rate");
+    const missedOut = document.getElementById("missedOut");
+    const valueOut = document.getElementById("valueOut");
+    const rateOut = document.getElementById("rateOut");
+    const opportunity = document.getElementById("opportunity");
+    const format = new Intl.NumberFormat("en-AE");
+    const updateCalc = () => {
+      const monthly = Number(missed.value) * 4.33 * Number(value.value) * (Number(rate.value) / 100);
+      missedOut.textContent = missed.value;
+      valueOut.textContent = `AED ${format.format(Number(value.value))}`;
+      rateOut.textContent = `${rate.value}%`;
+      opportunity.textContent = `AED ${Math.round(monthly / 1000)}k`;
+    };
+    [missed, value, rate].forEach((el) => el.addEventListener("input", updateCalc));
+    updateCalc();
+
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const tabPanels = document.querySelectorAll(".tab-panel");
+    tabButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const key = button.dataset.tab;
+        tabButtons.forEach((btn) => btn.classList.toggle("active", btn === button));
+        tabPanels.forEach((panel) => panel.classList.toggle("active", panel.dataset.panel === key));
+      });
+    });
+
+    document.querySelectorAll(".faq-q").forEach((button) => {
+      button.addEventListener("click", () => {
+        button.closest(".faq-item").classList.toggle("open");
+      });
+    });
+
+    const canvas = document.getElementById("signal-canvas");
+    const ctx = canvas.getContext("2d");
+    let dots = [];
+    const resizeCanvas = () => {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      canvas.width = innerWidth * dpr;
+      canvas.height = innerHeight * dpr;
+      canvas.style.width = `${innerWidth}px`;
+      canvas.style.height = `${innerHeight}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const count = Math.min(72, Math.max(32, Math.floor(innerWidth / 18)));
+      dots = Array.from({ length: count }, () => ({
+        x: Math.random() * innerWidth,
+        y: Math.random() * innerHeight,
+        vx: (Math.random() - 0.5) * 0.28,
+        vy: (Math.random() - 0.5) * 0.28,
+        r: Math.random() * 1.7 + 0.4
+      }));
+    };
+    const animateCanvas = () => {
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      dots.forEach((dot, index) => {
+        dot.x += dot.vx;
+        dot.y += dot.vy;
+        if (dot.x < 0 || dot.x > innerWidth) dot.vx *= -1;
+        if (dot.y < 0 || dot.y > innerHeight) dot.vy *= -1;
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, dot.r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(212, 175, 55, 0.34)";
+        ctx.fill();
+        for (let j = index + 1; j < dots.length; j++) {
+          const other = dots[j];
+          const dx = dot.x - other.x;
+          const dy = dot.y - other.y;
+          const distance = Math.hypot(dx, dy);
+          if (distance < 112) {
+            ctx.beginPath();
+            ctx.moveTo(dot.x, dot.y);
+            ctx.lineTo(other.x, other.y);
+            ctx.strokeStyle = `rgba(212, 175, 55, ${0.1 * (1 - distance / 112)})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      });
+      requestAnimationFrame(animateCanvas);
+    };
+    resizeCanvas();
+    animateCanvas();
+    addEventListener("resize", resizeCanvas);
+  </script>
+</body>
+</html>

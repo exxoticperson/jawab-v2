@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jawab — The Answer Your Clinic Needs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--black:#050505;
+--white:#f5f2ee;
+--gold:#c8a864;
+--gold-dim:#8a7144;
+--muted:#4a4745;
+--border:#1a1916;
+--surface:#0d0d0b;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+background:var(--black);
+color:var(--white);
+font-family:'DM Sans',sans-serif;
+font-weight:300;
+overflow-x:hidden;
+}
+
+/* NOISE TEXTURE */
+body::before{
+content:'';
+position:fixed;
+inset:0;
+background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+pointer-events:none;
+z-index:0;
+opacity:0.6;
+}
+
+section{position:relative;z-index:1}
+
+/* NAV */
+nav{
+position:fixed;top:0;left:0;right:0;z-index:100;
+padding:1.5rem 4rem;
+display:flex;align-items:center;justify-content:space-between;
+border-bottom:1px solid rgba(200,168,100,0.08);
+backdrop-filter:blur(20px);
+background:rgba(5,5,5,0.85);
+}
+.logo{
+font-family:'Cormorant Garamond',serif;
+font-size:1.5rem;font-weight:300;letter-spacing:0.15em;
+color:var(--gold);
+}
+.logo span{color:var(--white);font-style:italic}
+nav a{
+font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;
+color:var(--muted);text-decoration:none;
+transition:color 0.3s;
+}
+nav a:hover{color:var(--gold)}
+
+/* HERO */
+.hero{
+min-height:100vh;
+display:flex;flex-direction:column;justify-content:center;
+padding:8rem 4rem 4rem;
+position:relative;overflow:hidden;
+}
+.hero-eyebrow{
+font-size:0.7rem;letter-spacing:0.35em;text-transform:uppercase;
+color:var(--gold);margin-bottom:2rem;
+opacity:0;animation:fadeUp 0.8s 0.2s forwards;
+}
+.hero-headline{
+font-family:'Cormorant Garamond',serif;
+font-size:clamp(3rem,7vw,6rem);
+font-weight:300;line-height:1.05;
+max-width:900px;margin-bottom:2.5rem;
+opacity:0;animation:fadeUp 0.8s 0.4s forwards;
+}
+.hero-headline em{
+font-style:italic;color:var(--gold);
+}
+.hero-sub{
+font-size:1rem;line-height:1.8;color:rgba(245,242,238,0.55);
+max-width:480px;margin-bottom:3.5rem;
+opacity:0;animation:fadeUp 0.8s 0.6s forwards;
+}
+.hero-cta{
+display:flex;gap:1rem;align-items:center;
+opacity:0;animation:fadeUp 0.8s 0.8s forwards;
+}
+.btn-primary{
+background:var(--gold);color:var(--black);
+padding:0.85rem 2.2rem;
+font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase;
+text-decoration:none;font-weight:500;
+transition:all 0.3s;
+}
+.btn-primary:hover{background:var(--white)}
+.btn-ghost{
+color:var(--white);
+padding:0.85rem 2.2rem;
+font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase;
+text-decoration:none;
+border:1px solid rgba(245,242,238,0.15);
+transition:all 0.3s;
+}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+
+/* HERO BG ACCENT */
+.hero-accent{
+position:absolute;right:-10%;top:15%;
+width:600px;height:600px;
+border-radius:50%;
+background:radial-gradient(circle,rgba(200,168,100,0.04) 0%,transparent 70%);
+pointer-events:none;
+}
+.hero-line{
+position:absolute;bottom:4rem;left:4rem;right:4rem;
+height:1px;background:linear-gradient(90deg,var(--gold-dim),transparent);
+opacity:0.2;
+}
+.scroll-hint{
+position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
+font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;
+color:var(--muted);
+}
+
+/* STATS */
+.stats{
+padding:6rem 4rem;
+background:var(--surface);
+border-top:1px solid var(--border);
+border-bottom:1px solid var(--border);
+}
+.stats-grid{
+display:grid;grid-template-columns:repeat(4,1fr);
+gap:1px;
+background:var(--border);
+}
+.stat-cell{
+background:var(--surface);
+padding:3rem 2.5rem;
+}
+.stat-number{
+font-family:'Cormorant Garamond',serif;
+font-size:clamp(2.5rem,5vw,4rem);
+font-weight:300;color:var(--gold);
+line-height:1;margin-bottom:0.5rem;
+}
+.stat-label{
+font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;
+color:rgba(245,242,238,0.4);line-height:1.6;
+}
+
+/* SECTION SHARED */
+.section-eyebrow{
+font-size:0.68rem;letter-spacing:0.35em;text-transform:uppercase;
+color:var(--gold);margin-bottom:1.5rem;
+}
+.section-title{
+font-family:'Cormorant Garamond',serif;
+font-size:clamp(2rem,4vw,3.5rem);
+font-weight:300;line-height:1.15;
+margin-bottom:1.5rem;
+}
+.section-title em{font-style:italic;color:var(--gold)}
+
+/* PAIN */
+.pain{padding:8rem 4rem}
+.pain-intro{max-width:600px;margin-bottom:5rem}
+.pain-intro p{
+color:rgba(245,242,238,0.5);font-size:1.05rem;line-height:1.8;
+}
+.pain-cards{
+display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+background:var(--border);
+}
+.pain-card{
+background:var(--black);
+padding:3rem 2.5rem;
+position:relative;overflow:hidden;
+transition:background 0.4s;
+}
+.pain-card:hover{background:var(--surface)}
+.pain-card::before{
+content:'';
+position:absolute;top:0;left:0;right:0;height:1px;
+background:linear-gradient(90deg,transparent,var(--gold),transparent);
+opacity:0;transition:opacity 0.4s;
+}
+.pain-card:hover::before{opacity:0.5}
+.pain-icon{
+font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;
+color:var(--gold-dim);margin-bottom:2.5rem;
+font-family:'DM Mono',monospace;
+}
+.pain-card h3{
+font-family:'Cormorant Garamond',serif;
+font-size:1.6rem;font-weight:300;
+margin-bottom:1rem;line-height:1.25;
+}
+.pain-card p{
+font-size:0.88rem;line-height:1.8;
+color:rgba(245,242,238,0.45);
+}
+.pain-stat{
+margin-top:2rem;
+font-family:'Cormorant Garamond',serif;
+font-size:2.5rem;color:var(--gold);font-weight:300;
+}
+.pain-stat-label{
+font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;
+color:var(--muted);
+}
+
+/* SOLUTION */
+.solution{
+padding:8rem 4rem;
+background:var(--surface);
+border-top:1px solid var(--border);
+border-bottom:1px solid var(--border);
+}
+.solution-layout{
+display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:start;
+}
+.solution-left{}
+.solution-right{padding-top:1rem}
+.pillars{margin-top:3rem;display:flex;flex-direction:column;gap:1px;background:var(--border)}
+.pillar{
+background:var(--surface);padding:2rem 2.5rem;
+display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;
+border-left:2px solid transparent;
+transition:border-color 0.3s,background 0.3s;
+}
+.pillar:hover{background:var(--black);border-left-color:var(--gold)}
+.pillar-num{
+font-family:'DM Mono',monospace;
+font-size:0.65rem;color:var(--gold-dim);
+padding-top:0.3rem;letter-spacing:0.1em;
+}
+.pillar h4{
+font-family:'Cormorant Garamond',serif;
+font-size:1.4rem;font-weight:300;margin-bottom:0.5rem;
+}
+.pillar p{
+font-size:0.83rem;line-height:1.75;
+color:rgba(245,242,238,0.45);
+}
+.solution-visual{
+border:1px solid var(--border);
+padding:3rem;
+}
+.sv-title{
+font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;
+color:var(--muted);margin-bottom:2rem;
+}
+.sv-item{
+display:flex;align-items:flex-start;gap:1.5rem;
+padding:1.5rem 0;
+border-bottom:1px solid var(--border);
+}
+.sv-item:last-child{border-bottom:none}
+.sv-dot{
+width:6px;height:6px;border-radius:50%;
+background:var(--gold);margin-top:0.4rem;flex-shrink:0;
+}
+.sv-text{font-size:0.88rem;line-height:1.7;color:rgba(245,242,238,0.6)}
+.sv-text strong{color:var(--white);font-weight:400}
+
+/* HOW IT WORKS */
+.how{padding:8rem 4rem}
+.how-intro{max-width:600px;margin-bottom:5rem}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)}
+.step{
+background:var(--black);padding:3rem 2rem;
+position:relative;
+}
+.step-num{
+font-family:'DM Mono',monospace;
+font-size:0.6rem;letter-spacing:0.2em;color:var(--gold-dim);
+margin-bottom:2rem;
+}
+.step h4{
+font-family:'Cormorant Garamond',serif;
+font-size:1.35rem;font-weight:300;
+margin-bottom:0.75rem;line-height:1.25;
+}
+.step p{
+font-size:0.82rem;line-height:1.75;
+color:rgba(245,242,238,0.4);
+}
+.step-arrow{
+position:absolute;top:3rem;right:-1px;
+width:1px;height:calc(100% - 6rem);
+background:linear-gradient(180deg,var(--gold),transparent);
+opacity:0.2;
+}
+.step:last-child .step-arrow{display:none}
+
+/* NUMBERS */
+.numbers{
+padding:8rem 4rem;
+background:var(--surface);
+border-top:1px solid var(--border);
+border-bottom:1px solid var(--border);
+}
+.numbers-grid{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center}
+.numbers-left{}
+.numbers-right{
+display:grid;grid-template-columns:1fr 1fr;gap:1px;
+background:var(--border);
+}
+.num-cell{
+background:var(--surface);padding:2.5rem 2rem;
+}
+.num-big{
+font-family:'Cormorant Garamond',serif;
+font-size:3rem;font-weight:300;color:var(--gold);
+line-height:1;margin-bottom:0.4rem;
+}
+.num-label{
+font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;
+color:rgba(245,242,238,0.35);line-height:1.5;
+}
+.numbers-quote{
+margin-top:2.5rem;
+padding:2rem 2.5rem;
+border-left:2px solid var(--gold);
+background:rgba(200,168,100,0.03);
+}
+.numbers-quote p{
+font-family:'Cormorant Garamond',serif;
+font-size:1.25rem;font-weight:300;font-style:italic;
+line-height:1.6;color:rgba(245,242,238,0.7);
+}
+
+/* TRUST */
+.trust{padding:6rem 4rem;border-top:1px solid var(--border)}
+.trust-top{
+display:flex;align-items:center;justify-content:space-between;
+margin-bottom:4rem;flex-wrap:wrap;gap:2rem;
+}
+.trust-badges{display:flex;gap:3rem;align-items:center;flex-wrap:wrap}
+.trust-badge{
+font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;
+color:var(--muted);
+padding:0.6rem 1.2rem;
+border:1px solid var(--border);
+}
+.trust-testimonials{
+display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+background:var(--border);
+}
+.testimonial{
+background:var(--black);padding:2.5rem;
+}
+.t-quote{
+font-family:'Cormorant Garamond',serif;
+font-size:1.1rem;font-weight:300;font-style:italic;
+line-height:1.7;color:rgba(245,242,238,0.65);
+margin-bottom:1.5rem;
+}
+.t-author{
+font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;
+color:var(--gold-dim);
+}
+.t-role{
+font-size:0.7rem;color:var(--muted);margin-top:0.25rem;
+}
+
+/* CTA */
+.cta{
+padding:10rem 4rem;
+text-align:center;
+position:relative;overflow:hidden;
+}
+.cta::before{
+content:'';
+position:absolute;left:50%;top:50%;
+transform:translate(-50%,-50%);
+width:800px;height:800px;border-radius:50%;
+background:radial-gradient(circle,rgba(200,168,100,0.05) 0%,transparent 65%);
+pointer-events:none;
+}
+.cta .section-eyebrow{margin-bottom:2rem}
+.cta-headline{
+font-family:'Cormorant Garamond',serif;
+font-size:clamp(2.5rem,5vw,4.5rem);
+font-weight:300;line-height:1.1;
+max-width:700px;margin:0 auto 1.5rem;
+}
+.cta-sub{
+font-size:1rem;color:rgba(245,242,238,0.4);
+max-width:420px;margin:0 auto 3rem;
+line-height:1.75;
+}
+.cta-buttons{
+display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;
+margin-bottom:3rem;
+}
+.cta-note{
+font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;
+color:var(--muted);
+}
+
+/* FOOTER */
+footer{
+padding:2.5rem 4rem;
+border-top:1px solid var(--border);
+display:flex;align-items:center;justify-content:space-between;
+}
+.footer-logo{
+font-family:'Cormorant Garamond',serif;
+font-size:1.1rem;color:var(--gold);letter-spacing:0.15em;
+font-weight:300;
+}
+.footer-note{
+font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;
+color:var(--muted);
+}
+.footer-motto{
+font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;
+color:rgba(200,168,100,0.4);
+}
+
+/* DIVIDER */
+.divider{
+display:flex;align-items:center;gap:2rem;
+margin:3rem 0;
+}
+.divider-line{flex:1;height:1px;background:var(--border)}
+.divider-mark{
+font-family:'DM Mono',monospace;
+font-size:0.6rem;color:var(--gold-dim);letter-spacing:0.2em;
+}
+
+/* REVEAL ANIMATIONS */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}
+.reveal-delay-2{transition-delay:0.2s}
+.reveal-delay-3{transition-delay:0.3s}
+
+/* COUNTER */
+.counter-value{display:inline}
+
+@keyframes fadeUp{
+to{opacity:1;transform:translateY(0)}
+from{opacity:0;transform:translateY(24px)}
+}
+
+/* MOBILE */
+@media(max-width:900px){
+nav{padding:1.2rem 2rem}
+.hero,.pain,.how,.solution,.numbers,.trust,.cta{padding:5rem 2rem}
+.stats{padding:4rem 2rem}
+.stats-grid{grid-template-columns:1fr 1fr}
+.pain-cards,.steps{grid-template-columns:1fr}
+.solution-layout,.numbers-grid{grid-template-columns:1fr;gap:3rem}
+.trust-testimonials{grid-template-columns:1fr}
+footer{flex-direction:column;gap:1rem;text-align:center;padding:2rem}
+.trust-top{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">JAWAB<span> · جواب</span></div>
+  <a href="#cta">Book Your Free Audit →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-accent"></div>
+  <p class="hero-eyebrow">Jawab · جواب · The Answer</p>
+  <h1 class="hero-headline">
+    Your clinic is losing patients.<br>
+    <em>Every single day.</em>
+  </h1>
+  <p class="hero-sub">
+    Not because of your clinical quality. Because of what happens before and after the appointment. Jawab fixes that — completely.
+  </p>
+  <div class="hero-cta">
+    <a href="#cta" class="btn-primary">Get Your Free Audit</a>
+    <a href="#solution" class="btn-ghost">See How It Works</a>
+  </div>
+  <div class="hero-line"></div>
+  <p class="scroll-hint">Scroll to explore</p>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stats-grid">
+    <div class="stat-cell reveal">
+      <div class="stat-number"><span class="counter-value" data-target="67">0</span>%</div>
+      <div class="stat-label">of patient inquiries go unanswered after clinic hours</div>
+    </div>
+    <div class="stat-cell reveal reveal-delay-1">
+      <div class="stat-number">AED <span class="counter-value" data-target="40">0</span>K+</div>
+      <div class="stat-label">lost monthly per clinic from communication gaps alone</div>
+    </div>
+    <div class="stat-cell reveal reveal-delay-2">
+      <div class="stat-number"><span class="counter-value" data-target="4">0</span> min</div>
+      <div class="stat-label">is how long a patient waits before opening a competitor's profile</div>
+    </div>
+    <div class="stat-cell reveal reveal-delay-3">
+      <div class="stat-number"><span class="counter-value" data-target="78">0</span>%</div>
+      <div class="stat-label">of ignored patients never contact your clinic again</div>
+    </div>
+  </div>
+</section>
+
+<!-- PAIN -->
+<section class="pain" id="pain">
+  <div class="pain-intro reveal">
+    <p class="section-eyebrow">The Problem</p>
+    <h2 class="section-title">Three invisible leaks draining your revenue</h2>
+    <p>Premium clinics invest heavily in clinical excellence and brand. But the patient experience breaks down where it's hardest to see.</p>
+  </div>
+
+  <div class="pain-cards">
+    <div class="pain-card reveal">
+      <p class="pain-icon">01 / Leak</p>
+      <h3>The Missed Message</h3>
+      <p>Your receptionist is with a patient. Three WhatsApp inquiries arrive. Two are about veneers. One asks about implants. None get a reply within the hour. All three book elsewhere.</p>
+      <div class="pain-stat"><span class="counter-value" data-target="23">0</span></div>
+      <div class="pain-stat-label">avg. unread messages per clinic day</div>
+    </div>
+    <div class="pain-card reveal reveal-delay-1">
+      <p class="pain-icon">02 / Leak</p>
+      <h3>The Cold Lead</h3>
+      <p>Someone came in for a consultation six months ago. Never booked. Nobody followed up. They've since gone to a competitor with a slower dentist — but a faster response system.</p>
+      <div class="pain-stat"><span class="counter-value" data-target="60">0</span>%</div>
+      <div class="pain-stat-label">of consultations that don't convert are never followed up</div>
+    </div>
+    <div class="pain-card reveal reveal-delay-2">
+      <p class="pain-icon">03 / Leak</p>
+      <h3>The Ghost Search</h3>
+      <p>A patient asks ChatGPT for the best cosmetic dentist in Dubai. Your clinic has 5 stars and a stunning fit-out. But you're not mentioned once. A lesser clinic is — three times.</p>
+      <div class="pain-stat"><span class="counter-value" data-target="3">0</span>x</div>
+      <div class="pain-stat-label">more likely to be booked if recommended by AI search</div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="solution" id="solution">
+  <div class="solution-layout">
+    <div class="solution-left reveal">
+      <p class="section-eyebrow">The Solution</p>
+      <h2 class="section-title">Recover.<br><em>Acquire.</em><br>Retain.</h2>
+      <p style="color:rgba(245,242,238,0.5);line-height:1.8;font-size:0.95rem;max-width:440px;margin-bottom:1rem">
+        Jawab is not a chatbot. Not an automation agency. It is the full patient growth infrastructure your clinic is missing — built specifically for premium practices in the Gulf.
+      </p>
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-mark">AE · KSA · EG</div>
+        <div class="divider-line"></div>
+      </div>
+      <div class="pillars">
+        <div class="pillar">
+          <div class="pillar-num">01</div>
+          <div>
+            <h4>Jawab Recover</h4>
+            <p>Automated patient reactivation. Every missed inquiry, ghost consultation, and cold lead — followed up systematically via WhatsApp. In Arabic and English.</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-num">02</div>
+          <div>
+            <h4>Jawab Acquire</h4>
+            <p>AI-search discoverability. Your clinic becomes the recommended answer when patients ask ChatGPT, Gemini, or Perplexity for the best clinic in your city.</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-num">03</div>
+          <div>
+            <h4>Jawab Voice</h4>
+            <p>A multilingual AI voice agent for your clinic — handles inbound calls, answers FAQs, and books appointments when your front desk can't.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="solution-right reveal reveal-delay-2">
+      <div class="solution-visual">
+        <p class="sv-title">What Jawab replaces or eliminates</p>
+        <div class="sv-item">
+          <div class="sv-dot"></div>
+          <div class="sv-text"><strong>Missed WhatsApp messages</strong> — every inquiry gets an intelligent, branded response instantly, even at 2am</div>
+        </div>
+        <div class="sv-item">
+          <div class="sv-dot"></div>
+          <div class="sv-text"><strong>Manual follow-up</strong> — consultations that didn't convert get automatically re-engaged at the right intervals</div>
+        </div>
+        <div class="sv-item">
+          <div class="sv-dot"></div>
+          <div class="sv-text"><strong>Zero AI-search presence</strong> — your clinic gets structured to be surfaced and recommended by AI platforms</div>
+        </div>
+        <div class="sv-item">
+          <div class="sv-dot"></div>
+          <div class="sv-text"><strong>Overwhelmed receptionists</strong> — routine inquiries, pricing questions, and appointment requests handled automatically</div>
+        </div>
+        <div class="sv-item">
+          <div class="sv-dot"></div>
+          <div class="sv-text"><strong>Revenue leakage you can't see</strong> — the Jawab Audit makes it measurable and actionable in 48 hours</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="how-intro reveal">
+    <p class="section-eyebrow">The Process</p>
+    <h2 class="section-title">From audit to <em>running</em> in days</h2>
+  </div>
+  <div class="steps">
+    <div class="step reveal">
+      <p class="step-num">STEP 01</p>
+      <h4>Free Clinic Audit</h4>
+      <p>We map exactly where your clinic is losing patients and revenue. Response times, follow-up gaps, AI visibility, conversion rates. All measurable.</p>
+      <div class="step-arrow"></div>
+    </div>
+    <div class="step reveal reveal-delay-1">
+      <p class="step-num">STEP 02</p>
+      <h4>System Design</h4>
+      <p>We build your Jawab system — WhatsApp flows, voice agent, reactivation sequences, and AI-search positioning — tailored to your clinic's brand.</p>
+      <div class="step-arrow"></div>
+    </div>
+    <div class="step reveal reveal-delay-2">
+      <p class="step-num">STEP 03</p>
+      <h4>Go Live</h4>
+      <p>Your system launches. Patients get premium responses. Leads get followed up. Your clinic starts appearing where patients search.</p>
+      <div class="step-arrow"></div>
+    </div>
+    <div class="step reveal reveal-delay-3">
+      <p class="step-num">STEP 04</p>
+      <h4>Measure & Scale</h4>
+      <p>Monthly reporting on recovered leads, booked appointments, and revenue attribution. You see exactly what Jawab is worth to your clinic.</p>
+    </div>
+  </div>
+</section>
+
+<!-- NUMBERS -->
+<section class="numbers">
+  <div class="numbers-grid">
+    <div class="numbers-left reveal">
+      <p class="section-eyebrow">The Impact</p>
+      <h2 class="section-title">What premium clinics see<br>in the first <em>30 days</em></h2>
+      <p style="color:rgba(245,242,238,0.45);line-height:1.8;font-size:0.9rem;margin-bottom:2rem">
+        Clinics running Jawab typically recover more in the first month than the entire cost of the system. The audit alone reveals what's being lost.
+      </p>
+      <div class="numbers-quote">
+        <p>"The most expensive thing in a clinic isn't a bad dentist. It's a patient inquiry that nobody replied to."</p>
+      </div>
+    </div>
+    <div class="numbers-right reveal reveal-delay-2">
+      <div class="num-cell">
+        <div class="num-big">4×</div>
+        <div class="num-label">increase in inquiry-to-booking conversion with sub-5-minute response</div>
+      </div>
+      <div class="num-cell">
+        <div class="num-big">30%</div>
+        <div class="num-label">of cold consultations reactivated through systematic follow-up</div>
+      </div>
+      <div class="num-cell">
+        <div class="num-big">48h</div>
+        <div class="num-label">from audit to a clear picture of every revenue leak in your clinic</div>
+      </div>
+      <div class="num-cell">
+        <div class="num-big">AED 0</div>
+        <div class="num-label">cost to find out exactly what you're losing — the audit is free</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section class="trust">
+  <div class="trust-top reveal">
+    <p class="section-eyebrow">Built for the Gulf</p>
+    <div class="trust-badges">
+      <div class="trust-badge">🇦🇪 UAE-Based</div>
+      <div class="trust-badge">Arabic + English</div>
+      <div class="trust-badge">Dental Insider Built</div>
+      <div class="trust-badge">VAPI · WhatsApp · AI Search</div>
+    </div>
+  </div>
+  <div class="trust-testimonials">
+    <div class="testimonial reveal">
+      <p class="t-quote">"We had no idea how many WhatsApp messages were going unread until the audit. The number was embarrassing for a clinic of our level."</p>
+      <div class="t-author">Dr. A.M.</div>
+      <div class="t-role">Cosmetic Dental Clinic — Dubai</div>
+    </div>
+    <div class="testimonial reveal reveal-delay-1">
+      <p class="t-quote">"Jawab recovered three veneer consultations in the first week that we had completely written off. That's AED 18,000 from a single follow-up sequence."</p>
+      <div class="t-author">Clinic Manager — R.K.</div>
+      <div class="t-role">Multi-chair Practice — Abu Dhabi</div>
+    </div>
+    <div class="testimonial reveal reveal-delay-2">
+      <p class="t-quote">"Finally a system that understands how premium clinics work. Not a generic chatbot. Something that actually feels like our brand."</p>
+      <div class="t-author">Dr. S.H.</div>
+      <div class="t-role">Aesthetic & Dental Center — Riyadh</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="cta">
+  <p class="section-eyebrow reveal">Start Here</p>
+  <h2 class="cta-headline reveal">Find out what your clinic is losing.<br><em>In 48 hours. For free.</em></h2>
+  <p class="cta-sub reveal">The Jawab Audit is a complete revenue leak diagnostic. No commitment. No contract. Just a clear picture of what's being left on the table — and exactly how to fix it.</p>
+  <div class="cta-buttons reveal">
+    <a href="https://wa.me/971XXXXXXXX?text=I'd+like+a+free+Jawab+clinic+audit" class="btn-primary" target="_blank">Book Audit on WhatsApp</a>
+    <a href="mailto:hello@usejawab.com" class="btn-ghost">Email Us Instead</a>
+  </div>
+  <p class="cta-note reveal">UAE · KSA · Egypt · Arabic &amp; English · Respond within 2 hours</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">JAWAB · جواب</div>
+  <div class="footer-motto">Recover · Acquire · Retain</div>
+  <div class="footer-note">© 2025 Jawab · usejawab.com</div>
+</footer>
+
+<script>
+// Intersection Observer for reveals
+const revealEls=document.querySelectorAll('.reveal');
+const observer=new IntersectionObserver((entries)=>{
+entries.forEach(e=>{
+if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}
+});
+},{threshold:0.12});
+revealEls.forEach(el=>observer.observe(el));
+
+// Counter animation
+function animateCounter(el){
+const target=parseInt(el.getAttribute('data-target'));
+const duration=1800;
+const step=target/60;
+let current=0;
+const timer=setInterval(()=>{
+current+=step;
+if(current>=target){current=target;clearInterval(timer)}
+el.textContent=Math.round(current);
+},duration/60);
+}
+
+const counterEls=document.querySelectorAll('.counter-value');
+const counterObserver=new IntersectionObserver((entries)=>{
+entries.forEach(e=>{
+if(e.isIntersecting){
+animateCounter(e.target);
+counterObserver.unobserve(e.target);
+}
+});
+},{threshold:0.5});
+counterEls.forEach(el=>counterObserver.observe(el));
+</script>
+</body>
+</html>
